@@ -1,0 +1,20 @@
+services:
+  model-api:
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - influx
+  influx:
+    build:
+      context: ./docker/influxdb
+    hostname: influx
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - INFLUXDB_USER=${DB_USER}
+      - INFLUXDB_PASSWORD=${DB_PASSWORD}
+volumes:
+  influxdb-storage:
