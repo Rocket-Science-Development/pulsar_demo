@@ -7,7 +7,7 @@ datasources:
   url: http://influxdb:8086
   password: pass123
   user: admin
-  database: testDB
+  database: PULSAR_DATA_COLLECTION
   basicAuth: false
   basicAuthUser:
   basicAuthPassword:

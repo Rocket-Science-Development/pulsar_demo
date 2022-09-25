@@ -13,6 +13,7 @@ services:
     environment:
       - INFLUXDB_USER=${DB_USER}
       - INFLUXDB_PASSWORD=${DB_PASSWORD}
+    restart: always
   chronograf:
     image: chronograf:latest
     ports:
@@ -32,6 +33,7 @@ services:
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
+      - ./dashboards/:/etc/grafana/dashboards
     depends_on:
       - influxdb
     environment:

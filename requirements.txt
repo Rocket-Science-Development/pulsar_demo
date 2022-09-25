@@ -1,0 +1,3 @@
+git+https://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@github.com/Rocket-Science-Development/data-collection-sdk.git@feature/michael/data-capture-refactors
+git+https://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@github.com/Rocket-Science-Development/pulsar-metrics.git@features/adel/project_startup
+black
