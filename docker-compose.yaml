@@ -17,7 +17,7 @@ services:
   chronograf:
     image: chronograf:latest
     ports:
-      - '8888:8888'
+      - '8889:8888'
     volumes:
       - chronograf-storage:/var/lib/chronograf
     depends_on:

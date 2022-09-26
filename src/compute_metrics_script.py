@@ -5,7 +5,6 @@ from datetime import datetime
 from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin, DataWithPrediction
 from pulsar_metrics.analyzers.base import Analyzer
 
-logger = logging.getLogger("__main__")
 
 if __name__ == "__main__":
     # Reading reference dataset
@@ -35,7 +34,7 @@ if __name__ == "__main__":
     else:
         db_df = pd.DataFrame(dat_capture.collect().get("prediction"))
 
-    logger.info(f"Dataframe collected, df length: {len(db_df)}")
+    print(f"Dataframe collected, df length: {len(db_df)}")
 
     if len(db_df):
         # TODO: it should be changed, it's not clear why we cannot use datetime now
@@ -58,12 +57,12 @@ if __name__ == "__main__":
 
         dat_capture.push_metrics(df_result_drift)
 
-        logger.info(f"Metrics pushed to the db")
+        print(f"Metrics pushed to the db")
 
         # Add the last period to db after pushing
-        eval_timestamp_df = pd.DataFrame({"uuid": uuid.uuid4(), "timestamp": datetime.now(),
-                                          "eval_timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')}, index=[0, ])
+        eval_timestamp_df = pd.DataFrame({"uuid": uuid.uuid4(), "timestamp": datetime.utcnow(),
+                                          "eval_timestamp": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')}, index=[0, ])
         eval_timestamp_df.set_index("timestamp", inplace=True)
         dat_capture.push_eval_timestamp(eval_timestamp_df)
-        logger.info(f"Eval timestamp is updated in the db. Timestamp is: {eval_timestamp_df}")
+        print(f"Eval timestamp is updated in the db. Timestamp is: {eval_timestamp_df}")
 
