@@ -1,0 +1,2235 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "target": {
+                    "limit": 100,
+                    "matchAny": false,
+                    "tags": [],
+                    "type": "dashboard"
+                },
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 2,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "collapsed": false,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 18,
+            "panels": [],
+            "title": "Drift",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 3,
+                "x": 0,
+                "y": 1
+            },
+            "id": 26,
+            "options": {
+                "code": {
+                    "language": "plaintext",
+                    "showLineNumbers": false,
+                    "showMiniMap": false
+                },
+                "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
+                "mode": "html"
+            },
+            "pluginVersion": "9.2.5",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transparent": true,
+            "type": "text"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "Displays the statistical summary of different metrics for  a given feature.",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-GrYlRd"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "displayMode": "color-background",
+                        "inspect": false,
+                        "minWidth": 150,
+                        "width": 150
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                            {
+                                "color": "dark-purple",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Max"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.displayMode",
+                                "value": "auto"
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Min"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.displayMode",
+                                "value": "auto"
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Field"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.displayMode",
+                                "value": "auto"
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Distinct Count"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 128
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 3,
+                "y": 1
+            },
+            "id": 27,
+            "options": {
+                "footer": {
+                    "enablePagination": true,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true,
+                "sortBy": []
+            },
+            "pluginVersion": "9.2.5",
+            "targets": [
+                {
+                    "alias": "CvM",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Levene",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'levene' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "B",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Ttest",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ttest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "C",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Bftest",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'bftest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "D",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Ks_2samp",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ks_2samp' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "E",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Manwu",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'manwu' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "F",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Wasserstein",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "G",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Summary",
+            "transformations": [
+                {
+                    "id": "reduce",
+                    "options": {
+                        "reducers": [
+                            "max",
+                            "min",
+                            "changeCount",
+                            "distinctCount"
+                        ]
+                    }
+                }
+            ],
+            "transparent": true,
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-RdYlGr"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Wasserstein"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "green",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "CvM"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "semi-dark-red",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Bftest"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "yellow",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Manwu"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "blue",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Ks_2samp"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "orange",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Ttest"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "dark-purple",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Levene"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 9,
+                "x": 15,
+                "y": 1
+            },
+            "id": 28,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "alias": "CvM",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Wasserstein",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "B",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Bftest",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'bftest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "C",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Manwu",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'manwu' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "D",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Ks_2samp",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ks_2samp' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "E",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Ttest",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ttest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "F",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "Levene",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'levene' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "G",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Comparison",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 8
+            },
+            "id": 24,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'bftest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Bftest",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 6,
+                "y": 8
+            },
+            "id": 19,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "9.1.6",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ttest' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Ttest",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 8
+            },
+            "id": 22,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "9.2.5",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'manwu' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Manwu",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 8
+            },
+            "id": 20,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ks_2samp' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "KS_2samp",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 16
+            },
+            "id": 14,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Wasserstein",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 6,
+                "y": 16
+            },
+            "id": 23,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "9.1.6",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'levene' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Levene",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 16
+            },
+            "id": 21,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'kl' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "KL",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "continuous-BlPu"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 16
+            },
+            "id": 25,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "CvM",
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "collapsed": true,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 24
+            },
+            "id": 16,
+            "panels": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 0,
+                        "y": 32
+                    },
+                    "id": 6,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'precision'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "Precision",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 12,
+                        "y": 32
+                    },
+                    "id": 9,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'precision'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "Precision",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 0,
+                        "y": 47
+                    },
+                    "id": 5,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'recall'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "Recall",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 12,
+                        "y": 47
+                    },
+                    "id": 8,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'f1'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "F1",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 0,
+                        "y": 62
+                    },
+                    "id": 7,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'brier'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "Brier",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 12,
+                        "y": 62
+                    },
+                    "id": 11,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'brier'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "Brier",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 0,
+                        "y": 77
+                    },
+                    "id": 10,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'mae'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "MAE",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 12,
+                        "y": 77
+                    },
+                    "id": 12,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'mape'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "MAPE",
+                    "type": "timeseries"
+                },
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "fieldConfig": {
+                        "defaults": {
+                            "color": {
+                                "mode": "palette-classic"
+                            },
+                            "custom": {
+                                "axisCenteredZero": false,
+                                "axisColorMode": "text",
+                                "axisLabel": "",
+                                "axisPlacement": "auto",
+                                "barAlignment": 0,
+                                "drawStyle": "line",
+                                "fillOpacity": 0,
+                                "gradientMode": "none",
+                                "hideFrom": {
+                                    "legend": false,
+                                    "tooltip": false,
+                                    "viz": false
+                                },
+                                "lineInterpolation": "linear",
+                                "lineWidth": 1,
+                                "pointSize": 5,
+                                "scaleDistribution": {
+                                    "type": "linear"
+                                },
+                                "showPoints": "auto",
+                                "spanNulls": false,
+                                "stacking": {
+                                    "group": "A",
+                                    "mode": "none"
+                                },
+                                "thresholdsStyle": {
+                                    "mode": "off"
+                                }
+                            },
+                            "mappings": [],
+                            "thresholds": {
+                                "mode": "absolute",
+                                "steps": [
+                                    {
+                                        "color": "green"
+                                    },
+                                    {
+                                        "color": "red",
+                                        "value": 80
+                                    }
+                                ]
+                            }
+                        },
+                        "overrides": []
+                    },
+                    "gridPos": {
+                        "h": 15,
+                        "w": 12,
+                        "x": 0,
+                        "y": 92
+                    },
+                    "id": 13,
+                    "options": {
+                        "legend": {
+                            "calcs": [],
+                            "displayMode": "list",
+                            "placement": "bottom",
+                            "showLegend": true
+                        },
+                        "tooltip": {
+                            "mode": "single",
+                            "sort": "none"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "datasource": {
+                                "type": "influxdb",
+                                "uid": "PB6B4F2F1C736D27A"
+                            },
+                            "query": "SELECT value FROM metrics_db where type = '$type' and feature = '$feature_name' and metric_name = 'r2'",
+                            "rawQuery": true,
+                            "refId": "A",
+                            "resultFormat": "time_series"
+                        }
+                    ],
+                    "title": "R2",
+                    "type": "timeseries"
+                }
+            ],
+            "title": "Perfomence",
+            "type": "row"
+        }
+    ],
+    "refresh": false,
+    "schemaVersion": 37,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": [
+            {
+                "current": {
+                    "selected": true,
+                    "text": "drift",
+                    "value": "drift"
+                },
+                "description": "Type of the metric",
+                "hide": 0,
+                "includeAll": false,
+                "label": "Type",
+                "multi": false,
+                "name": "type",
+                "options": [
+                    {
+                        "selected": true,
+                        "text": "drift",
+                        "value": "drift"
+                    }
+                ],
+                "query": "drift",
+                "queryValue": "",
+                "skipUrlSync": false,
+                "type": "custom"
+            },
+            {
+                "current": {
+                    "selected": false,
+                    "text": "age",
+                    "value": "age"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"feature\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "label": "Feature Name",
+                "multi": false,
+                "name": "feature_name",
+                "options": [],
+                "query": "SELECT distinct(\"feature\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": false,
+                    "text": "1",
+                    "value": "1"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "label": "Model Id",
+                "multi": false,
+                "name": "model_id",
+                "options": [],
+                "query": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": false,
+                    "text": "2",
+                    "value": "2"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "label": "Model Version",
+                "multi": false,
+                "name": "model_version",
+                "options": [],
+                "query": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            }
+        ]
+    },
+    "time": {
+        "from": "2022-09-26T14:04:03.556Z",
+        "to": "2022-11-21T02:42:43.545Z"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Drift Dashboard",
+    "uid": "y4-ZCkG4k",
+    "version": 11,
+    "weekStart": ""
+}
