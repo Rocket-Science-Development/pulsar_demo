@@ -1,13 +1,13 @@
 apiVersion: 1
 
 providers:
-  - name: 'Influx DB'
+  - name: "Influx DB"
     orgId: 1
-    folder: 'Metrics'
+    folder: "Metrics"
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
-    allowUiUpdates: false
+    allowUiUpdates: true
     options:
       path: /etc/grafana/dashboards
       foldersFromFilesStructure: true
