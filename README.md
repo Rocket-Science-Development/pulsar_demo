@@ -6,7 +6,7 @@ on dashboards.
 
 <h3>Getting started</h3><hr/>
 
-####Components:
+<h4>Components:</h4>
 There are several components in pulsar-demo: grafana dashboards,
 model, script for metrics computing, script for making fake data (you can push own data instead),
 influx database image, docker-compose file what combines everything together, crontab bash script
