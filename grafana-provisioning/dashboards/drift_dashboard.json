@@ -24,7 +24,6 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 2,
     "links": [],
     "liveNow": false,
     "panels": [
@@ -91,7 +90,7 @@
                     },
                     "custom": {
                         "align": "auto",
-                        "displayMode": "color-background",
+                        "displayMode": "lcd-gauge",
                         "inspect": false,
                         "minWidth": 150,
                         "width": 150
@@ -163,7 +162,7 @@
                 ]
             },
             "gridPos": {
-                "h": 7,
+                "h": 8,
                 "w": 12,
                 "x": 3,
                 "y": 1
@@ -264,6 +263,18 @@
                     "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
                     "rawQuery": true,
                     "refId": "G",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "KL",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'kl' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "H",
                     "resultFormat": "time_series"
                 }
             ],
@@ -447,7 +458,7 @@
                 ]
             },
             "gridPos": {
-                "h": 7,
+                "h": 8,
                 "w": 9,
                 "x": 15,
                 "y": 1
@@ -615,7 +626,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 8
+                "y": 9
             },
             "id": 24,
             "options": {
@@ -707,7 +718,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 8
+                "y": 9
             },
             "id": 19,
             "options": {
@@ -800,7 +811,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 8
+                "y": 9
             },
             "id": 22,
             "options": {
@@ -894,7 +905,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 8
+                "y": 9
             },
             "id": 20,
             "options": {
@@ -986,7 +997,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 16
+                "y": 17
             },
             "id": 14,
             "options": {
@@ -1078,7 +1089,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 16
+                "y": 17
             },
             "id": 23,
             "options": {
@@ -1118,7 +1129,7 @@
             "fieldConfig": {
                 "defaults": {
                     "color": {
-                        "mode": "palette-classic"
+                        "mode": "continuous-BlPu"
                     },
                     "custom": {
                         "axisCenteredZero": false,
@@ -1127,15 +1138,15 @@
                         "axisPlacement": "auto",
                         "barAlignment": 0,
                         "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
                         "hideFrom": {
                             "legend": false,
                             "tooltip": false,
                             "viz": false
                         },
-                        "lineInterpolation": "linear",
-                        "lineWidth": 1,
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
                         "pointSize": 5,
                         "scaleDistribution": {
                             "type": "linear"
@@ -1171,7 +1182,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 16
+                "y": 17
             },
             "id": 21,
             "options": {
@@ -1199,6 +1210,7 @@
                 }
             ],
             "title": "KL",
+            "transparent": true,
             "type": "timeseries"
         },
         {
@@ -1262,7 +1274,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 16
+                "y": 17
             },
             "id": 25,
             "options": {
@@ -1299,7 +1311,7 @@
                 "h": 1,
                 "w": 24,
                 "x": 0,
-                "y": 24
+                "y": 25
             },
             "id": 16,
             "panels": [
@@ -2230,6 +2242,6 @@
     "timezone": "",
     "title": "Drift Dashboard",
     "uid": "y4-ZCkG4k",
-    "version": 11,
+    "version": 13,
     "weekStart": ""
 }
