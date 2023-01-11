@@ -1,0 +1,309 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "target": {
+                    "limit": 100,
+                    "matchAny": false,
+                    "tags": [],
+                    "type": "dashboard"
+                },
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 4,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "code": {
+                    "language": "plaintext",
+                    "showLineNumbers": false,
+                    "showMiniMap": false
+                },
+                "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
+                "mode": "html"
+            },
+            "pluginVersion": "9.2.5",
+            "transparent": true,
+            "type": "text"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "displayMode": "auto",
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 16,
+                "w": 20,
+                "x": 4,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "footer": {
+                    "enablePagination": true,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "frameIndex": 1,
+                "showHeader": true
+            },
+            "pluginVersion": "9.2.5",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT feature, value FROM metrics where type = 'drift' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "table"
+                }
+            ],
+            "title": "Feature Summary",
+            "transformations": [
+                {
+                    "id": "extractFields",
+                    "options": {
+                        "format": "auto",
+                        "replace": false,
+                        "source": "value"
+                    }
+                },
+                {
+                    "id": "groupBy",
+                    "options": {
+                        "fields": {
+                            "feature": {
+                                "aggregations": [],
+                                "operation": "groupby"
+                            },
+                            "value": {
+                                "aggregations": [
+                                    "max",
+                                    "min",
+                                    "range",
+                                    "distinctCount",
+                                    "changeCount"
+                                ],
+                                "operation": "aggregate"
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "ChangeAmt",
+                        "binary": {
+                            "left": "value (range)",
+                            "operator": "/",
+                            "reducer": "sum",
+                            "right": "value (max)"
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "calculateField",
+                    "options": {
+                        "alias": "FeatureChange%",
+                        "binary": {
+                            "left": "ChangeAmt",
+                            "operator": "*",
+                            "reducer": "sum",
+                            "right": "100"
+                        },
+                        "mode": "binary",
+                        "reduce": {
+                            "reducer": "sum"
+                        }
+                    }
+                },
+                {
+                    "id": "organize",
+                    "options": {
+                        "excludeByName": {
+                            "ChangeAmt": true,
+                            "value (range)": true
+                        },
+                        "indexByName": {
+                            "ChangeAmt": 7,
+                            "FeatureChange%": 4,
+                            "feature": 0,
+                            "value (changeCount)": 6,
+                            "value (distinctCount)": 5,
+                            "value (max)": 1,
+                            "value (min)": 2,
+                            "value (range)": 3
+                        },
+                        "renameByName": {
+                            "feature": "Feature",
+                            "value (changeCount)": "ChangeCount",
+                            "value (distinctCount)": "DistinctCount",
+                            "value (max)": "Max",
+                            "value (min)": "Min"
+                        }
+                    }
+                }
+            ],
+            "transparent": true,
+            "type": "table"
+        }
+    ],
+    "refresh": false,
+    "schemaVersion": 37,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": [
+            {
+                "current": {
+                    "selected": true,
+                    "text": "manwu",
+                    "value": "manwu"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"metric_name\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "multi": false,
+                "name": "metric_name",
+                "options": [],
+                "query": "SELECT distinct(\"metric_name\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": true,
+                    "text": "1",
+                    "value": "1"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "multi": false,
+                "name": "model_id",
+                "options": [],
+                "query": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            },
+            {
+                "current": {
+                    "selected": true,
+                    "text": "2",
+                    "value": "2"
+                },
+                "datasource": {
+                    "type": "influxdb",
+                    "uid": "PB6B4F2F1C736D27A"
+                },
+                "definition": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+                "hide": 0,
+                "includeAll": false,
+                "multi": false,
+                "name": "model_version",
+                "options": [],
+                "query": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+                "refresh": 1,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "type": "query"
+            },
+            {
+                "hide": 2,
+                "name": "type",
+                "query": "drift",
+                "skipUrlSync": false,
+                "type": "constant"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "DriftSummaryDashboard",
+    "uid": "663ynapVk",
+    "version": 6,
+    "weekStart": ""
+}
