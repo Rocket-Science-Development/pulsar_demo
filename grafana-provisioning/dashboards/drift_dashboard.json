@@ -37,6 +37,18 @@
             "tooltip": "",
             "type": "link",
             "url": "http://localhost:3000/d/663ynapVk/driftsummarydashboard?orgId=1"
+        },
+        {
+            "asDropdown": false,
+            "icon": "doc",
+            "includeVars": false,
+            "keepTime": false,
+            "tags": [],
+            "targetBlank": true,
+            "title": "GitHub",
+            "tooltip": "",
+            "type": "link",
+            "url": "https://github.com/Rocket-Science-Development/pulsar_demo"
         }
     ],
     "liveNow": false,
@@ -75,7 +87,7 @@
                 "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
                 "mode": "html"
             },
-            "pluginVersion": "9.2.5",
+            "pluginVersion": "9.3.2",
             "targets": [
                 {
                     "datasource": {
@@ -90,6 +102,596 @@
             ],
             "transparent": true,
             "type": "text"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "dark-purple",
+                        "mode": "fixed"
+                    },
+                    "displayName": "Max:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 4,
+                "y": 1
+            },
+            "id": 31,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "max"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version'",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "dark-purple",
+                        "mode": "fixed"
+                    },
+                    "displayName": "Min:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 7,
+                "y": 1
+            },
+            "id": 32,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "min"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version' ",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "dark-purple",
+                        "mode": "fixed"
+                    },
+                    "displayName": "Mean:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 10,
+                "y": 1
+            },
+            "id": 33,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version' ",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "Time Series graphs for all metrics for the selected Feature. ",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "purple",
+                        "mode": "fixed"
+                    },
+                    "custom": {
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 3,
+                        "pointSize": 10,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "spanNulls": true,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "links": [],
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byRegexp",
+                            "options": "/TRUE$/"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "blue",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byRegexp",
+                            "options": "/FALSE$/"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "green",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 11,
+                "w": 9,
+                "x": 15,
+                "y": 1
+            },
+            "id": 28,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "targets": [
+                {
+                    "alias": "$feature_name-Prediction=TRUE",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT $feature_name FROM prediction where y_pred =1",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "$feature_name-Prediction=FALSE",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT $feature_name FROM prediction where y_pred =0",
+                    "rawQuery": true,
+                    "refId": "B",
+                    "resultFormat": "time_series"
+                },
+                {
+                    "alias": "$feature_name-Moving Avg",
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "hide": false,
+                    "query": "SELECT moving_average(mean($feature_name), 2) FROM prediction WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+                    "rawQuery": true,
+                    "refId": "D",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "title": "Comparison",
+            "transformations": [],
+            "transparent": true,
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#9678d4",
+                        "mode": "fixed"
+                    },
+                    "displayName": "Std Dev:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 4,
+                "y": 5
+            },
+            "id": 35,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "stdDev"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version' ",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#9678d4",
+                        "mode": "fixed"
+                    },
+                    "displayName": "Variance:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 7,
+                "y": 5
+            },
+            "id": 34,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "variance"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version' ",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "influxdb",
+                "uid": "PB6B4F2F1C736D27A"
+            },
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#9678d4",
+                        "mode": "fixed"
+                    },
+                    "displayName": "# Metrics Drifted:",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 3,
+                "x": 10,
+                "y": 5
+            },
+            "id": 36,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {
+                    "titleSize": 20,
+                    "valueSize": 45
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "9.3.2",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "influxdb",
+                        "uid": "PB6B4F2F1C736D27A"
+                    },
+                    "query": "SELECT COUNT(DISTINCT(metric_name)) FROM metrics WHERE status='True' AND type = '$type' and feature = '$feature_name' and model_id = '$model_id' and model_version = '$model_version' ",
+                    "rawQuery": true,
+                    "refId": "A",
+                    "resultFormat": "time_series"
+                }
+            ],
+            "transformations": [],
+            "transparent": true,
+            "type": "stat"
         },
         {
             "datasource": {
@@ -119,10 +721,10 @@
                 "overrides": []
             },
             "gridPos": {
-                "h": 2,
-                "w": 6,
-                "x": 3,
-                "y": 1
+                "h": 3,
+                "w": 3,
+                "x": 4,
+                "y": 9
             },
             "id": 29,
             "options": {
@@ -139,7 +741,7 @@
                 },
                 "textMode": "auto"
             },
-            "pluginVersion": "9.2.5",
+            "pluginVersion": "9.3.2",
             "targets": [
                 {
                     "datasource": {
@@ -184,10 +786,10 @@
                 "overrides": []
             },
             "gridPos": {
-                "h": 2,
-                "w": 6,
-                "x": 9,
-                "y": 1
+                "h": 3,
+                "w": 3,
+                "x": 7,
+                "y": 9
             },
             "id": 30,
             "options": {
@@ -204,7 +806,7 @@
                 },
                 "textMode": "auto"
             },
-            "pluginVersion": "9.2.5",
+            "pluginVersion": "9.3.2",
             "targets": [
                 {
                     "datasource": {
@@ -226,574 +828,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "continuous-RdYlGr"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "barAlignment": 0,
-                        "drawStyle": "line",
-                        "fillOpacity": 20,
-                        "gradientMode": "scheme",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineInterpolation": "smooth",
-                        "lineWidth": 3,
-                        "pointSize": 5,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "auto",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": [
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Wasserstein"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "green",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "CvM"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "semi-dark-red",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Bftest"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "yellow",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Manwu"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "blue",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Ks_2samp"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "orange",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Ttest"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "fixedColor": "dark-purple",
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Levene"
-                        },
-                        "properties": [
-                            {
-                                "id": "color",
-                                "value": {
-                                    "mode": "fixed"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            },
-            "gridPos": {
-                "h": 10,
-                "w": 9,
-                "x": 15,
-                "y": 1
-            },
-            "id": 28,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                }
-            },
-            "targets": [
-                {
-                    "alias": "CvM",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "A",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Wasserstein",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "B",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Bftest",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'bftest' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "C",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Manwu",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'manwu' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "D",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Ks_2samp",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ks_2samp' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "E",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Ttest",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ttest' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "F",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Levene",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'levene' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "G",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'kl' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "H",
-                    "resultFormat": "time_series"
-                }
-            ],
-            "title": "Comparison",
-            "transparent": true,
-            "type": "timeseries"
-        },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "PB6B4F2F1C736D27A"
-            },
-            "description": "Displays the statistical summary of different metrics for  a given feature.",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "continuous-GrYlRd"
-                    },
-                    "custom": {
-                        "align": "auto",
-                        "displayMode": "lcd-gauge",
-                        "inspect": false,
-                        "minWidth": 150,
-                        "width": 150
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "percentage",
-                        "steps": [
-                            {
-                                "color": "dark-purple",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": [
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Max"
-                        },
-                        "properties": [
-                            {
-                                "id": "custom.displayMode",
-                                "value": "auto"
-                            },
-                            {
-                                "id": "custom.width",
-                                "value": 134
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Min"
-                        },
-                        "properties": [
-                            {
-                                "id": "custom.displayMode",
-                                "value": "auto"
-                            },
-                            {
-                                "id": "custom.width",
-                                "value": 134
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Field"
-                        },
-                        "properties": [
-                            {
-                                "id": "custom.displayMode",
-                                "value": "auto"
-                            },
-                            {
-                                "id": "custom.width",
-                                "value": 135
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Distinct Count"
-                        },
-                        "properties": [
-                            {
-                                "id": "custom.width",
-                                "value": 128
-                            }
-                        ]
-                    },
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Metric Change%"
-                        },
-                        "properties": [
-                            {
-                                "id": "custom.displayMode",
-                                "value": "auto"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 12,
-                "x": 3,
-                "y": 3
-            },
-            "id": 27,
-            "options": {
-                "footer": {
-                    "enablePagination": true,
-                    "fields": "",
-                    "reducer": [
-                        "sum"
-                    ],
-                    "show": false
-                },
-                "showHeader": true,
-                "sortBy": []
-            },
-            "pluginVersion": "9.2.5",
-            "targets": [
-                {
-                    "alias": "CvM",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "A",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Levene",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'levene' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "B",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Ttest",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ttest' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "C",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Bftest",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'bftest' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "D",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Ks_2samp",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'ks_2samp' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "E",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Manwu",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'manwu' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "F",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "Wasserstein",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'wasserstein' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "G",
-                    "resultFormat": "time_series"
-                },
-                {
-                    "alias": "KL",
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "PB6B4F2F1C736D27A"
-                    },
-                    "hide": false,
-                    "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'kl' and model_id = '$model_id' and model_version = '$model_version'",
-                    "rawQuery": true,
-                    "refId": "H",
-                    "resultFormat": "time_series"
-                }
-            ],
-            "title": "Summary",
-            "transformations": [
-                {
-                    "id": "reduce",
-                    "options": {
-                        "reducers": [
-                            "max",
-                            "min",
-                            "changeCount",
-                            "distinctCount",
-                            "range"
-                        ]
-                    }
-                },
-                {
-                    "id": "calculateField",
-                    "options": {
-                        "alias": "Drift",
-                        "binary": {
-                            "left": "Range",
-                            "operator": "/",
-                            "reducer": "sum",
-                            "right": "Max"
-                        },
-                        "mode": "binary",
-                        "reduce": {
-                            "reducer": "sum"
-                        }
-                    }
-                },
-                {
-                    "id": "calculateField",
-                    "options": {
-                        "alias": "Metric Change%",
-                        "binary": {
-                            "left": "Drift",
-                            "operator": "*",
-                            "reducer": "sum",
-                            "right": "100"
-                        },
-                        "mode": "binary",
-                        "reduce": {
-                            "reducer": "sum"
-                        },
-                        "replaceFields": false
-                    }
-                },
-                {
-                    "id": "organize",
-                    "options": {
-                        "excludeByName": {
-                            "Drift": true,
-                            "Range": true
-                        },
-                        "indexByName": {},
-                        "renameByName": {}
-                    }
-                }
-            ],
-            "transparent": true,
-            "type": "table"
-        },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "PB6B4F2F1C736D27A"
-            },
+            "description": "Brown Forsythe test metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -829,6 +864,13 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=bftest"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
@@ -850,7 +892,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 11
+                "y": 12
             },
             "id": 24,
             "options": {
@@ -877,7 +919,7 @@
                     "resultFormat": "time_series"
                 }
             ],
-            "title": "Bftest",
+            "title": "Brown Forsythe Test",
             "transparent": true,
             "type": "timeseries"
         },
@@ -886,6 +928,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Ttest metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -921,6 +964,13 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ttest"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
@@ -942,7 +992,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 11
+                "y": 12
             },
             "id": 19,
             "options": {
@@ -979,6 +1029,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Manwu metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1014,6 +1065,13 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=manwu"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
@@ -1035,7 +1093,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 11
+                "y": 12
             },
             "id": 22,
             "options": {
@@ -1072,7 +1130,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
-            "description": "",
+            "description": "Kolmogorov Smirnov metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1108,6 +1166,13 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ks_2samp"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
@@ -1129,7 +1194,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 11
+                "y": 12
             },
             "id": 20,
             "options": {
@@ -1156,7 +1221,7 @@
                     "resultFormat": "time_series"
                 }
             ],
-            "title": "KS_2samp",
+            "title": "Kolmogorov Smirnov",
             "transparent": true,
             "type": "timeseries"
         },
@@ -1165,6 +1230,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Wasserstein metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1200,12 +1266,20 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=wasserstein"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green"
+                                "color": "green",
+                                "value": null
                             },
                             {
                                 "color": "red",
@@ -1220,7 +1294,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 19
+                "y": 20
             },
             "id": 14,
             "options": {
@@ -1256,6 +1330,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Levene metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1291,12 +1366,20 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=levene"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green"
+                                "color": "green",
+                                "value": null
                             },
                             {
                                 "color": "red",
@@ -1311,7 +1394,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 19
+                "y": 20
             },
             "id": 23,
             "options": {
@@ -1348,6 +1431,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Kullback-Leibler metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1383,12 +1467,20 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=kl"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green"
+                                "color": "green",
+                                "value": null
                             },
                             {
                                 "color": "red",
@@ -1403,7 +1495,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 19
+                "y": 20
             },
             "id": 21,
             "options": {
@@ -1430,7 +1522,7 @@
                     "resultFormat": "time_series"
                 }
             ],
-            "title": "KL",
+            "title": "Kullback-Leibler",
             "transparent": true,
             "type": "timeseries"
         },
@@ -1439,6 +1531,7 @@
                 "type": "influxdb",
                 "uid": "PB6B4F2F1C736D27A"
             },
+            "description": "Cramer-von Mises metric corresponding to the Feature - $feature_name. Click on the data points to navigate to more detailed view.",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -1474,12 +1567,20 @@
                             "mode": "off"
                         }
                     },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "DriftDetailDashboard",
+                            "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=CvM"
+                        }
+                    ],
                     "mappings": [],
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [
                             {
-                                "color": "green"
+                                "color": "green",
+                                "value": null
                             },
                             {
                                 "color": "red",
@@ -1494,7 +1595,7 @@
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 19
+                "y": 20
             },
             "id": 25,
             "options": {
@@ -1521,7 +1622,7 @@
                     "resultFormat": "time_series"
                 }
             ],
-            "title": "CvM",
+            "title": "Cramer-von Mises",
             "transparent": true,
             "type": "timeseries"
         },
@@ -1531,7 +1632,7 @@
                 "h": 1,
                 "w": 24,
                 "x": 0,
-                "y": 27
+                "y": 28
             },
             "id": 16,
             "panels": [
@@ -2358,7 +2459,7 @@
         "list": [
             {
                 "current": {
-                    "selected": true,
+                    "selected": false,
                     "text": "drift",
                     "value": "drift"
                 },
@@ -2384,8 +2485,8 @@
                 "allValue": "",
                 "current": {
                     "selected": false,
-                    "text": "age",
-                    "value": "age"
+                    "text": "bgr",
+                    "value": "bgr"
                 },
                 "datasource": {
                     "type": "influxdb",
@@ -2464,7 +2565,7 @@
                     "uid": "PB6B4F2F1C736D27A"
                 },
                 "definition": "SELECT distinct(\"metric_name\") FROM metrics where type = '$type'",
-                "hide": 0,
+                "hide": 2,
                 "includeAll": false,
                 "label": "Metric Name",
                 "multi": false,
@@ -2480,13 +2581,13 @@
         ]
     },
     "time": {
-        "from": "2022-09-26T14:04:03.556Z",
-        "to": "2022-11-21T02:42:43.545Z"
+        "from": "now-2d",
+        "to": "now"
     },
     "timepicker": {},
     "timezone": "",
     "title": "Drift Dashboard",
     "uid": "y4-ZCkG4k",
-    "version": 20,
+    "version": 16,
     "weekStart": ""
 }
