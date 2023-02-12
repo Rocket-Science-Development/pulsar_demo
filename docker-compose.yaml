@@ -1,45 +1,35 @@
 services:
-  compute-metrics:
-    build: .
-    links:
-      - influxdb
   influxdb:
-    build:
-      context: ./docker/influxdb
+    image: "influxdb:2.6.1"
+    env_file:
+      - ./env_files/influxv2.env
+    volumes:
+      # Mount for influxdb data directory and configuration
+      - influxdbv2:/var/lib/influxdb2:rw
     ports:
       - "8086:8086"
-    volumes:
-      - influxdb-storage:/var/lib/influxdb
-    environment:
-      - INFLUXDB_USER=${DB_USER}
-      - INFLUXDB_PASSWORD=${DB_PASSWORD}
-    restart: always
-  chronograf:
-    image: chronograf:latest
-    ports:
-      - '8889:8888'
-    volumes:
-      - chronograf-storage:/var/lib/chronograf
-    depends_on:
-      - influxdb
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_USERNAME=${DB_USER}
-      - INFLUXDB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - influxdb-net
   grafana:
-    image: grafana/grafana:latest
+    image: "grafana/grafana:latest"
+    networks:
+      - influxdb-net
     ports:
       - '3000:3000'
+    depends_on:
+      - influxdb
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
       - ./dashboards/:/etc/grafana/dashboards
-    depends_on:
-      - influxdb
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    env_file:
+      - ./env_files/grafana.env
+      - ./env_files/influxv2.env
+
 volumes:
-  influxdb-storage:
-  chronograf-storage:
+  influxdbv2:
+    driver: local
   grafana-storage:
+    driver: local
+networks:
+  influxdb-net: {}
