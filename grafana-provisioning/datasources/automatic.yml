@@ -1,24 +1,24 @@
 apiVersion: 1
 
 datasources:
-- name: MYINFLUXDB
-  type: influxdb
-  access: proxy
-  url: http://influxdb:8086
-  password: pass123
-  user: admin
-  database: PULSAR_DATA_COLLECTION
-  basicAuth: false
-  basicAuthUser:
-  basicAuthPassword:
-  withCredentials:
-  isDefault: true
-  jsonData:
-     tlsAuth: false
-     tlsAuthWithCACert: false
-  secureJsonData:
-    tlsCACert: ""
-    tlsClientCert: ""
-    tlsClientKey: ""
-  version: 1
-  editable: true
+  - name: influxdbv2.x
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    password: $DOCKER_INFLUXDB_INIT_PASSWORD
+    user: $DOCKER_INFLUXDB_INIT_USERNAME
+    database: $DOCKER_INFLUXDB_INIT_BUCKET
+    basicAuth: false
+    basicAuthUser:
+    basicAuthPassword:
+    withCredentials:
+    isDefault: true
+    jsonData:
+      tlsAuth: false
+      tlsAuthWithCACert: false
+    secureJsonData:
+      tlsCACert: ""
+      tlsClientCert: ""
+      tlsClientKey: ""
+    version: 1
+    editable: false
