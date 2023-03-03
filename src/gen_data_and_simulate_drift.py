@@ -8,6 +8,8 @@ import logging
 import random
 from sklearn.model_selection import train_test_split
 import numpy as np
+PATH_REF_DATA_GDRIVE='https://drive.google.com/file/d/11rMPmaE_T-LFCNcb281PG611g38syCkI/view?usp=sharing'
+PATH_REF_DATA_GDRIVE='https://drive.google.com/uc?id=' + PATH_REF_DATA_GDRIVE.split('/')[-2]
 logging.getLogger().setLevel(logging.INFO)
 
 warnings.filterwarnings("ignore")
@@ -95,15 +97,18 @@ class GenerateFakeData():
         keep only the numerical columns and target
         :return: the data ref with num cols and target
         '''
+        print(self.data_ref_target)
         target_col = self.df_ref[self.data_ref_target]
         self.df_ref = self.df_ref.select_dtypes(['number'])
         self.num_cols = list(self.df_ref.columns)
         self.df_ref[self.data_ref_target]= target_col
 
     def read_data_reference(self):
-        self.df_ref = pd.read_csv(self.path_ref_data)
-
-
+        try:
+            self.df_ref = pd.read_csv(PATH_REF_DATA_GDRIVE)
+        except FileNotFoundError:
+            print("Wrong file or file path")
+        
     def generate_fake_data_using_copulas(self):
         dist= None
 
@@ -210,3 +215,4 @@ if __name__ == '__main__':
     a = ds.get_test_data_drifted()
 
 
+    

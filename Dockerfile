@@ -15,6 +15,7 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 COPY src/compute_metrics_script.py compute_metrics_script.py
+COPY src/gen_data_and_simulate_drift.py gen_data_and_simulate_drift.py
 COPY src/fake_data_script.py fake_data_script.py
 COPY datasets/ datasets/
 COPY models/ models/
