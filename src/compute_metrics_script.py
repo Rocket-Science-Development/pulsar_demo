@@ -16,7 +16,6 @@ if __name__ == "__main__":
     df_ref['pred_timestamp'] = datetime.strptime('10/7/2022 22:30:30', '%d/%m/%Y %H:%M:%S')
     df_ref['period'] = 'reference'
 
-
     # Reading the newest prediction data
     database_login = DatabaseLogin(db_host="influxdb", db_port=8086, db_user="admin", db_password="pass123", protocol="line")
 
@@ -40,13 +39,13 @@ if __name__ == "__main__":
         # TODO: it should be changed, it's not clear why we cannot use datetime now
         db_df['pred_timestamp'] = datetime.strptime('20/8/2022 22:30:30', '%d/%m/%Y %H:%M:%S')
 
-        analysis = Analyzer(name='Compute Script Analyzer', description='Analyzer for compute script usage', data=db_df)
+        analysis = Analyzer(name='Compute Script Analyzer', description='Analyzer for compute script usage', model_id='1', model_version='2')
         analysis.add_drift_metrics(
-            metrics_list=['wasserstein', 'ttest', 'ks_2samp','kl','manwu','levene','bftest','CvM'],
+            metrics_list=['wasserstein', 'ttest', 'ks_2samp','kl','manwu','levene','bftest','CvM','psi'],
             features_list=['age','al','ane','appet','ba','bgr','bp','bu','cad','dm','hemo','htn','id','pc','pcc','pcv','pe','pot','rbc','rbcc','sg','sc','sod','su']
         )
 
-        analysis.run(data_ref=df_ref, options={'ttest': {'alpha': 0.05, 'equal_var': False}})
+        analysis.run(reference=df_ref, current=db_df, options={'ttest': {'alpha': 0.05, 'equal_var': False}, 'wasserstein': {'threshold' : 0.2}})
         df_result_drift = analysis.results_to_pandas()
 
         df_result_drift.set_index("eval_timestamp", inplace=True)
