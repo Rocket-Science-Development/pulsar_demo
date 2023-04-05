@@ -1,17 +1,39 @@
 import pandas as pd
 import pickle as pkl
 from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin, DataWithPrediction
+from gen_data_and_simulate_drift import GenerateFakeData, DriftSimulator, DriftIntensity
+from training_script import Classifier
 
 
-if __name__ == "__main__":
-    print("Pushing data")
-    data_test = pd.read_csv('/app/datasets/test_data_no_class.csv')
 
-    model = pkl.load(open("/app/models/kidney_disease.pkl", "rb"))
+# if __name__ == "__main__":
+    # print("Pushing data")
+    # data_test = pd.read_csv('/app/datasets/test_data_no_class.csv')
 
-    test_data = data_test.sample(frac=0.3, random_state=1)
+    # model = pkl.load(open("/app/models/kidney_disease.pkl", "rb"))
 
-    prediction = model.predict(test_data)
+    # test_data = data_test.sample(frac=0.3, random_state=1)
+
+    # prediction = model.predict(test_data)
+
+
+if __name__ == '__main__':
+    target = 'Legendary'
+    genertor_fake_data = GenerateFakeData(path_ref_data='pokemon.csv', sample_size = 1000, target=target)
+    sampled_data = genertor_fake_data.get_dataclass_sampling()
+
+    # if the task is classification
+    pok_classifier = Classifier(df_train=sampled_data.train_data,
+                num_features=sampled_data.list_num_col,
+                cat_features=None,
+                target=target,
+                pkl_file_path=f'class_{target}_model.pkl')
+    pok_classifier.train()
+
+    drift_sim_info = DriftSimulator(sampled_data, nb_cols_to_drift=1, drift_intensity=DriftIntensity.MODERATE)
+    # to get test_data after drifting
+    df_test_drifted = drift_sim_info.get_test_data_drifted()
+    prediction = pok_classifier.predict(df_test_drifted)
 
     database_login = DatabaseLogin(
         db_host="influxdb",
@@ -32,6 +54,6 @@ if __name__ == "__main__":
         login_url=database_login
     )
 
-    dat_predict = DataWithPrediction(prediction=prediction, data_points=test_data)
+    dat_predict = DataWithPrediction(prediction=prediction, data_points=df_test_drifted)
 
     dat_capture.push(dat_predict)

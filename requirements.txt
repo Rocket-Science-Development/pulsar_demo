@@ -2,3 +2,4 @@ black
 pulsar-metrics
 pulsar-data-collection
 copulas
+catboost
