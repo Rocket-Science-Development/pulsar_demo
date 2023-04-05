@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # to get test_data after drifting
     df_test_drifted = drift_sim_info.get_test_data_drifted()
 
-    prediction = pok_classifier._predict(df_test=df_test_drifted,)
+    prediction = pok_classifier._predict(df_test=df_test_drifted)
 
     database_login = DatabaseLogin(
         db_host="influxdb",
