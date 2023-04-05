@@ -1,6 +1,6 @@
 FROM python:3.9.13-slim-buster
 
-RUN apt-get update && apt-get install -y git && apt-get -y install gcc && apt-get -y install cron
+RUN apt-get update && apt-get install -y git gcc cron
 
 # Add crontab file in the cron directory
 ADD ./src/crontab/crontab /etc/cron.d/crontab
