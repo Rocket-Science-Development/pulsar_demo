@@ -1,8 +1,10 @@
-from sklearn.model_selection import train_test_split
-from catboost import CatBoostClassifier
-import pandas as pd
-from typing import List
 import pickle
+from typing import List
+
+import pandas as pd
+from catboost import CatBoostClassifier
+from sklearn.model_selection import train_test_split
+
 
 class Classifier:
     def __init__(self, df_train:pd.DataFrame,
@@ -17,18 +19,19 @@ class Classifier:
         if not cat_features:
             self.cat_features = list(set(self.df_train.columns) - set(num_features))
 
+    def serialize(self):
+        with open(self.pkl_file_path, 'wb') as file:
+            pickle.dump(self, file)
+
     def train(self):
-        model = CatBoostClassifier(iterations=2,
+        self.model = CatBoostClassifier(iterations=2,
                                    learning_rate=1,
                                    depth=2)
-        model.fit(self.df_train[self.num_features + self.cat_features], self.df_train[self.target])
+        self.model.fit(self.df_train[self.num_features + self.cat_features], self.df_train[self.target])
 
-        with open(self.pkl_file_path, 'wb') as file:
-            pickle.dump(model, file)
 
-    def predict(self, df_test, model_path:str):
-        with open(model_path, 'rb') as file:
-            model = pickle.load(file)
 
-        # Use the loaded model to make predictions
-        return model.predict(df_test)
+    def _predict(self, df_test):
+
+            # Use the loaded model to make predictions
+            return self.model.predict(df_test)

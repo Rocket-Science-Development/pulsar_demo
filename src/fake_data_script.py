@@ -1,10 +1,14 @@
-import pandas as pd
 import pickle as pkl
-from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin, DataWithPrediction
-from gen_data_and_simulate_drift import GenerateFakeData, DriftSimulator, DriftIntensity
+
+import pandas as pd
+from pulsar_data_collection.data_capture import (
+    DatabaseLogin,
+    DataCapture,
+    DataWithPrediction,
+)
+
+from gen_data_and_simulate_drift import DriftIntensity, DriftSimulator, GenerateFakeData
 from training_script import Classifier
-
-
 
 # if __name__ == "__main__":
     # print("Pushing data")
@@ -29,11 +33,13 @@ if __name__ == '__main__':
                 target=target,
                 pkl_file_path=f'class_{target}_model.pkl')
     pok_classifier.train()
+    pok_classifier.serialize()
 
     drift_sim_info = DriftSimulator(sampled_data, nb_cols_to_drift=1, drift_intensity=DriftIntensity.MODERATE)
     # to get test_data after drifting
     df_test_drifted = drift_sim_info.get_test_data_drifted()
-    prediction = pok_classifier.predict(df_test_drifted)
+
+    prediction = pok_classifier._predict(df_test=df_test_drifted,)
 
     database_login = DatabaseLogin(
         db_host="influxdb",
