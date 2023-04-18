@@ -31,7 +31,7 @@ class Classifier:
 
 
 
-    def _predict(self, df_test):
+    def predict(self, df_test):
 
             # Use the loaded model to make predictions
             return self.model.predict(df_test)
