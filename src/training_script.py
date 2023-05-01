@@ -21,7 +21,11 @@ class Classifier:
 
     def serialize(self):
         with open(self.pkl_file_path, 'wb') as file:
-            pickle.dump(self, file)
+            try:
+                 pickle.dump(self, file)
+            except pickle.PickleError as e:
+                 # handle any PickleError exceptions that may occur during serialization
+                 print("Error occurred while pickling:", e)
 
     def train(self):
         self.model = CatBoostClassifier(iterations=2,
