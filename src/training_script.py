@@ -27,6 +27,10 @@ class Classifier:
                  # handle any PickleError exceptions that may occur during serialization
                  print("Error occurred while pickling:", e)
 
+    """
+    Trains a machine learning model using a dataframe (self. df_train and specified features [self.num_features + self.cat_features] 
+    and target (self.target) attributes.
+    """
     def train(self):
         self.model = CatBoostClassifier(iterations=2,
                                    learning_rate=1,
