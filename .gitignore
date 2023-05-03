@@ -136,4 +136,3 @@ dmypy.json
 # Catboost folder
 catboost_info/
 src/catboost_info/
-src/__pycache__/
