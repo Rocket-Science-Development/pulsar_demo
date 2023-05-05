@@ -148,7 +148,8 @@ class GenerateFakeData():
                            list_num_col=self.num_cols,
                            used_distribution=self.sampling_method,
                            train_data=df_train,
-                           test_data=df_test
+                           test_data=df_test,
+                           dict_col_type=self.dict_col_type
                            )
 
 
