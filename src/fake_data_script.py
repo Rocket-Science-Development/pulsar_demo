@@ -10,20 +10,25 @@ from pulsar_data_collection.data_capture import (
 from gen_data_and_simulate_drift import DriftIntensity, DriftSimulator, GenerateFakeData
 from training_script import Classifier
 
+# Below is the code for Kidney disease model
+# kidneydisease_test_data='/app/datasets/test_data_no_class.csv'
+# kidneydisease_model="/app/models/kidney_disease.pkl"
 # if __name__ == "__main__":
-    # print("Pushing data")
-    # data_test = pd.read_csv('/app/datasets/test_data_no_class.csv')
+#     print("Pushing data")
+#     data_test = pd.read_csv(kidneydisease_test_data)
 
-    # model = pkl.load(open("/app/models/kidney_disease.pkl", "rb"))
+#     model = pkl.load(open(kidneydisease_model, "rb"))
 
-    # test_data = data_test.sample(frac=0.3, random_state=1)
+#     test_data = data_test.sample(frac=0.3, random_state=1)
 
-    # prediction = model.predict(test_data)
+#     prediction = model.predict(test_data)
 
-
+# Below is the code for Pokemon model
+pokemon_test_data='pokemon.csv'
+SAMPLE_SIZE=1000
 if __name__ == '__main__':
     target = 'Legendary'
-    genertor_fake_data = GenerateFakeData(path_ref_data='pokemon.csv', sample_size = 1000, target=target)
+    genertor_fake_data = GenerateFakeData(path_ref_data=pokemon_test_data, sample_size=SAMPLE_SIZE, target=target)
     sampled_data = genertor_fake_data.get_dataclass_sampling()
 
     # if the task is classification
