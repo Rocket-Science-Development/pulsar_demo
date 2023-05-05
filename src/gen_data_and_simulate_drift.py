@@ -43,6 +43,7 @@ class SampledData:
     test_data:pd.DataFrame
     list_num_col: List
     used_distribution: SamplingMethod
+    dict_col_type: Dict
 
 
 def create_dict_type_for_df(df_ref:pd.DataFrame):
