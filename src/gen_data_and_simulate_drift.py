@@ -14,6 +14,20 @@ logging.getLogger().setLevel(logging.INFO)
 
 warnings.filterwarnings("ignore")
 
+
+def apply_right_type_to_generated_columns(df: pd.DataFrame, dict_col_type: Dict) -> pd.DataFrame:
+    '''
+    if the generated data don't have the best type
+    almost for the integer (p.ex avoid to have 'age' as float)
+    df: dataframe to be adjusted
+    dict_col_type: dictionnary with the columns name and their types
+    :return: generated dataframe with the good type
+    '''
+    for c, type in dict_col_type.items():
+        df[c] = df[c].astype(type)
+    return df
+
+
 class SamplingMethod(Enum):
     COPULAS_GAUSS_MULT = 1
 
@@ -90,7 +104,7 @@ class GenerateFakeData():
             self.generate_fake_data_using_copulas()
         # TODO add more distributions
 
-        self.apply_right_type_to_generated_columns()
+        self.df_samples = apply_right_type_to_generated_columns(self.df_samples, self.dict_col_type)
 
     def keep_numerical_col(self):
         '''
@@ -122,15 +136,6 @@ class GenerateFakeData():
             sampled = dist.sample(self.sample_size)
             sampled[self.data_ref_target] = a_target
             self.df_samples = self.df_samples.append(sampled)
-
-    def apply_right_type_to_generated_columns(self):
-        '''
-        if the generated data don't have the best type
-        almost for the integer (p.ex avoid to have 'age' as float)
-        :return: generated dataframe with the good type
-        '''
-        for c, type in self.dict_col_type.items():
-            self.df_samples[c] = self.df_samples[c].astype(type)
 
     def get_dataclass_sampling(self):
         '''
@@ -166,12 +171,6 @@ class DriftSimulator():
         self.nb_col_to_drift = nb_cols_to_drift
         self.drift_intensity = drift_intensity
         self.test_data_drifted = self.input_data.test_data.copy()
-        # assert ((drift_intensity == None and len(selected_columns_to_drift) > 0)
-        #         or (self.selected_columns_to_drift == 0))
-        #
-        # assert (len(self.selected_columns_to_drift) == 0
-        #         or (len(self.selected_columns_to_drift) == self.nb_col_to_drift)
-        #         ), 'Number to columns must be equal to  the "number of selected columns"'
 
         self.nb_col_to_drift  = min(len(self.input_data.list_num_col), nb_cols_to_drift)
         print(f'number of columns to drift is : {self.nb_col_to_drift}')
