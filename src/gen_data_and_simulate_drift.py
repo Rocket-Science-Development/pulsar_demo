@@ -201,6 +201,7 @@ class DriftSimulator():
             self.test_data_drifted[col] = drifted_data
 
     def get_test_data_drifted(self):
+        self.test_data_drifted = apply_right_type_to_generated_columns(self.test_data_drifted, self.input_data.dict_col_type)
         return self.test_data_drifted
 
 if __name__ == '__main__':
