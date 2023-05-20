@@ -70,7 +70,7 @@ if __name__ == '__main__':
         model_version="2",
         data_id="FluxDB",
         y_name="y_pred",
-        pred_name=" ",
+        pred_name="clf_target",
         operation_type="INSERT_PREDICTION",
         login_url=database_login
     )
