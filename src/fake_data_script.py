@@ -1,6 +1,7 @@
 import pickle as pkl
 
 import pandas as pd
+import numpy as numpy
 from pulsar_data_collection.data_capture import (
     DatabaseLogin,
     DataCapture,
@@ -42,10 +43,19 @@ if __name__ == '__main__':
 
     drift_sim_info = DriftSimulator(sampled_data, nb_cols_to_drift=1, drift_intensity=DriftIntensity.MODERATE)
     # to get test_data after drifting
+   
     df_test_drifted = drift_sim_info.get_test_data_drifted()
+    print('info:',df_test_drifted.dtypes)
+    # df_test_drifted[target] = df_test_drifted[target].astype(int)
 
     prediction = pok_classifier.predict(df_test=df_test_drifted)
-
+    prediction_int = [1 if e=='True' else 0 for e in prediction]
+    # prediction = prediction.astype(int)
+    # print('prediction: ', prediction)
+    # print('prediction.type',prediction.dtypes)
+    # print('prediction_int: ', prediction_int)
+    # print('prediction_int_type',prediction_int.dtypes)
+   
     database_login = DatabaseLogin(
         db_host="influxdb",
         db_port=8086,
@@ -60,11 +70,13 @@ if __name__ == '__main__':
         model_version="2",
         data_id="FluxDB",
         y_name="y_pred",
-        pred_name="clf_target",
+        pred_name=" ",
         operation_type="INSERT_PREDICTION",
         login_url=database_login
     )
 
-    dat_predict = DataWithPrediction(prediction=prediction, data_points=df_test_drifted)
+    prediction_numpy = numpy.asarray(prediction_int)
+
+    dat_predict = DataWithPrediction(prediction=prediction_numpy, data_points=df_test_drifted)
 
     dat_capture.push(dat_predict)

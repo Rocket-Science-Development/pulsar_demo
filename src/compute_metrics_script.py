@@ -9,7 +9,7 @@ from pulsar_metrics.analyzers.base import Analyzer
 if __name__ == "__main__":
     # Reading reference dataset
     df_result = pd.DataFrame()
-    df_ref = pd.read_csv('/app/datasets/kidney_test.csv')
+    df_ref = pd.read_csv('/app/datasets/pokemon.csv')
 
     df_ref['model_id'] = '1'
     df_ref['model_version'] = '2'
@@ -42,7 +42,8 @@ if __name__ == "__main__":
         analysis = Analyzer(name='Compute Script Analyzer', description='Analyzer for compute script usage', model_id='1', model_version='2')
         analysis.add_drift_metrics(
             metrics_list=['wasserstein', 'ttest', 'ks_2samp','kl','manwu','levene','bftest','CvM','psi'],
-            features_list=['age','al','ane','appet','ba','bgr','bp','bu','cad','dm','hemo','htn','id','pc','pcc','pcv','pe','pot','rbc','rbcc','sg','sc','sod','su']
+            # features_list=['age','al','ane','appet','ba','bgr','bp','bu','cad','dm','hemo','htn','id','pc','pcc','pcv','pe','pot','rbc','rbcc','sg','sc','sod','su']
+            features_list=['#','Attack','Defense','Generation','HP','Legendary','Sp. Atk','Sp. Def','Speed','Total']
         )
 
         analysis.run(reference=df_ref, current=db_df, options={'ttest': {'alpha': 0.05, 'equal_var': False}, 'wasserstein': {'threshold' : 0.2}})

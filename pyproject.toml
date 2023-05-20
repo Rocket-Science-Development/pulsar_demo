@@ -10,6 +10,9 @@ packages = [{include = "pulsar_demo"}]
 python = "3.9.6"
 
 
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.22.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
