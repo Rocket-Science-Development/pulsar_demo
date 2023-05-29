@@ -8,9 +8,25 @@ import logging
 import random
 from sklearn.model_selection import train_test_split
 import numpy as np
+PATH_REF_DATA_GDRIVE='https://drive.google.com/file/d/11rMPmaE_T-LFCNcb281PG611g38syCkI/view?usp=sharing'
+PATH_REF_DATA_GDRIVE='https://drive.google.com/uc?id=' + PATH_REF_DATA_GDRIVE.split('/')[-2]
 logging.getLogger().setLevel(logging.INFO)
 
 warnings.filterwarnings("ignore")
+
+
+def apply_right_type_to_generated_columns(df: pd.DataFrame, dict_col_type: Dict) -> pd.DataFrame:
+    '''
+    if the generated data don't have the best type
+    almost for the integer (p.ex avoid to have 'age' as float)
+    df: dataframe to be adjusted
+    dict_col_type: dictionnary with the columns name and their types
+    :return: generated dataframe with the good type
+    '''
+    for c, type in dict_col_type.items():
+        df[c] = df[c].astype(type)
+    return df
+
 
 class SamplingMethod(Enum):
     COPULAS_GAUSS_MULT = 1
@@ -27,6 +43,7 @@ class SampledData:
     test_data:pd.DataFrame
     list_num_col: List
     used_distribution: SamplingMethod
+    dict_col_type: Dict
 
 
 def create_dict_type_for_df(df_ref:pd.DataFrame):
@@ -88,22 +105,25 @@ class GenerateFakeData():
             self.generate_fake_data_using_copulas()
         # TODO add more distributions
 
-        self.apply_right_type_to_generated_columns()
+        self.df_samples = apply_right_type_to_generated_columns(self.df_samples, self.dict_col_type)
 
     def keep_numerical_col(self):
         '''
         keep only the numerical columns and target
         :return: the data ref with num cols and target
         '''
+        print(self.data_ref_target)
         target_col = self.df_ref[self.data_ref_target]
         self.df_ref = self.df_ref.select_dtypes(['number'])
         self.num_cols = list(self.df_ref.columns)
         self.df_ref[self.data_ref_target]= target_col
 
     def read_data_reference(self):
-        self.df_ref = pd.read_csv(self.path_ref_data)
-
-
+        try:
+            self.df_ref = pd.read_csv(PATH_REF_DATA_GDRIVE)
+        except FileNotFoundError:
+            print("Wrong file or file path")
+        
     def generate_fake_data_using_copulas(self):
         dist= None
 
@@ -118,15 +138,6 @@ class GenerateFakeData():
             sampled[self.data_ref_target] = a_target
             self.df_samples = self.df_samples.append(sampled)
 
-    def apply_right_type_to_generated_columns(self):
-        '''
-        if the generated data don't have the best type
-        almost for the integer (p.ex avoid to have 'age' as float)
-        :return: generated dataframe with the good type
-        '''
-        for c, type in self.dict_col_type.items():
-            self.df_samples[c] = self.df_samples[c].astype(type)
-
     def get_dataclass_sampling(self):
         '''
 
@@ -138,7 +149,8 @@ class GenerateFakeData():
                            list_num_col=self.num_cols,
                            used_distribution=self.sampling_method,
                            train_data=df_train,
-                           test_data=df_test
+                           test_data=df_test,
+                           dict_col_type=self.dict_col_type
                            )
 
 
@@ -161,12 +173,6 @@ class DriftSimulator():
         self.nb_col_to_drift = nb_cols_to_drift
         self.drift_intensity = drift_intensity
         self.test_data_drifted = self.input_data.test_data.copy()
-        # assert ((drift_intensity == None and len(selected_columns_to_drift) > 0)
-        #         or (self.selected_columns_to_drift == 0))
-        #
-        # assert (len(self.selected_columns_to_drift) == 0
-        #         or (len(self.selected_columns_to_drift) == self.nb_col_to_drift)
-        #         ), 'Number to columns must be equal to  the "number of selected columns"'
 
         self.nb_col_to_drift  = min(len(self.input_data.list_num_col), nb_cols_to_drift)
         print(f'number of columns to drift is : {self.nb_col_to_drift}')
@@ -197,6 +203,7 @@ class DriftSimulator():
             self.test_data_drifted[col] = drifted_data
 
     def get_test_data_drifted(self):
+        self.test_data_drifted = apply_right_type_to_generated_columns(self.test_data_drifted, self.input_data.dict_col_type)
         return self.test_data_drifted
 
 if __name__ == '__main__':
@@ -210,3 +217,4 @@ if __name__ == '__main__':
     a = ds.get_test_data_drifted()
 
 
+    

@@ -1,6 +1,6 @@
-FROM python:3.9.13-slim-buster
+FROM amd64/python:3.9.6-slim-buster
 
-RUN apt-get update && apt-get install -y git && apt-get -y install gcc && apt-get -y install cron
+RUN apt-get update && apt-get install -y git gcc cron
 
 # Add crontab file in the cron directory
 ADD ./src/crontab/crontab /etc/cron.d/crontab
@@ -15,7 +15,9 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 COPY src/compute_metrics_script.py compute_metrics_script.py
+COPY src/gen_data_and_simulate_drift.py gen_data_and_simulate_drift.py
 COPY src/fake_data_script.py fake_data_script.py
+COPY src/training_script.py training_script.py
 COPY datasets/ datasets/
 COPY models/ models/
 
