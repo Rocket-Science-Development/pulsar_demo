@@ -10,6 +10,19 @@ services:
       - "8086:8086"
     networks:
       - influxdb-net
+  jupyter:
+    build: .
+    image: jupyter/base-notebook:latest
+    networks:
+      - influxdb-net
+    ports:
+      - 8888:8888
+    depends_on:
+      - influxdb
+    volumes:
+      - ./notebooks:/app
+    env_file:
+      - ./env_files/influxv2.env
   grafana:
     image: "grafana/grafana:latest"
     networks:
