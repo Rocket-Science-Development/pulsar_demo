@@ -21,6 +21,7 @@ services:
       - influxdb
     volumes:
       - ./notebooks:/app
+      - ./src:/src
     env_file:
       - ./env_files/influxv2.env
   grafana:
