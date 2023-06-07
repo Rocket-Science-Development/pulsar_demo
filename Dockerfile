@@ -18,13 +18,23 @@ COPY src/compute_metrics_script.py compute_metrics_script.py
 COPY src/fake_data_script.py fake_data_script.py
 COPY datasets/ datasets/
 COPY models/ models/
+COPY execute_cron_nb.sh /script.sh
 
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 RUN /usr/bin/crontab /etc/cron.d/crontab
 
-# Run the command on container startup
-CMD ["cron", "-f"]
+# Expose the port on which Jupyter Notebook will run
+EXPOSE 8888
+
+# Run Jupyter Notebook when the container launches
+RUN pip install jupyterlab
+
+# Execution right on script
+RUN chmod 0644 /script.sh
+
+# Run the script on container startup
+CMD ["/script.sh"]
 
 
 # RUN adduser app && chown -R app /app
