@@ -1,5 +1,6 @@
 black
 pulsar-metrics
 pulsar-data-collection==0.2.0rc0
+# git+https://github.com/Rocket-Science-Development/pulsar_data_collection.git@manu/local-copy-v2
 copulas
 catboost
