@@ -87,7 +87,7 @@
         "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
         "mode": "html"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -160,14 +160,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT MAX($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT MAX(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -234,14 +234,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT MIN($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT MIN(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -308,14 +308,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT MEAN($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT MEAN(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -442,7 +442,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT $feature_name FROM prediction where y_pred =1",
+          "query": "SELECT \"$feature_name\" FROM prediction where y_pred =1",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -454,7 +454,7 @@
             "uid": "PB6B4F2F1C736D27A"
           },
           "hide": false,
-          "query": "SELECT $feature_name FROM prediction where y_pred =0",
+          "query": "SELECT \"$feature_name\" FROM prediction where y_pred =0",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -466,7 +466,7 @@
             "uid": "PB6B4F2F1C736D27A"
           },
           "hide": false,
-          "query": "SELECT moving_average(mean($feature_name), 2) FROM prediction WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "query": "SELECT moving_average(mean(\"$feature_name\"), 2) FROM prediction WHERE $timeFilter GROUP BY time($__interval) fill(null)",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series"
@@ -534,14 +534,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT STDDEV($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter ",
+          "query": "SELECT STDDEV(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter ",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -608,14 +608,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT median($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT median(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -681,7 +681,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -740,6 +740,7 @@
       },
       "id": 37,
       "options": {
+        "cellHeight": "sm",
         "footer": {
           "countRows": false,
           "fields": "",
@@ -750,7 +751,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -837,14 +838,14 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT COUNT($feature_name) FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT COUNT(\"$feature_name\") FROM prediction where model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -902,7 +903,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -967,7 +968,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -1848,7 +1849,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2754,9 +2756,9 @@
       {
         "allValue": "",
         "current": {
-          "selected": false,
-          "text": "sg",
-          "value": "sg"
+          "selected": true,
+          "text": "Sp. Atk",
+          "value": "Sp. Atk"
         },
         "datasource": {
           "type": "influxdb",
@@ -2858,6 +2860,6 @@
   "timezone": "",
   "title": "Drift Dashboard",
   "uid": "y4-ZCkG4k",
-  "version": 4,
+  "version": 7,
   "weekStart": ""
 }

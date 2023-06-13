@@ -49,7 +49,7 @@
         "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
         "mode": "html"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "transparent": true,
       "type": "text"
     },
@@ -110,7 +110,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -184,7 +184,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -257,7 +257,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -327,7 +327,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -403,7 +403,7 @@
           "valueSize": 40
         }
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -536,7 +536,7 @@
           "reverse": false
         }
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
@@ -631,6 +631,14 @@
                   "fixedColor": "blue",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
               }
             ]
           }
@@ -762,9 +770,9 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "sg",
-          "value": "sg"
+          "selected": true,
+          "text": "HP",
+          "value": "HP"
         },
         "datasource": {
           "type": "influxdb",
@@ -809,13 +817,13 @@
     ]
   },
   "time": {
-    "from": "2023-02-20T15:50:02.374Z",
-    "to": "2023-02-28T18:40:02.821Z"
+    "from": "now-7d",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "DriftDetailDashboard",
   "uid": "Zntdh-tVz",
-  "version": 2,
+  "version": 8,
   "weekStart": ""
 }
