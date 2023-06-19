@@ -1,4 +1,4 @@
-FROM amd64/python:3.9.6-slim-buster
+FROM python:3.9.6-slim-buster
 
 RUN apt-get update && apt-get install -y git gcc cron
 
@@ -21,7 +21,7 @@ COPY src/training_script.py training_script.py
 COPY datasets/ datasets/
 COPY models/ models/
 
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 RUN /usr/bin/crontab /etc/cron.d/crontab
 

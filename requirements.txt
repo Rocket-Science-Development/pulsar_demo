@@ -2,4 +2,4 @@ black
 pulsar-metrics
 pulsar-data-collection
 copulas
-catboost
+catboost==1.1.1
