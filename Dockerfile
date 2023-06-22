@@ -18,19 +18,32 @@ COPY src/compute_metrics_script.py compute_metrics_script.py
 COPY src/gen_data_and_simulate_drift.py /app/gen_data_and_simulate_drift.py
 COPY src/fake_data_script.py /app/fake_data_script.py
 COPY src/training_script.py /app/training_script.py
+COPY src/app.py /app/app.py
+COPY src/main.py .
 COPY datasets/ datasets/
 COPY models/ models/
+COPY pulsar_data_collection-0.0.0-py3-none-any.whl /app/
 
+RUN pip install python-multipart
+RUN pip install influxdb-client
+RUN pip install /app/pulsar_data_collection-0.0.0-py3-none-any.whl
+RUN pip install python-dotenv
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 RUN /usr/bin/crontab /etc/cron.d/crontab
 
 # Expose the port on which Jupyter Notebook will run
-EXPOSE 8888
+# EXPOSE 8888
+
+# Expose the port that the FastAPI application will run
+EXPOSE 8000
+
+# Start the FastAPI app when the container starts
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 
 # Run Jupyter Notebook when the container launches
-RUN pip install jupyterlab
-CMD ["jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--no-browser"]
+# RUN pip install jupyterlab
+# CMD ["jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--no-browser"]
 
 
 # RUN adduser app && chown -R app /app

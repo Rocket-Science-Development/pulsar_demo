@@ -4,7 +4,7 @@ datasources:
   - name: influxdbv2.x
     type: influxdb
     access: proxy
-    url: http://influxdb:8086
+    url: http://localhost:8086
     password: $DOCKER_INFLUXDB_INIT_PASSWORD
     user: $DOCKER_INFLUXDB_INIT_USERNAME
     database: $DOCKER_INFLUXDB_INIT_BUCKET
@@ -21,4 +21,4 @@ datasources:
       tlsClientCert: ""
       tlsClientKey: ""
     version: 1
-    editable: false
+    editable: true

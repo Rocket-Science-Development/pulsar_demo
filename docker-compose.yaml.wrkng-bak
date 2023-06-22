@@ -10,7 +10,20 @@ services:
       - "8086:8086"
     networks:
       - influxdb-net
-
+  jupyter:
+    build: .
+    image: jupyter/base-notebook:latest
+    networks:
+      - influxdb-net
+    ports:
+      - 8888:8888
+    depends_on:
+      - influxdb
+    volumes:
+      - ./notebooks:/app
+      - ./src:/src
+    env_file:
+      - ./env_files/influxv2.env
   grafana:
     image: "grafana/grafana:latest"
     networks:
@@ -26,17 +39,7 @@ services:
     env_file:
       - ./env_files/grafana.env
       - ./env_files/influxv2.env
-  web:
-    build: .
-    container_name: "web-container-fastapi"
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./env_files/influxv2.env
-    depends_on:
-      - influxdb
-    networks:
-      - influxdb-net
+
 volumes:
   influxdbv2:
     driver: local
