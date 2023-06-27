@@ -24,6 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -48,7 +49,7 @@
         "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
         "mode": "html"
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "transparent": true,
       "type": "text"
     },
@@ -109,7 +110,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -117,7 +118,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
+          "query": "SELECT metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -183,7 +184,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -191,7 +192,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
+          "query": "SELECT metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -256,7 +257,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -264,7 +265,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT COUNT(value) FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name'  and model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT COUNT(metric_value) FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name'  and model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -326,7 +327,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -334,7 +335,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT time, value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ORDER BY time DESC LIMIT 1",
+          "query": "SELECT time, metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ORDER BY time DESC LIMIT 1",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -380,7 +381,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 12,
         "y": 4
@@ -402,7 +403,7 @@
           "valueSize": 40
         }
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "alias": "",
@@ -410,7 +411,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
+          "query": "SELECT metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' ",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -488,7 +489,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
+        "h": 16,
         "w": 9,
         "x": 0,
         "y": 7
@@ -535,14 +536,14 @@
           "reverse": false
         }
       },
-      "pluginVersion": "9.3.6",
+      "pluginVersion": "9.5.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT time, value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
+          "query": "SELECT time, metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -630,16 +631,24 @@
                   "fixedColor": "blue",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 14,
+        "h": 15,
         "w": 15,
         "x": 9,
-        "y": 9
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -661,7 +670,7 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version'",
+          "query": "SELECT metric_value FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version'",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -673,7 +682,7 @@
             "uid": "PB6B4F2F1C736D27A"
           },
           "hide": false,
-          "query": "SELECT threshold FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version'",
+          "query": "SELECT threshold FROM metrics where metric_type = '$type' and feature_name = '$feature_name' and metric_name = '$metric_name' and model_id = '$model_id' and model_version = '$model_version'",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -684,8 +693,9 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 37,
+  "refresh": "",
+  "revision": 1,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -722,13 +732,13 @@
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+        "definition": "SELECT distinct(\"model_id\") FROM metrics where metric_type = '$type'",
         "hide": 0,
         "includeAll": false,
         "multi": false,
         "name": "model_id",
         "options": [],
-        "query": "SELECT distinct(\"model_id\") FROM metrics where type = '$type'",
+        "query": "SELECT distinct(\"model_id\") FROM metrics where metric_type = '$type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -745,13 +755,13 @@
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+        "definition": "SELECT distinct(\"model_version\") FROM metrics where metric_type = '$type'",
         "hide": 0,
         "includeAll": false,
         "multi": false,
         "name": "model_version",
         "options": [],
-        "query": "SELECT distinct(\"model_version\") FROM metrics where type = '$type'",
+        "query": "SELECT distinct(\"model_version\") FROM metrics where metric_type = '$type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -760,21 +770,21 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "bp",
-          "value": "bp"
+          "selected": true,
+          "text": "HP",
+          "value": "HP"
         },
         "datasource": {
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"feature\") FROM metrics where type = '$type'",
+        "definition": "SELECT distinct(\"feature_name\") FROM metrics where metric_type = '$type'",
         "hide": 0,
         "includeAll": false,
         "multi": false,
         "name": "feature_name",
         "options": [],
-        "query": "SELECT distinct(\"feature\") FROM metrics where type = '$type'",
+        "query": "SELECT distinct(\"feature_name\") FROM metrics where metric_type = '$type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -784,20 +794,20 @@
       {
         "current": {
           "selected": false,
-          "text": "ttest",
-          "value": "ttest"
+          "text": "manwu",
+          "value": "manwu"
         },
         "datasource": {
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"metric_name\") FROM metrics where type = '$type'",
+        "definition": "SELECT distinct(\"metric_name\") FROM metrics where metric_type = '$type'",
         "hide": 0,
         "includeAll": false,
         "multi": false,
         "name": "metric_name",
         "options": [],
-        "query": "SELECT distinct(\"metric_name\") FROM metrics where type = '$type'",
+        "query": "SELECT distinct(\"metric_name\") FROM metrics where metric_type = '$type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -807,8 +817,8 @@
     ]
   },
   "time": {
-    "from": "2023-02-20T15:50:02.374Z",
-    "to": "2023-02-28T18:40:02.821Z"
+    "from": "now-7d",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
