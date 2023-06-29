@@ -3,5 +3,5 @@
 #Running jupyter lab
 jupyter lab --ip 0.0.0.0 --allow-root --no-browser
 
-#Cron execution
-cron -f
+#Running FastAPI
+uvicorn main:app --reload --host 0.0.0.0 --port 8000

@@ -31,7 +31,7 @@ url = 'http://influxdb:8086'
 
 @app.get("/")
 def index():
-    return {"title": "Hello world"}
+    return {"title": "pulsar.ml"}
 
 @app.post("/predict")
 async def predict_pokemon(file: UploadFile = File(...)):
