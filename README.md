@@ -10,6 +10,8 @@ Thsi repo containing an example use-case showing how to leverage [pulsar-data-co
     ```bash
         export GRAFANA_USERNAME=admin;
         export GRAFANA_PASSWORD=pass123;
+        export DB_USER=admin;
+        export DB_PASSWORD=pass123;
         docker-compose up --build
     ```
 
