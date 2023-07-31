@@ -1,0 +1,30 @@
+# Use the base Jupyter Notebook image from Docker Hub
+FROM jupyter/datascience-notebook:python-3.9.6
+
+# Expose the port Jupyter Notebook will listen on
+EXPOSE 8888
+
+# Copy the requirements.txt file for Jupyter
+COPY requirements.txt /app/requirements.txt
+COPY src/compute_metrics_script.py /app/compute_metrics_script.py
+COPY src/gen_data_and_simulate_drift.py /app/gen_data_and_simulate_drift.py
+COPY src/fake_data_script.py /app/fake_data_script.py
+COPY src/training_script.py /app/training_script.py
+COPY datasets/ datasets/
+COPY models/ models/
+COPY notebooks/pulsar_data_collection-0.0.0-py3-none-any.whl /app/
+
+WORKDIR /app
+
+# Install Jupyter dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+RUN pip install influxdb-client
+RUN pip install python-dotenv
+RUN pip install python-multipart
+
+RUN pip install /app/pulsar_data_collection-0.0.0-py3-none-any.whl
+
+# Start the Jupyter Notebook server
+# CMD ["jupyter", "lab", "--ip", "0.0.0.0", "--allow-root", "--no-browser"]
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--allow-root"]

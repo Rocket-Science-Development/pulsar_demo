@@ -11,8 +11,9 @@ services:
     networks:
       - influxdb-net
   jupyter:
-    build: .
-    image: jupyter/base-notebook:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile_jupyter
     networks:
       - influxdb-net
     ports:
@@ -20,7 +21,7 @@ services:
     depends_on:
       - influxdb
     volumes:
-      - ./notebooks:/app
+      - ./notebooks:/tmp
       - ./src:/src
     env_file:
       - ./env_files/influxv2.env
@@ -40,7 +41,9 @@ services:
       - ./env_files/grafana.env
       - ./env_files/influxv2.env
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile_fastapi
     container_name: "web-container-fastapi"
     ports:
       - "8000:8000"
