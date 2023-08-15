@@ -43,3 +43,25 @@ class Classifier:
 
             # Use the loaded model to make predictions
             return self.model.predict(df_test)
+    
+    @classmethod
+    def load_model(cls, pkl_file_path):
+        """
+        Loads a serialized Classifier object from the specified .pkl file.
+
+        Parameters:
+            pkl_file_path (str): Path to the .pkl file.
+
+        Returns:
+            Classifier: A loaded Classifier object.
+        """
+        with open(pkl_file_path, 'rb') as file:
+            try:
+                classifier_obj = pickle.load(file)
+                if not isinstance(classifier_obj, cls):
+                    raise ValueError("Invalid pickled object. Expected Classifier object.")
+                return classifier_obj
+            except pickle.PickleError as e:
+                # handle any PickleError exceptions that may occur during deserialization
+                print("Error occurred while unpickling:", e)
+                return None
