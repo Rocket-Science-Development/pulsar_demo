@@ -38,5 +38,4 @@ class ReturnOfInvestment():
         print("predict_ROI_FN =>",net_FNR )
         
         ROI_gain = net_FPR + net_FNR
-        
         return ROI_gain    
