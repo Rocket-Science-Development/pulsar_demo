@@ -16,6 +16,8 @@ if __name__ == "__main__":
     # Reading reference dataset
     df_result = pd.DataFrame()
     df_ref = pd.read_csv('/app/datasets/pokemon.csv')
+    target = 'Legendary'
+    prediction = 'y_pred'
 
     df_ref['model_id'] = '1'
     df_ref['model_version'] = '2'
@@ -51,7 +53,7 @@ if __name__ == "__main__":
             # features_list=['age','al','ane','appet','ba','bgr','bp','bu','cad','dm','hemo','htn','id','pc','pcc','pcv','pe','pot','rbc','rbcc','sg','sc','sod','su']
             features_list=['#','Attack','Defense','Generation','HP','Sp. Atk','Sp. Def','Speed','Total']
         )
-        analysis.add_performance_metrics(metrics_list=['accuracy','precision'], y_name = 'Legendary')
+        analysis.add_performance_metrics(metrics_list=['accuracy','precision'], y_name = target)
 
         analysis.run(reference=df_ref, current=db_df, options={'ttest': {'alpha': 0.05, 'equal_var': False}, 'wasserstein': {'threshold' : 0.2}})
         print("analysis: ", analysis)
@@ -68,8 +70,8 @@ if __name__ == "__main__":
         # roi_x = roiInstance.calculate_ROI(db_df['Legendary'].astype(int).to_list(), db_df['y_pred'].to_list())
         # print("roi return: ", roi_x)
 
-        reference_data = db_df['Legendary'].astype(int).tolist()
-        current_data = db_df['y_pred'].tolist()
+        reference_data = db_df[target].astype(int).tolist()
+        current_data = db_df[prediction].tolist()
 
         cus = test_roi(metric_name = 'roi')
         cus.evaluate(current = current_data, reference = reference_data, threshold = 1, multiple=0.5)
