@@ -201,6 +201,9 @@ class DriftSimulator():
             # TODO add more distribution option
             drifted_data = np.random.normal(mean*coef_mean, std*coef_std, size_test_data)
             self.test_data_drifted[col] = drifted_data
+            
+            #Added for ROI
+            #self.test_data_drifted[f'Ground Truth_{col}'] = self.input_data.test_data[col]
 
     def get_test_data_drifted(self):
         self.test_data_drifted = apply_right_type_to_generated_columns(self.test_data_drifted, self.input_data.dict_col_type)

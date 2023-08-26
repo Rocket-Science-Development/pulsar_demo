@@ -3,3 +3,4 @@ pulsar-metrics
 pulsar-data-collection
 copulas
 catboost==1.2
+scikit-learn

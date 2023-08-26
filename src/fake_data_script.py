@@ -1,5 +1,5 @@
 import pickle as pkl
-
+import os
 import pandas as pd
 import numpy as numpy
 from pulsar_data_collection.data_capture import (
@@ -33,13 +33,24 @@ if __name__ == '__main__':
     sampled_data = genertor_fake_data.get_dataclass_sampling()
 
     # if the task is classification
+    # pok_classifier = Classifier(df_train=sampled_data.train_data,
+    #             num_features=sampled_data.list_num_col,
+    #             cat_features=None,
+    #             target=target,
+    #             pkl_file_path=f'class_{target}_model.pkl')
     pok_classifier = Classifier(df_train=sampled_data.train_data,
                 num_features=sampled_data.list_num_col,
                 cat_features=None,
                 target=target,
-                pkl_file_path=f'class_{target}_model.pkl')
-    pok_classifier.train()
-    pok_classifier.serialize()
+                pkl_file_path=os.path.join('/app', f'class_{target}_model.pkl'))  # Update the path here
+    
+    # pok_classifier.train()
+    # pok_classifier.serialize()
+   
+    # Load the serialized model
+    # pkl_file_path = os.path.join('/app', 'class_Legendary_model.pkl')
+
+    pok_classifier.load_model()
 
     drift_sim_info = DriftSimulator(sampled_data, nb_cols_to_drift=1, drift_intensity=DriftIntensity.MODERATE)
     # to get test_data after drifting

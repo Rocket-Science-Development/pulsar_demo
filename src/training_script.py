@@ -40,6 +40,11 @@ class Classifier:
 
 
     def predict(self, df_test):
-
+            self.load_model()
             # Use the loaded model to make predictions
             return self.model.predict(df_test)
+    
+    def load_model(self):
+         with open(self.pkl_file_path, 'rb') as file:
+            loaded_classifier = pickle.load(file)
+            self.model = loaded_classifier.model
