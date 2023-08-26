@@ -1,12 +1,10 @@
 import uuid
-import logging
 import pandas as pd
 from datetime import datetime
-from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin, DataWithPrediction
+from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin
 from pulsar_metrics.analyzers.base import Analyzer
 from pulsar_metrics.metrics.base import CustomMetric 
 from roi import ReturnOfInvestment
-import numpy as np
 
 @CustomMetric
 def test_roi(current, reference, multiple=3, **kwargs):
@@ -92,8 +90,8 @@ if __name__ == "__main__":
 
         print("df_reshaped: ", df_reshaped)
 
-        # df_result_drift = df_result_drift.append(df_reshaped, ignore_index=True)
-        # print("df_result_drift: ", df_result_drift)
+        df_result_drift = df_result_drift.append(df_reshaped, ignore_index=True)
+        print("df_result_drift: ", df_result_drift)
 
         
         

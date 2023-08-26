@@ -46,9 +46,6 @@ if __name__ == '__main__':
     
     # pok_classifier.train()
     # pok_classifier.serialize()
-   
-    # Load the serialized model
-    # pkl_file_path = os.path.join('/app', 'class_Legendary_model.pkl')
 
     pok_classifier.load_model()
 
@@ -66,7 +63,23 @@ if __name__ == '__main__':
     # print('prediction.type',prediction.dtypes)
     # print('prediction_int: ', prediction_int)
     # print('prediction_int_type',prediction_int.dtypes)
-   
+
+    # Adding the logic to Flip a % of values in our Prediction array before ingesting the data in DB so as to have FP & FN values generated successfully.
+    # Introduce random coefficient
+    randomization_percentage = 0.2  # Can be adjusted. 0.2 here means 20% of the values will be flipped.
+
+    # Calculate the number of values to be changed based on the coefficient
+    num_values_to_change = int(len(prediction_int) * randomization_percentage)
+
+    # Generate random indices to select positions for randomization
+    random_indices = numpy.random.choice(len(prediction_int), size=num_values_to_change, replace=False)
+
+    # Iterate through the random indices and flip the corresponding values in prediction_int
+    for index in random_indices:
+        prediction_int[index] = 1 - prediction_int[index]
+
+    print('prediction_int after: ', prediction_int)
+
     database_login = DatabaseLogin(
         db_host="influxdb",
         db_port=8086,
