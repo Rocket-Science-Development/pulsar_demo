@@ -47,18 +47,20 @@ def create_dict_type_for_df(df_ref:pd.DataFrame):
         dict_col_type[col] = df_ref[col].dtype
     return dict_col_type
 
-def get_shift_coef(drift_intensity:DriftIntensity):
+def get_shift_coef(drift_intensity:DriftIntensity=DriftIntensity.MODERATE):
     '''
     :param drift_intensity: enum with the level of intensity to be used
     :return: the new mean and stdev; used to drift features
     '''
-    if drift_intensity == DriftIntensity.MODERATE:
+
+    if drift_intensity is DriftIntensity.MODERATE:
         mean_coef = random.uniform(1.2, 1.7)
         std_coef = random.uniform(1.5, 2)
-
-    if drift_intensity == DriftIntensity.EXTREME:
+    elif drift_intensity is DriftIntensity.EXTREME:
         mean_coef = random.uniform(1.5, 2.7)
         std_coef = random.uniform(2, 5)
+    else:
+        print('Unrecognized drift intensity in get_shift_coef()')
 
     return mean_coef, std_coef
 
@@ -130,7 +132,7 @@ class GenerateFakeData():
         # generate new data using COPULAS_GAUSS_MULT method
         # TODO add more distribution option
         if self.sampling_method == SamplingMethod.COPULAS_GAUSS_MULT:
-            dist = GaussianMultivariate()
+            dist = GaussianMultivariate(random_state = 1)
 
         # If target is numeric
         if (not is_object_dtype(self.df_ref[self.data_ref_target])) & (not is_bool_dtype(self.df_ref[self.data_ref_target])):
@@ -188,7 +190,7 @@ class DriftSimulator():
     '''
     def __init__(self, sampled_data:SampledData,
                  nb_cols_to_drift:int,
-                 drift_intensity:DriftIntensity = None,
+                 drift_intensity:DriftIntensity = DriftIntensity.MODERATE,
                  selected_columns_to_drift = []):
         self.input_data = sampled_data
         self.selected_columns_to_drift= selected_columns_to_drift
@@ -228,7 +230,7 @@ class DriftSimulator():
             #self.test_data_drifted[f'Ground Truth_{col}'] = self.input_data.test_data[col]
 
     def get_test_data_drifted(self):
-        self.test_data_drifted = apply_right_type_to_generated_columns(self.test_data_drifted, self.input_data.dict_col_type)
+        self.test_data_drifted = self.test_data_drifted.astype(self.input_data.test_data.dtypes)
         return self.test_data_drifted
 
 if __name__ == '__main__':
