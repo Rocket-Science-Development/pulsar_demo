@@ -2,18 +2,20 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
 """ Implementation of ROI calculation for wrong or bad prediction """
-#Hard Coded value for testing
-FPR_THRESHOLD = 0.5
-FPN_THRESHOLD = 0.2 
 
 class ReturnOfInvestment():
     def __init__(self):
-        #Hard coded for testing
-        self.cost_per_FP = 100
-        self.cost_per_FN = 300
-        '''Constructor of the ReturnOfInvestment class '''  
+               '''Constructor of the ReturnOfInvestment class '''  
 
-    def calculate_ROI(self,lebel_data,predicted_data):
+    def calculate_ROI(
+                self,
+                lebel_data,
+                predicted_data,
+                FPR_THRESHOLD = 0.5,
+                FNR_THRESHOLD = 0.2,
+                cost_per_FP = 100,
+                cost_per_FN = 300
+                ):
         cm = confusion_matrix(lebel_data, predicted_data)
         cm_param = {'tn': cm[0, 0], 'fp': cm[0, 1],'fn': cm[1, 0], 'tp': cm[1, 1]}
         print("confusion_matrix",cm_param)
@@ -36,8 +38,8 @@ class ReturnOfInvestment():
         print("False Negative Rate(FNR)",FNR)
 
         #Caluclate the Return of Investment (ROI) for wrong prediction
-        net_FPR = np.sign(FPR_THRESHOLD - FPR) * totalNegatives*self.cost_per_FP
-        net_FNR = np.sign(FPN_THRESHOLD - FNR) * totalPositives*self.cost_per_FN
+        net_FPR = np.sign(FPR_THRESHOLD - FPR) * totalNegatives * cost_per_FP
+        net_FNR = np.sign(FNR_THRESHOLD - FNR) * totalPositives * cost_per_FN
 
         print("predict_ROI_FP =>",net_FPR)
         print("predict_ROI_FN =>",net_FNR)
