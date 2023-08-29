@@ -6,17 +6,22 @@ from pulsar_metrics.analyzers.base import Analyzer
 from pulsar_metrics.metrics.base import CustomMetric 
 from roi import ReturnOfInvestment
 
+FPR_THRESHOLD=0.5
+FNR_THRESHOLD=0.2
+cost_per_FP=100
+cost_per_FN=300
+
 @CustomMetric
 def test_roi(current, reference, multiple=3, **kwargs):
     roiInstance = ReturnOfInvestment()
-    roi_x = roiInstance.calculate_ROI(reference, current)
+    roi_x = roiInstance.calculate_ROI(reference, current, FPR_THRESHOLD, FNR_THRESHOLD, cost_per_FP, cost_per_FN)
     return roi_x
 
 if __name__ == "__main__":
     # Reading reference dataset
     df_result = pd.DataFrame()
-    df_ref = pd.read_csv('/app/datasets/pokemon.csv')
-    target = 'Legendary'
+    df_ref = pd.read_csv('/app/datasets/bank_num.csv')
+    target = 'default'
     prediction = 'y_pred'
 
     df_ref['model_id'] = '1'
@@ -42,6 +47,10 @@ if __name__ == "__main__":
         db_df = pd.DataFrame(dat_capture.collect().get("prediction"))
 
     print(f"Dataframe collected, df length: {len(db_df)}")
+    print(f"Dataframe : {db_df.head()}")
+
+    conversion_dict = {'yes': 1, 'no': 0}
+    df_ref['default'] = df_ref['default'].map(conversion_dict)
 
     if len(db_df):
         # TODO: it should be changed, it's not clear why we cannot use datetime now
@@ -51,7 +60,8 @@ if __name__ == "__main__":
         analysis.add_drift_metrics(
             metrics_list=['wasserstein', 'ttest', 'ks_2samp','kl','manwu','levene','bftest','CvM','psi'],
             # features_list=['age','al','ane','appet','ba','bgr','bp','bu','cad','dm','hemo','htn','id','pc','pcc','pcv','pe','pot','rbc','rbcc','sg','sc','sod','su']
-            features_list=['#','Attack','Defense','Generation','HP','Sp. Atk','Sp. Def','Speed','Total']
+            # features_list=['#','Attack','Defense','Generation','HP','Sp. Atk','Sp. Def','Speed','Total']
+            features_list=['age','job','marital','education','balance','housing','loan','contact','day','month','duration','campaign','pdays','previous','poutcome','deposit']
         )
         analysis.add_performance_metrics(metrics_list=['accuracy','precision'], y_name = target)
 
@@ -70,11 +80,13 @@ if __name__ == "__main__":
         # roi_x = roiInstance.calculate_ROI(db_df['Legendary'].astype(int).to_list(), db_df['y_pred'].to_list())
         # print("roi return: ", roi_x)
 
+        # conversion_dict = {'yes': 1, 'no': 0}
+        # reference_data = db_df[target].map(conversion_dict).tolist()
         reference_data = db_df[target].astype(int).tolist()
         current_data = db_df[prediction].tolist()
 
         cus = test_roi(metric_name = 'roi')
-        cus.evaluate(current = current_data, reference = reference_data, threshold = 1, multiple=0.5)
+        cus.evaluate(current = current_data, reference = reference_data)
         df_roi = cus.get_result()
         print("df_roi: ", df_roi)
 

@@ -25,10 +25,10 @@ from training_script import Classifier
 #     prediction = model.predict(test_data)
 
 # Below is the code for Pokemon model
-pokemon_test_data='pokemon.csv'
+pokemon_test_data='/app/datasets/bank_num.csv'
 SAMPLE_SIZE=1000
 if __name__ == '__main__':
-    target = 'Legendary'
+    target = 'default'
     genertor_fake_data = GenerateFakeData(path_ref_data=pokemon_test_data, sample_size=SAMPLE_SIZE, target=target)
     sampled_data = genertor_fake_data.get_dataclass_sampling()
 
@@ -42,12 +42,13 @@ if __name__ == '__main__':
                 num_features=sampled_data.list_num_col,
                 cat_features=None,
                 target=target,
-                pkl_file_path=os.path.join('/app', f'class_{target}_model.pkl'))  # Update the path here
+                pkl_file_path=os.path.join('/app', f'class_{target}_model.pkl')
+                ,iterations = 200, depth = None, learning_rate = 0.03) 
     
-    # pok_classifier.train()
-    # pok_classifier.serialize()
+    pok_classifier.train()
+    pok_classifier.serialize()
 
-    pok_classifier.load_model()
+    # pok_classifier.load_model()
 
     drift_sim_info = DriftSimulator(sampled_data, nb_cols_to_drift=1, drift_intensity=DriftIntensity.MODERATE)
     # to get test_data after drifting
@@ -56,8 +57,11 @@ if __name__ == '__main__':
     print('info:',df_test_drifted.dtypes)
     # df_test_drifted[target] = df_test_drifted[target].astype(int)
 
-    prediction = pok_classifier.predict(df_test=df_test_drifted)
-    prediction_int = [1 if e=='True' else 0 for e in prediction]
+    prediction = pok_classifier.predict(df_test=df_test_drifted.drop(target, axis=1))
+    prediction_int = [1 if e=='yes' else 0 for e in prediction]
+
+    conversion_dict = {'yes': 1, 'no': 0}
+    df_test_drifted['default'] = df_test_drifted['default'].map(conversion_dict)
     # prediction = prediction.astype(int)
     # print('prediction: ', prediction)
     # print('prediction.type',prediction.dtypes)
@@ -66,19 +70,19 @@ if __name__ == '__main__':
 
     # Adding the logic to Flip a % of values in our Prediction array before ingesting the data in DB so as to have FP & FN values generated successfully.
     # Introduce random coefficient
-    randomization_percentage = 0.2  # Can be adjusted. 0.2 here means 20% of the values will be flipped.
+    # randomization_percentage = 0.2  # Can be adjusted. 0.2 here means 20% of the values will be flipped. Accuracy hence would be 80% in this scenario.
 
     # Calculate the number of values to be changed based on the coefficient
-    num_values_to_change = int(len(prediction_int) * randomization_percentage)
+    # num_values_to_change = int(len(prediction_int) * randomization_percentage)
 
     # Generate random indices to select positions for randomization
-    random_indices = numpy.random.choice(len(prediction_int), size=num_values_to_change, replace=False)
+    # random_indices = numpy.random.choice(len(prediction_int), size=num_values_to_change, replace=False)
 
     # Iterate through the random indices and flip the corresponding values in prediction_int
-    for index in random_indices:
-        prediction_int[index] = 1 - prediction_int[index]
+    # for index in random_indices:
+    #     prediction_int[index] = 1 - prediction_int[index]
 
-    print('prediction_int after: ', prediction_int)
+    # print('prediction_int after: ', prediction_int)
 
     database_login = DatabaseLogin(
         db_host="influxdb",
