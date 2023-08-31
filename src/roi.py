@@ -38,8 +38,8 @@ class ReturnOfInvestment():
         print("False Negative Rate(FNR)",FNR)
 
         #Caluclate the Return of Investment (ROI) for wrong prediction
-        net_FPR = np.sign(FPR_THRESHOLD - FPR) * totalNegatives * cost_per_FP
-        net_FNR = np.sign(FNR_THRESHOLD - FNR) * totalPositives * cost_per_FN
+        net_FPR = np.sign(FPR_THRESHOLD - FPR) * totalNegatives * cost_per_FP * FPR
+        net_FNR = np.sign(FNR_THRESHOLD - FNR) * totalPositives * cost_per_FN * FNR
 
         print("predict_ROI_FP =>",net_FPR)
         print("predict_ROI_FN =>",net_FNR)

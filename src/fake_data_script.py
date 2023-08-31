@@ -29,7 +29,7 @@ pokemon_test_data='/app/datasets/bank_num.csv'
 SAMPLE_SIZE=1000
 if __name__ == '__main__':
     target = 'default'
-    genertor_fake_data = GenerateFakeData(path_ref_data=pokemon_test_data, sample_size=SAMPLE_SIZE, target=target)
+    genertor_fake_data = GenerateFakeData(path_ref_data=pokemon_test_data, sample_size=SAMPLE_SIZE, target=target, model_name = 'bank_generator.pkl')
     sampled_data = genertor_fake_data.get_dataclass_sampling()
 
     # if the task is classification

@@ -63,7 +63,7 @@ if __name__ == "__main__":
             # features_list=['#','Attack','Defense','Generation','HP','Sp. Atk','Sp. Def','Speed','Total']
             features_list=['age','job','marital','education','balance','housing','loan','contact','day','month','duration','campaign','pdays','previous','poutcome','deposit']
         )
-        analysis.add_performance_metrics(metrics_list=['accuracy','precision'], y_name = target)
+        analysis.add_performance_metrics(metrics_list=['accuracy','precision','recall'], y_name = target)
 
         analysis.run(reference=df_ref, current=db_df, options={'ttest': {'alpha': 0.05, 'equal_var': False}, 'wasserstein': {'threshold' : 0.2}})
         print("analysis: ", analysis)

@@ -1,474 +1,479 @@
 {
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": {
-            "type": "grafana",
-            "uid": "-- Grafana --"
-          },
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "target": {
-            "limit": 100,
-            "matchAny": false,
-            "tags": [],
-            "type": "dashboard"
-          },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
           "type": "dashboard"
-        }
-      ]
-    },
-    "description": "Dashboard for ROI display",
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 4,
-    "links": [],
-    "liveNow": false,
-    "panels": [
-      {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
         },
-        "gridPos": {
-          "h": 8,
-          "w": 4,
-          "x": 0,
-          "y": 0
-        },
-        "id": 4,
-        "options": {
-          "code": {
-            "language": "plaintext",
-            "showLineNumbers": false,
-            "showMiniMap": false
-          },
-          "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
-          "mode": "html"
-        },
-        "pluginVersion": "10.0.3",
-        "transparent": true,
-        "type": "text"
-      },
-      {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "fillOpacity": 80,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "lineWidth": 1,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 11,
-          "w": 20,
-          "x": 4,
-          "y": 0
-        },
-        "id": 2,
-        "options": {
-          "barRadius": 0,
-          "barWidth": 0.97,
-          "fullHighlight": false,
-          "groupWidth": 0.7,
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "orientation": "auto",
-          "showValue": "auto",
-          "stacking": "none",
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          },
-          "xTickLabelRotation": 0,
-          "xTickLabelSpacing": 0
-        },
-        "pluginVersion": "10.0.3",
-        "targets": [
-          {
-            "alias": "ROI",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "hide": false,
-            "query": "SELECT metric_value FROM metrics where metric_name = 'roi' ",
-            "rawQuery": true,
-            "refId": "A",
-            "resultFormat": "time_series"
-          }
-        ],
-        "title": "ROI",
-        "transformations": [],
-        "transparent": true,
-        "type": "barchart"
-      },
-      {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              }
-            },
-            "mappings": []
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 11,
-          "x": 0,
-          "y": 11
-        },
-        "id": 5,
-        "options": {
-          "legend": {
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "pieType": "pie",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "targets": [
-          {
-            "alias": "TP",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "query": "SELECT count(\"y_pred\") AS TP FROM prediction WHERE \"y_pred\"=1 and \"Legendary\"=true",
-            "rawQuery": true,
-            "refId": "A",
-            "resultFormat": "time_series"
-          },
-          {
-            "alias": "TN",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "hide": false,
-            "query": "SELECT count(\"y_pred\") AS TN FROM prediction WHERE \"y_pred\"=0 and \"Legendary\"=false",
-            "rawQuery": true,
-            "refId": "B",
-            "resultFormat": "time_series"
-          },
-          {
-            "alias": "FN",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "hide": false,
-            "query": "SELECT count(\"y_pred\") AS FN FROM prediction WHERE \"y_pred\"=0 and \"Legendary\"=true",
-            "rawQuery": true,
-            "refId": "C",
-            "resultFormat": "time_series"
-          },
-          {
-            "alias": "FP",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "hide": false,
-            "query": "SELECT count(\"y_pred\") AS FP FROM prediction WHERE \"Legendary\"=false and \"y_pred\"=1",
-            "rawQuery": true,
-            "refId": "D",
-            "resultFormat": "time_series"
-          }
-        ],
-        "title": "Confusion Matrix",
-        "transformations": [],
-        "type": "piechart"
-      },
-      {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "drawStyle": "line",
-              "fillOpacity": 0,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "lineInterpolation": "linear",
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 10,
-          "w": 13,
-          "x": 11,
-          "y": 11
-        },
-        "id": 6,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "targets": [
-          {
-            "alias": "Accuracy",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "query": "SELECT metric_value FROM metrics where metric_name = 'accuracy' and model_id = '$model_id' and model_version = '$model_version'",
-            "rawQuery": true,
-            "refId": "A",
-            "resultFormat": "time_series"
-          },
-          {
-            "alias": "Precision",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "PB6B4F2F1C736D27A"
-            },
-            "hide": false,
-            "query": "SELECT metric_value FROM metrics where metric_name = 'precision' and model_id = '$model_id' and model_version = '$model_version'",
-            "rawQuery": true,
-            "refId": "B",
-            "resultFormat": "time_series"
-          }
-        ],
-        "title": "Performance Metrics",
-        "type": "timeseries"
+        "type": "dashboard"
       }
-    ],
-    "refresh": false,
-    "schemaVersion": 38,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-      "list": [
-        {
-          "current": {
-            "selected": false,
-            "text": "1",
-            "value": "1"
+    ]
+  },
+  "description": "Dashboard for ROI display",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 2,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PB6B4F2F1C736D27A"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
+        "mode": "html"
+      },
+      "pluginVersion": "10.1.0",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PB6B4F2F1C736D27A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
           },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 20,
+        "x": 4,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "alias": "Return of Investment (in $)",
           "datasource": {
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "definition": "SELECT distinct(\"model_id\") FROM metrics",
-          "hide": 0,
-          "includeAll": false,
-          "multi": false,
-          "name": "model_id",
-          "options": [],
-          "query": "SELECT distinct(\"model_id\") FROM metrics",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "type": "query"
-        },
-        {
-          "current": {
-            "selected": false,
-            "text": "2",
-            "value": "2"
-          },
-          "datasource": {
-            "type": "influxdb",
-            "uid": "PB6B4F2F1C736D27A"
-          },
-          "definition": "SELECT distinct(\"model_version\") FROM metrics",
-          "hide": 0,
-          "includeAll": false,
-          "multi": false,
-          "name": "model_version",
-          "options": [],
-          "query": "SELECT distinct(\"model_version\") FROM metrics",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "type": "query"
-        },
-        {
-          "hide": 2,
-          "name": "type",
-          "query": "custom",
-          "skipUrlSync": false,
-          "type": "constant"
-        },
-        {
-          "current": {
-            "selected": false,
-            "text": "0",
-            "value": "0"
-          },
-          "datasource": {
-            "type": "influxdb",
-            "uid": "PB6B4F2F1C736D27A"
-          },
-          "definition": "SELECT distinct(\"y_pred\") FROM prediction",
-          "hide": 2,
-          "includeAll": false,
-          "multi": false,
-          "name": "prediction",
-          "options": [],
-          "query": "SELECT distinct(\"y_pred\") FROM prediction",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "type": "query"
-        },
-        {
-          "current": {
-            "selected": false,
-            "text": "false",
-            "value": "false"
-          },
-          "datasource": {
-            "type": "influxdb",
-            "uid": "PB6B4F2F1C736D27A"
-          },
-          "definition": "SELECT distinct(\"Legendary\") FROM prediction",
-          "hide": 2,
-          "includeAll": false,
-          "multi": false,
-          "name": "actual",
-          "options": [],
-          "query": "SELECT distinct(\"Legendary\") FROM prediction",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "type": "query"
+          "hide": false,
+          "query": "SELECT metric_value FROM metrics where metric_name = 'roi' ",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
         }
-      ]
+      ],
+      "title": "ROI",
+      "transformations": [],
+      "transparent": true,
+      "type": "barchart"
     },
-    "time": {
-      "from": "2023-08-26T22:58:04.191Z",
-      "to": "2023-08-26T23:10:04.314Z"
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PB6B4F2F1C736D27A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 11,
+        "x": 0,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "True Positive",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "query": "SELECT count(\"y_pred\") AS TP FROM prediction WHERE \"y_pred\"=1 and \"default\"=1",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "True Negative",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "hide": false,
+          "query": "SELECT count(\"y_pred\") AS TN FROM prediction WHERE \"y_pred\"=0 and \"default\"=0",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "False Negative",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "hide": false,
+          "query": "SELECT count(\"y_pred\") AS FN FROM prediction WHERE \"y_pred\"=0 and \"default\"=1",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "False Positive",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "hide": false,
+          "query": "SELECT count(\"y_pred\") AS FP FROM prediction WHERE \"default\"=0 and \"y_pred\"=1",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Confusion Matrix",
+      "transformations": [],
+      "type": "piechart"
     },
-    "timepicker": {},
-    "timezone": "",
-    "title": "ROIDashboard",
-    "uid": "663ynapVk",
-    "version": 2,
-    "weekStart": ""
-  }
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PB6B4F2F1C736D27A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 13,
+        "x": 11,
+        "y": 11
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Accuracy",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "query": "SELECT metric_value FROM metrics where metric_name = 'accuracy' and model_id = '$model_id' and model_version = '$model_version'",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "Precision",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "hide": false,
+          "query": "SELECT metric_value FROM metrics where metric_name = 'precision' and model_id = '$model_id' and model_version = '$model_version'",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Performance Metrics",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "1",
+          "value": "1"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "PB6B4F2F1C736D27A"
+        },
+        "definition": "SELECT distinct(\"model_id\") FROM metrics",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "model_id",
+        "options": [],
+        "query": "SELECT distinct(\"model_id\") FROM metrics",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "2",
+          "value": "2"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "PB6B4F2F1C736D27A"
+        },
+        "definition": "SELECT distinct(\"model_version\") FROM metrics",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "model_version",
+        "options": [],
+        "query": "SELECT distinct(\"model_version\") FROM metrics",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "hide": 2,
+        "name": "type",
+        "query": "custom",
+        "skipUrlSync": false,
+        "type": "constant"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "0",
+          "value": "0"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "PB6B4F2F1C736D27A"
+        },
+        "definition": "SELECT distinct(\"y_pred\") FROM prediction",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "prediction",
+        "options": [],
+        "query": "SELECT distinct(\"y_pred\") FROM prediction",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "isNone": true,
+          "selected": false,
+          "text": "None",
+          "value": ""
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "PB6B4F2F1C736D27A"
+        },
+        "definition": "SELECT distinct(\"Legendary\") FROM prediction",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "actual",
+        "options": [],
+        "query": "SELECT distinct(\"Legendary\") FROM prediction",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "2023-08-29T04:20:40.596Z",
+    "to": "2023-08-29T16:20:40.597Z"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "ROIDashboard",
+  "uid": "663ynapVk",
+  "version": 20,
+  "weekStart": ""
+}
