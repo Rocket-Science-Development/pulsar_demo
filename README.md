@@ -17,6 +17,10 @@ Thsi repo containing an example use-case showing how to leverage [pulsar-data-co
 
 3. open a browser tab on `localhost:3000` and enter the grafana credentials set at the previous step
 
+## Pulsar.ML Architecture
+
+![Architecture](images/PulsarDemoFlowDiagram_v1.jpeg)
+
 ## Demo Components
 
 ![Demo workflow](images/pulsar-demo-workflow.png)
