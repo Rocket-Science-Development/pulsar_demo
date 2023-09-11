@@ -47,7 +47,7 @@ if __name__ == "__main__":
         db_df = pd.DataFrame(dat_capture.collect().get("prediction"))
 
     print(f"Dataframe collected, df length: {len(db_df)}")
-    print(f"Dataframe : {db_df.head()}")
+    # print(f"Dataframe : {db_df.head()}")
 
     conversion_dict = {'yes': 1, 'no': 0}
     df_ref['default'] = df_ref['default'].map(conversion_dict)
@@ -66,10 +66,10 @@ if __name__ == "__main__":
         analysis.add_performance_metrics(metrics_list=['accuracy','precision','recall'], y_name = target)
 
         analysis.run(reference=df_ref, current=db_df, options={'ttest': {'alpha': 0.05, 'equal_var': False}, 'wasserstein': {'threshold' : 0.2}})
-        print("analysis: ", analysis)
+        # print("analysis: ", analysis)
         df_result_drift = analysis.results_to_pandas()
 
-        print("df_result",df_result_drift)
+        # print("df_result",df_result_drift)
 
         # print("prediction:",db_df['y_pred'])
         # print("ground truth:",db_df['Legendary'])
@@ -88,10 +88,10 @@ if __name__ == "__main__":
         cus = test_roi(metric_name = 'roi')
         cus.evaluate(current = current_data, reference = reference_data)
         df_roi = cus.get_result()
-        print("df_roi: ", df_roi)
+        # print("df_roi: ", df_roi)
 
         df_roi_pd = pd.DataFrame(df_roi)
-        print("df_roi_pd: ", df_roi_pd)
+        # print("df_roi_pd: ", df_roi_pd)
 
         # df_reshaped = pd.DataFrame([df_roi_pd[1].to_list()], columns=df_roi_pd[0])
         # df_reshaped = df_roi_pd.pivot(index=None, columns=df_roi_pd.columns[0], values=df_roi_pd.columns[1])
@@ -102,10 +102,10 @@ if __name__ == "__main__":
         df_reshaped["model_id"] = df_ref["model_id"]
         df_reshaped["model_version"] = df_ref["model_version"]
 
-        print("df_reshaped: ", df_reshaped)
+        # print("df_reshaped: ", df_reshaped)
 
         df_result_drift = df_result_drift.append(df_reshaped, ignore_index=True)
-        print("df_result_drift: ", df_result_drift)
+        # print("df_result_drift: ", df_result_drift)
 
         
         

@@ -15,7 +15,12 @@ PATH_REF_DATA_GDRIVE='https://drive.google.com/file/d/11rMPmaE_T-LFCNcb281PG611g
 PATH_REF_DATA_GDRIVE='https://drive.google.com/uc?id=' + PATH_REF_DATA_GDRIVE.split('/')[-2]
 DATA_PATH = '/datasets/'
 MODELS_PATH = '/app/models/'
-logging.getLogger().setLevel(logging.INFO)
+# logging.getLogger().setLevel(logging.INFO)
+
+
+'''
+:This module contains code for generating synthetic data and simulating data drift.
+'''
 
 warnings.filterwarnings("ignore")
 
@@ -96,13 +101,13 @@ class GenerateFakeData():
             self.model = {}
 
         self.path_ref_data=path_ref_data
-        logging.info('Read reference data...')
+        # logging.info('Read reference data...')
         self.read_data_reference()
-        logging.info('Keep numerical columns...')
+        # logging.info('Keep numerical columns...')
         self.keep_numerical_col()
         self.dict_col_type = self.df_ref.dtypes
 
-        logging.info('Generate fake/synthetic data...')
+        # logging.info('Generate fake/synthetic data...')
         if self.sampling_method == SamplingMethod.COPULAS_GAUSS_MULT:
             self.generate_fake_data_using_copulas()
         # TODO add more distributions
@@ -112,7 +117,7 @@ class GenerateFakeData():
         keep only the numerical columns and target
         :return: the data ref with num cols and target
         '''
-        logging.info(f'target:: {self.data_ref_target}')
+        # logging.info(f'target:: {self.data_ref_target}')
         target_col = self.df_ref[self.data_ref_target]
         self.df_ref = self.df_ref.select_dtypes(['number'])
         self.num_cols = list(self.df_ref.columns)
@@ -121,12 +126,12 @@ class GenerateFakeData():
         self.df_ref[self.data_ref_target]= target_col
 
     def read_data_reference(self):
-        logging.info('Inside reference data...')
-        logging.info(f'Trying to read {self.path_ref_data}')
+        # logging.info('Inside reference data...')
+        # logging.info(f'Trying to read {self.path_ref_data}')
         try:
             self.df_ref = pd.read_csv(self.path_ref_data)
-            pd_string=self.df_ref.head().to_string(index=False)
-            logging.info(f'dataframe:: {pd_string}')
+            # pd_string=self.df_ref.head().to_string(index=False)
+            # logging.info(f'dataframe:: {pd_string}')
         except FileNotFoundError:
             print("Wrong file or file path")
         
@@ -138,11 +143,11 @@ class GenerateFakeData():
         if self.sampling_method == SamplingMethod.COPULAS_GAUSS_MULT:
             dist = GaussianMultivariate(random_state = 1)
 
-        logging.info(f'Target for dataframe:: {self.df_ref.dtypes}')
-        logging.info(f'Target type is {self.df_ref[self.data_ref_target].dtypes}')
+        # logging.info(f'Target for dataframe:: {self.df_ref.dtypes}')
+        # logging.info(f'Target type is {self.df_ref[self.data_ref_target].dtypes}')
         # If target is numeric
         if (not is_object_dtype(self.df_ref[self.data_ref_target])) & (not is_bool_dtype(self.df_ref[self.data_ref_target])):
-            logging.info('numerical copulas...')
+            # logging.info('numerical copulas...')
             if (len(self.model) == 0):
                 dist.fit(self.df_ref)
                 self.model = dist
@@ -150,7 +155,7 @@ class GenerateFakeData():
                 dist = self.model
             self.df_samples = dist.sample(self.sample_size)
         else:
-            logging.info('numerical copulas 2...')
+            # logging.info('numerical copulas 2...')
             target_unique = self.df_ref[self.data_ref_target].unique()
             for a_target in target_unique:
                 ## Only fit if model does not exists already
@@ -166,7 +171,7 @@ class GenerateFakeData():
         
         self.df_samples = self.df_samples.astype(self.dict_col_type)
 
-        logging.info(f'model path is {self.model_path}')
+        # logging.info(f'model path is {self.model_path}')
         if (len(self.model) !=0) & (self.model_name != ''):
             with open (self.model_path, 'wb') as f:
                 pickle.dump(self.model, f)
@@ -176,7 +181,7 @@ class GenerateFakeData():
 
         :return: data class with the relevant information/data
         '''
-        logging.info('sampling...')
+        # logging.info('sampling...')
         df_train, df_test = train_test_split(self.df_samples, test_size=0.2, stratify = self.df_samples[self.data_ref_target])
         return SampledData(df_ref_data= self.df_ref,
                            df_sampled=self.df_samples,

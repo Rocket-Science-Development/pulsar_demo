@@ -11,6 +11,13 @@ from pulsar_data_collection.data_capture import (
 from gen_data_and_simulate_drift import DriftIntensity, DriftSimulator, GenerateFakeData
 from training_script import Classifier
 
+
+"""
+
+:This script generates synthetic data using copulas and simulates drift in the dataset.
+
+"""
+
 # Below is the code for Kidney disease model
 # kidneydisease_test_data='/app/datasets/test_data_no_class.csv'
 # kidneydisease_model="/app/models/kidney_disease.pkl"
@@ -28,6 +35,9 @@ from training_script import Classifier
 pokemon_test_data='/app/datasets/bank_num.csv'
 SAMPLE_SIZE=1000
 if __name__ == '__main__':
+    """
+    :Main execution point of the script.
+    """
     target = 'default'
     genertor_fake_data = GenerateFakeData(path_ref_data=pokemon_test_data, sample_size=SAMPLE_SIZE, target=target, model_name = 'bank_generator.pkl')
     sampled_data = genertor_fake_data.get_dataclass_sampling()
@@ -54,7 +64,7 @@ if __name__ == '__main__':
     # to get test_data after drifting
    
     df_test_drifted = drift_sim_info.get_test_data_drifted()
-    print('info:',df_test_drifted.dtypes)
+    # print('info:',df_test_drifted.dtypes)
     # df_test_drifted[target] = df_test_drifted[target].astype(int)
 
     prediction = pok_classifier.predict(df_test=df_test_drifted.drop(target, axis=1))
