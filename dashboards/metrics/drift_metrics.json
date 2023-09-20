@@ -36,7 +36,7 @@
       "title": "ROI",
       "tooltip": "",
       "type": "link",
-      "url": "http://localhost:3000/goto/N3jDzGzSR?orgId=1"
+      "url": "http://localhost:3000/goto/CdGv5VkSg?orgId=1"
     },
     {
       "asDropdown": false,
@@ -2732,7 +2732,7 @@
       "type": "row"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
@@ -2741,7 +2741,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "drift",
           "value": "drift"
         },
@@ -2767,8 +2767,8 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "month",
-          "value": "month"
+          "text": "housing",
+          "value": "housing"
         },
         "datasource": {
           "type": "influxdb",
@@ -2863,13 +2863,13 @@
     ]
   },
   "time": {
-    "from": "now-12h",
-    "to": "now"
+    "from": "2023-08-29T03:20:02.475Z",
+    "to": "2023-08-30T16:50:01.810Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Drift Dashboard",
   "uid": "y4-ZCkG4k",
-  "version": 3,
+  "version": 7,
   "weekStart": ""
 }

@@ -11,12 +11,6 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [],
-          "type": "dashboard"
-        },
         "type": "dashboard"
       }
     ]
@@ -25,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 5,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -40,7 +34,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 1,
       "options": {
         "code": {
           "language": "plaintext",
@@ -51,6 +45,18 @@
         "mode": "html"
       },
       "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "query": "SELECT value FROM metrics where type = '$type' and feature = '$feature_name' and metric_name = 'CvM' and model_id = '$model_id' and model_version = '$model_version'",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
@@ -59,6 +65,7 @@
         "type": "influxdb",
         "uid": "PB6B4F2F1C736D27A"
       },
+      "description": "ROI metric",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -85,6 +92,7 @@
               "mode": "off"
             }
           },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -104,15 +112,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
+        "h": 12,
         "w": 20,
         "x": 4,
         "y": 0
       },
       "id": 2,
       "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
+        "barRadius": 0.2,
+        "barWidth": 0.96,
         "fullHighlight": false,
         "groupWidth": 0.7,
         "legend": {
@@ -131,7 +139,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
           "alias": "Return of Investment (in $)",
@@ -139,15 +147,13 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "hide": false,
-          "query": "SELECT metric_value FROM metrics where metric_name = 'roi' ",
+          "query": "SELECT metric_value FROM metrics where metric_name = 'roi' and model_id = '$model_id' and model_version = '$model_version' and $timeFilter",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
       ],
       "title": "ROI",
-      "transformations": [],
       "transparent": true,
       "type": "barchart"
     },
@@ -156,6 +162,7 @@
         "type": "influxdb",
         "uid": "PB6B4F2F1C736D27A"
       },
+      "description": "Confusion matrix showing the breakdown of TP, TN, FP, FN values",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -174,16 +181,20 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 11,
+        "w": 12,
         "x": 0,
-        "y": 11
+        "y": 12
       },
-      "id": 5,
+      "id": 3,
       "options": {
+        "displayLabels": [
+          "percent"
+        ],
         "legend": {
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "right",
+          "showLegend": true,
+          "values": []
         },
         "pieType": "pie",
         "reduceOptions": {
@@ -205,10 +216,41 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
-          "query": "SELECT count(\"y_pred\") AS TP FROM prediction WHERE \"y_pred\"=1 and \"default\"=1",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"y_pred\") FROM prediction where \"y_pred\"=1 and \"default\"=1 and $timeFilter",
           "rawQuery": true,
           "refId": "A",
-          "resultFormat": "time_series"
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         },
         {
           "alias": "True Negative",
@@ -216,23 +258,42 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
           "hide": false,
-          "query": "SELECT count(\"y_pred\") AS TN FROM prediction WHERE \"y_pred\"=0 and \"default\"=0",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"y_pred\") FROM prediction where \"y_pred\"=0 and \"default\"=0 and $timeFilter",
           "rawQuery": true,
           "refId": "B",
-          "resultFormat": "time_series"
-        },
-        {
-          "alias": "False Negative",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "PB6B4F2F1C736D27A"
-          },
-          "hide": false,
-          "query": "SELECT count(\"y_pred\") AS FN FROM prediction WHERE \"y_pred\"=0 and \"default\"=1",
-          "rawQuery": true,
-          "refId": "C",
-          "resultFormat": "time_series"
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         },
         {
           "alias": "False Positive",
@@ -240,15 +301,89 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
           "hide": false,
-          "query": "SELECT count(\"y_pred\") AS FP FROM prediction WHERE \"default\"=0 and \"y_pred\"=1",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"y_pred\") FROM prediction where \"y_pred\"=1 and \"default\"=0 and $timeFilter",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "False Negative",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"y_pred\") FROM prediction where \"y_pred\"=0 and \"default\"=1 and $timeFilter",
           "rawQuery": true,
           "refId": "D",
-          "resultFormat": "time_series"
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         }
       ],
       "title": "Confusion Matrix",
-      "transformations": [],
+      "transparent": true,
       "type": "piechart"
     },
     {
@@ -256,6 +391,7 @@
         "type": "influxdb",
         "uid": "PB6B4F2F1C736D27A"
       },
+      "description": "Performance matrices for getting a better understanding of how ROI is co-related with different parameters.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -269,7 +405,7 @@
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 15,
-            "gradientMode": "none",
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -277,7 +413,7 @@
             },
             "insertNulls": false,
             "lineInterpolation": "smooth",
-            "lineWidth": 3,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -312,11 +448,11 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 13,
-        "x": 11,
-        "y": 11
+        "w": 12,
+        "x": 12,
+        "y": 12
       },
-      "id": 6,
+      "id": 4,
       "options": {
         "legend": {
           "calcs": [],
@@ -336,10 +472,41 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "autogen",
           "query": "SELECT metric_value FROM metrics where metric_name = 'accuracy' and model_id = '$model_id' and model_version = '$model_version'",
           "rawQuery": true,
           "refId": "A",
-          "resultFormat": "time_series"
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         },
         {
           "alias": "Precision",
@@ -347,14 +514,89 @@
             "type": "influxdb",
             "uid": "PB6B4F2F1C736D27A"
           },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
           "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
           "query": "SELECT metric_value FROM metrics where metric_name = 'precision' and model_id = '$model_id' and model_version = '$model_version'",
           "rawQuery": true,
           "refId": "B",
-          "resultFormat": "time_series"
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "Recall",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PB6B4F2F1C736D27A"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT metric_value FROM metrics where metric_name = 'recall' and model_id = '$model_id' and model_version = '$model_version'",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         }
       ],
       "title": "Performance Metrics",
+      "transparent": true,
       "type": "timeseries"
     }
   ],
@@ -367,6 +609,28 @@
       {
         "current": {
           "selected": false,
+          "text": "custom",
+          "value": "custom"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "metric type",
+        "multi": false,
+        "name": "metric_type",
+        "options": [
+          {
+            "selected": true,
+            "text": "custom",
+            "value": "custom"
+          }
+        ],
+        "query": "custom",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "current": {
+          "selected": false,
           "text": "1",
           "value": "1"
         },
@@ -374,13 +638,14 @@
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"model_id\") FROM metrics",
+        "definition": "SELECT distinct(\"model_id\") FROM metrics where metric_type = '$metric_type'",
         "hide": 0,
         "includeAll": false,
+        "label": "model id",
         "multi": false,
         "name": "model_id",
         "options": [],
-        "query": "SELECT distinct(\"model_id\") FROM metrics",
+        "query": "SELECT distinct(\"model_id\") FROM metrics where metric_type = '$metric_type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -397,67 +662,14 @@
           "type": "influxdb",
           "uid": "PB6B4F2F1C736D27A"
         },
-        "definition": "SELECT distinct(\"model_version\") FROM metrics",
+        "definition": "SELECT distinct(\"model_version\") FROM metrics where metric_type = '$metric_type'",
         "hide": 0,
         "includeAll": false,
+        "label": "model version",
         "multi": false,
         "name": "model_version",
         "options": [],
-        "query": "SELECT distinct(\"model_version\") FROM metrics",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "hide": 2,
-        "name": "type",
-        "query": "custom",
-        "skipUrlSync": false,
-        "type": "constant"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "0",
-          "value": "0"
-        },
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
-        },
-        "definition": "SELECT distinct(\"y_pred\") FROM prediction",
-        "hide": 2,
-        "includeAll": false,
-        "multi": false,
-        "name": "prediction",
-        "options": [],
-        "query": "SELECT distinct(\"y_pred\") FROM prediction",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
-        },
-        "datasource": {
-          "type": "influxdb",
-          "uid": "PB6B4F2F1C736D27A"
-        },
-        "definition": "SELECT distinct(\"Legendary\") FROM prediction",
-        "hide": 2,
-        "includeAll": false,
-        "multi": false,
-        "name": "actual",
-        "options": [],
-        "query": "SELECT distinct(\"Legendary\") FROM prediction",
+        "query": "SELECT distinct(\"model_version\") FROM metrics where metric_type = '$metric_type'",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -467,13 +679,13 @@
     ]
   },
   "time": {
-    "from": "2023-08-29T04:20:40.596Z",
-    "to": "2023-08-29T16:20:40.597Z"
+    "from": "2023-08-29T16:21:59.212Z",
+    "to": "2023-08-30T16:21:59.212Z"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "ROIDashboard",
-  "uid": "663ynapVk",
-  "version": 20,
+  "title": "ROI-dashboard",
+  "uid": "b93ee885-457d-4298-b2d6-563bcb2efb42",
+  "version": 6,
   "weekStart": ""
 }
