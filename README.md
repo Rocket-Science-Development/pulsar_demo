@@ -1,4 +1,4 @@
-# Pulsar Local demo
+# Pulsar.ML Local demo
 
 Thsi repo containing an example use-case showing how to leverage [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management
 
@@ -10,10 +10,16 @@ Thsi repo containing an example use-case showing how to leverage [pulsar-data-co
     ```bash
         export GRAFANA_USERNAME=admin;
         export GRAFANA_PASSWORD=pass123;
+        export DB_USER=admin;
+        export DB_PASSWORD=pass123;
         docker-compose up --build
     ```
 
 3. open a browser tab on `localhost:3000` and enter the grafana credentials set at the previous step
+
+## Pulsar.ML Architecture
+
+![Architecture](images/PulsarDemoFlowDiagram_v1.jpeg)
 
 ## Demo Components
 
@@ -26,9 +32,9 @@ here is a description of the steps inside the workflow :
 3. `compute-metrics` service will query the latest entries from the database then leverage [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) in order to compute the different metrics.
 4. All computed metrics will then be written to another index in influxdb in order to be displayed on grafana.
 
-## About [PulsarML](https://pulsar.ml/)
+## About [Pulsar.ML](https://pulsar.ml/)
 
-PulsarML is a project helping with monitoring your models and gain powerful insights into its performance.
+Pulsar.ML is an application helping with monitoring your models and gain powerful insights into its performance.
 
 We released two Open Source packages :
 
