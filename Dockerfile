@@ -18,6 +18,8 @@ COPY src/compute_metrics_script.py compute_metrics_script.py
 COPY src/gen_data_and_simulate_drift.py gen_data_and_simulate_drift.py
 COPY src/fake_data_script.py fake_data_script.py
 COPY src/training_script.py training_script.py
+COPY src/roi.py roi.py
+COPY src/class_Legendary_model.pkl class_Legendary_model.pkl
 COPY datasets/ datasets/
 COPY models/ models/
 

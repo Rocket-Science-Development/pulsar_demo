@@ -8,25 +8,21 @@ import logging
 import random
 from sklearn.model_selection import train_test_split
 import numpy as np
+import pickle
+import os
+from pandas.api.types import is_numeric_dtype, is_object_dtype, is_bool_dtype
 PATH_REF_DATA_GDRIVE='https://drive.google.com/file/d/11rMPmaE_T-LFCNcb281PG611g38syCkI/view?usp=sharing'
 PATH_REF_DATA_GDRIVE='https://drive.google.com/uc?id=' + PATH_REF_DATA_GDRIVE.split('/')[-2]
-logging.getLogger().setLevel(logging.INFO)
+DATA_PATH = '/datasets/'
+MODELS_PATH = '/app/models/'
+# logging.getLogger().setLevel(logging.INFO)
+
+
+'''
+:This module contains code for generating synthetic data and simulating data drift.
+'''
 
 warnings.filterwarnings("ignore")
-
-
-def apply_right_type_to_generated_columns(df: pd.DataFrame, dict_col_type: Dict) -> pd.DataFrame:
-    '''
-    if the generated data don't have the best type
-    almost for the integer (p.ex avoid to have 'age' as float)
-    df: dataframe to be adjusted
-    dict_col_type: dictionnary with the columns name and their types
-    :return: generated dataframe with the good type
-    '''
-    for c, type in dict_col_type.items():
-        df[c] = df[c].astype(type)
-    return df
-
 
 class SamplingMethod(Enum):
     COPULAS_GAUSS_MULT = 1
@@ -56,18 +52,20 @@ def create_dict_type_for_df(df_ref:pd.DataFrame):
         dict_col_type[col] = df_ref[col].dtype
     return dict_col_type
 
-def get_shift_coef(drift_intensity:DriftIntensity):
+def get_shift_coef(drift_intensity:DriftIntensity=DriftIntensity.MODERATE):
     '''
     :param drift_intensity: enum with the level of intensity to be used
     :return: the new mean and stdev; used to drift features
     '''
-    if drift_intensity == DriftIntensity.MODERATE:
+
+    if drift_intensity is DriftIntensity.MODERATE:
         mean_coef = random.uniform(1.2, 1.7)
         std_coef = random.uniform(1.5, 2)
-
-    if drift_intensity == DriftIntensity.EXTREME:
+    elif drift_intensity is DriftIntensity.EXTREME:
         mean_coef = random.uniform(1.5, 2.7)
         std_coef = random.uniform(2, 5)
+    else:
+        print('Unrecognized drift intensity in get_shift_coef()')
 
     return mean_coef, std_coef
 
@@ -76,7 +74,8 @@ class GenerateFakeData():
     def __init__(self, path_ref_data:str='pokemon.csv',
                  sample_size = 1000,
                  sampling_method= SamplingMethod.COPULAS_GAUSS_MULT,
-                 target = 'Legendary'):
+                 target = 'Legendary',
+                 model_name:str= ''):
         '''
 
         :param path_ref_data: the dataset (reference)
@@ -92,35 +91,47 @@ class GenerateFakeData():
         self.sample_size = sample_size
         self.train_set = pd.DataFrame({})
         self.test_set = pd.DataFrame({})
+        self.model_path = MODELS_PATH + model_name
+        self.model_name = model_name
+
+        if os.path.exists(self.model_path) and (self.model_path != MODELS_PATH):
+            with open(self.model_path, 'rb') as f:
+                self.model = pickle.load(f)
+        else:
+            self.model = {}
 
         self.path_ref_data=path_ref_data
-        # logging.INFO('Read reference data...')
+        # logging.info('Read reference data...')
         self.read_data_reference()
-        # logging.INFO('Keep numerical columns...')
+        # logging.info('Keep numerical columns...')
         self.keep_numerical_col()
-        self.dict_col_type = create_dict_type_for_df(self.df_ref)
+        self.dict_col_type = self.df_ref.dtypes
 
-        # logging.INFO('Generate fake/synthetic data...')
+        # logging.info('Generate fake/synthetic data...')
         if self.sampling_method == SamplingMethod.COPULAS_GAUSS_MULT:
             self.generate_fake_data_using_copulas()
         # TODO add more distributions
-
-        self.df_samples = apply_right_type_to_generated_columns(self.df_samples, self.dict_col_type)
 
     def keep_numerical_col(self):
         '''
         keep only the numerical columns and target
         :return: the data ref with num cols and target
         '''
-        print(self.data_ref_target)
+        # logging.info(f'target:: {self.data_ref_target}')
         target_col = self.df_ref[self.data_ref_target]
         self.df_ref = self.df_ref.select_dtypes(['number'])
         self.num_cols = list(self.df_ref.columns)
+        if self.data_ref_target in self.num_cols:
+            self.num_cols.remove(self.data_ref_target)
         self.df_ref[self.data_ref_target]= target_col
 
     def read_data_reference(self):
+        # logging.info('Inside reference data...')
+        # logging.info(f'Trying to read {self.path_ref_data}')
         try:
-            self.df_ref = pd.read_csv(PATH_REF_DATA_GDRIVE)
+            self.df_ref = pd.read_csv(self.path_ref_data)
+            # pd_string=self.df_ref.head().to_string(index=False)
+            # logging.info(f'dataframe:: {pd_string}')
         except FileNotFoundError:
             print("Wrong file or file path")
         
@@ -130,20 +141,48 @@ class GenerateFakeData():
         # generate new data using COPULAS_GAUSS_MULT method
         # TODO add more distribution option
         if self.sampling_method == SamplingMethod.COPULAS_GAUSS_MULT:
-            dist = GaussianMultivariate()
+            dist = GaussianMultivariate(random_state = 1)
 
-        for a_target in self.df_ref[self.data_ref_target].unique():
-            dist.fit(self.df_ref[self.df_ref[self.data_ref_target] == a_target].drop([self.data_ref_target], axis=1))
-            sampled = dist.sample(self.sample_size)
-            sampled[self.data_ref_target] = a_target
-            self.df_samples = self.df_samples.append(sampled)
+        # logging.info(f'Target for dataframe:: {self.df_ref.dtypes}')
+        # logging.info(f'Target type is {self.df_ref[self.data_ref_target].dtypes}')
+        # If target is numeric
+        if (not is_object_dtype(self.df_ref[self.data_ref_target])) & (not is_bool_dtype(self.df_ref[self.data_ref_target])):
+            # logging.info('numerical copulas...')
+            if (len(self.model) == 0):
+                dist.fit(self.df_ref)
+                self.model = dist
+            else:
+                dist = self.model
+            self.df_samples = dist.sample(self.sample_size)
+        else:
+            # logging.info('numerical copulas 2...')
+            target_unique = self.df_ref[self.data_ref_target].unique()
+            for a_target in target_unique:
+                ## Only fit if model does not exists already
+                if (len(self.model) == 0) or (a_target not in self.model.keys()):
+                    dist.fit(self.df_ref[self.df_ref[self.data_ref_target] == a_target].drop([self.data_ref_target], axis=1))
+                    self.model[a_target] = dist
+                else:
+                    dist = self.model[a_target]
+                sampled = dist.sample(self.sample_size//len(target_unique))
+                sampled[self.data_ref_target] = a_target
+                self.df_samples = self.df_samples.append(sampled)
+            # Setting the right data types
+        
+        self.df_samples = self.df_samples.astype(self.dict_col_type)
+
+        # logging.info(f'model path is {self.model_path}')
+        if (len(self.model) !=0) & (self.model_name != ''):
+            with open (self.model_path, 'wb') as f:
+                pickle.dump(self.model, f)
 
     def get_dataclass_sampling(self):
         '''
 
         :return: data class with the relevant information/data
         '''
-        df_train, df_test = train_test_split(self.df_samples, test_size=0.2)
+        # logging.info('sampling...')
+        df_train, df_test = train_test_split(self.df_samples, test_size=0.2, stratify = self.df_samples[self.data_ref_target])
         return SampledData(df_ref_data= self.df_ref,
                            df_sampled=self.df_samples,
                            list_num_col=self.num_cols,
@@ -166,7 +205,7 @@ class DriftSimulator():
     '''
     def __init__(self, sampled_data:SampledData,
                  nb_cols_to_drift:int,
-                 drift_intensity:DriftIntensity = None,
+                 drift_intensity:DriftIntensity = DriftIntensity.MODERATE,
                  selected_columns_to_drift = []):
         self.input_data = sampled_data
         self.selected_columns_to_drift= selected_columns_to_drift
@@ -201,9 +240,12 @@ class DriftSimulator():
             # TODO add more distribution option
             drifted_data = np.random.normal(mean*coef_mean, std*coef_std, size_test_data)
             self.test_data_drifted[col] = drifted_data
+            
+            #Added for ROI
+            #self.test_data_drifted[f'Ground Truth_{col}'] = self.input_data.test_data[col]
 
     def get_test_data_drifted(self):
-        self.test_data_drifted = apply_right_type_to_generated_columns(self.test_data_drifted, self.input_data.dict_col_type)
+        self.test_data_drifted = self.test_data_drifted.astype(self.input_data.test_data.dtypes)
         return self.test_data_drifted
 
 if __name__ == '__main__':

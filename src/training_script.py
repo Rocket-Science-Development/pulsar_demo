@@ -11,13 +11,19 @@ class Classifier:
                 num_features:List,
                 cat_features:List,
                 target:str,
-                 pkl_file_path:str):
+                 pkl_file_path:str, 
+                 iterations = 2,
+                 learning_rate = 1,
+                 depth = 2):
         self.df_train = df_train
         self.num_features = num_features
         self.target = target
         self.pkl_file_path= pkl_file_path
         if not cat_features:
-            self.cat_features = list(set(self.df_train.columns) - set(num_features))
+            self.cat_features = list(set(self.df_train.columns) - set(num_features)- set([self.target]) )
+        self.iterations = iterations
+        self.learning_rate = learning_rate
+        self.depth = depth
 
     def serialize(self):
         with open(self.pkl_file_path, 'wb') as file:
@@ -32,14 +38,19 @@ class Classifier:
     and target (self.target) attributes.
     """
     def train(self):
-        self.model = CatBoostClassifier(iterations=2,
-                                   learning_rate=1,
-                                   depth=2)
-        self.model.fit(self.df_train[self.num_features + self.cat_features], self.df_train[self.target])
+        self.model = CatBoostClassifier(iterations=self.iterations,
+                                   learning_rate=self.learning_rate,
+                                   depth=self.depth)
+        self.model.fit(self.df_train[self.num_features + self.cat_features], self.df_train[self.target], cat_features=self.cat_features)
 
 
 
     def predict(self, df_test):
-
+            #self.load_model()
             # Use the loaded model to make predictions
             return self.model.predict(df_test)
+    
+    def load_model(self):
+         with open(self.pkl_file_path, 'rb') as file:
+            loaded_classifier = pickle.load(file)
+            self.model = loaded_classifier.model

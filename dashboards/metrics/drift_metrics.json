@@ -24,19 +24,19 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 4,
   "links": [
     {
       "asDropdown": false,
       "icon": "external link",
-      "includeVars": true,
+      "includeVars": false,
       "keepTime": true,
       "tags": [],
       "targetBlank": true,
-      "title": "Drift Summary",
+      "title": "ROI",
       "tooltip": "",
       "type": "link",
-      "url": "http://localhost:3000/d/663ynapVk/driftsummarydashboard?orgId=1"
+      "url": "http://localhost:3000/goto/CdGv5VkSg?orgId=1"
     },
     {
       "asDropdown": false,
@@ -87,7 +87,7 @@
         "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
         "mode": "html"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -160,7 +160,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -234,7 +234,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -308,7 +308,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -351,6 +351,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 10,
@@ -534,7 +535,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -608,7 +609,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -681,7 +682,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -751,7 +752,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -838,7 +839,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -903,7 +904,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -968,7 +969,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.3",
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -1010,6 +1011,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1111,6 +1113,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1213,6 +1216,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1315,6 +1319,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1416,6 +1421,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1517,6 +1523,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1619,6 +1626,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1720,6 +1728,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -1821,6 +1830,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 3,
             "pointSize": 5,
@@ -2722,7 +2732,7 @@
       "type": "row"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
@@ -2731,7 +2741,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "drift",
           "value": "drift"
         },
@@ -2757,8 +2767,8 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "Sp. Atk",
-          "value": "Sp. Atk"
+          "text": "housing",
+          "value": "housing"
         },
         "datasource": {
           "type": "influxdb",
@@ -2853,8 +2863,8 @@
     ]
   },
   "time": {
-    "from": "now-7d",
-    "to": "now"
+    "from": "2023-08-29T03:20:02.475Z",
+    "to": "2023-08-30T16:50:01.810Z"
   },
   "timepicker": {},
   "timezone": "",
