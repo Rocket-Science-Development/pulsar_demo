@@ -1,11 +1,11 @@
 # Pulsar.ML Local demo
 
-Thsi repo containing an example use-case showing how to leverage [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management
+This repository contains an example use-case demonstrating how to utilize [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management.
 
 ## Quickstart
 
-1. install docker and docker-compose
-2. execute the following commands :
+1. Make sure you have Docker and Docker Compose installed.
+2. Execute the following commands:
 
     ```bash
         export GRAFANA_USERNAME=admin;
@@ -15,7 +15,7 @@ Thsi repo containing an example use-case showing how to leverage [pulsar-data-co
         docker-compose up --build
     ```
 
-3. open a browser tab on `localhost:3000` and enter the grafana credentials set at the previous step
+3. Open a web browser and go to localhost:3000. Enter the Grafana credentials set in the previous step.
 
 ## Pulsar.ML Architecture
 
@@ -25,23 +25,23 @@ Thsi repo containing an example use-case showing how to leverage [pulsar-data-co
 
 ![Demo workflow](images/pulsar-demo-workflow.png)
 
-here is a description of the steps inside the workflow :
+Here is a description of the steps within the workflow
 
 1. Data is captured from an inference container or a notebook using [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection)
 2. Collected data point, predictions, and other relevant configured metadata are written into an index inside influxdb
 3. `compute-metrics` service will query the latest entries from the database then leverage [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) in order to compute the different metrics.
-4. All computed metrics will then be written to another index in influxdb in order to be displayed on grafana.
+4. All computed metrics are then written to another index in InfluxDB for display in Grafana.
 
 ## About [Pulsar.ML](https://pulsar.ml/)
 
-Pulsar.ML is an application helping with monitoring your models and gain powerful insights into its performance.
+Pulsar.ML is an application designed to assist with monitoring your machine learning models and gaining powerful insights into their performance.
 
-We released two Open Source packages :
+We have released two open-source packages:
 
-- [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) :  lightweight python SDK enabling data collection of features, predictions and metadata from an ML model serving code/micro-service
-- [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) : library for evaluating and monitoring data and concept drift with an extensive set of metrics. It also offers the possibility to use custom metrics defined by the user.
+- [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) :  A lightweight Python SDK for collecting features, predictions, and metadata from an ML model serving code or microservice.
+- [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) : A library for evaluating and monitoring data and concept drift with an extensive set of metrics. It also provides the flexibility to use custom metrics defined by the user.
 
-We also created [pulsar demo](https://github.com/Rocket-Science-Development/pulsar_demo) to display an example use-case showing how to leverage both packages to implement model monitoring and performance management.
+We also created [pulsar demo](https://github.com/Rocket-Science-Development/pulsar_demo) to showcase an example use-case that demonstrates how to leverage both packages for model monitoring and performance management.
 
 Want to interact with the community? join our [slack channel](https://pulsarml.slack.com)
 
