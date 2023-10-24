@@ -4,8 +4,7 @@ This repository contains an example use-case demonstrating how to utilize [pulsa
 
 ## Quickstart
 
-1. Make sure you have Docker and Docker Compose installed.
-2. Execute the following commands:
+1. Make sure that you have the Docker and Docker compose installed and execute the following commands:
 
     ```bash
         export GRAFANA_USERNAME=admin;
@@ -15,7 +14,7 @@ This repository contains an example use-case demonstrating how to utilize [pulsa
         docker-compose up --build
     ```
 
-3. Open a web browser and go to localhost:3000. Enter the Grafana credentials set in the previous step.
+2. Open a web browser and go to localhost:3000. Enter the Grafana credentials set in the previous step.
 
 ## Pulsar.ML Architecture
 
@@ -43,7 +42,7 @@ We have released two open-source packages:
 
 We also created [pulsar demo](https://github.com/Rocket-Science-Development/pulsar_demo) to showcase an example use-case that demonstrates how to leverage both packages for model monitoring and performance management.
 
-Want to interact with the community? join our [slack channel](https://pulsarml.slack.com)
+For further interaction with our community, Please join our [slack channel](https://pulsarml.slack.com)
 
 Powered by [Rocket Science Development](https://rocketscience.one/)
 
