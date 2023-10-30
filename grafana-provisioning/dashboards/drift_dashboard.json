@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 3,
   "links": [
     {
       "asDropdown": false,
@@ -36,7 +36,7 @@
       "title": "ROI",
       "tooltip": "",
       "type": "link",
-      "url": "http://localhost:3000/goto/CdGv5VkSg?orgId=1"
+      "url": "http://35.184.68.209:3000/d/b93ee885-457d-4298-b2d6-563bcb2efb42/roi-dashboard?orgId=1&from=now-1h&to=now"
     },
     {
       "asDropdown": false,
@@ -87,7 +87,7 @@
         "content": "<img src=\"https://drive.google.com/uc?export=view&id=1qmZiGy4wkwO2o-cFzPM3Sd9D-fa5Vubv\" style=\"height:90%;align=right;\"/>",
         "mode": "html"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -160,7 +160,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -234,7 +234,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -308,7 +308,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -535,7 +535,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -609,7 +609,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -682,7 +682,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -752,7 +752,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -839,7 +839,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -904,7 +904,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -969,7 +969,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.1.0",
+      "pluginVersion": "10.1.5",
       "targets": [
         {
           "datasource": {
@@ -1032,7 +1032,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=bftest"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=bftest"
             }
           ],
           "mappings": [],
@@ -1134,7 +1134,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ttest"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ttest"
             }
           ],
           "mappings": [],
@@ -1237,7 +1237,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=manwu"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=manwu"
             }
           ],
           "mappings": [],
@@ -1340,7 +1340,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ks_2samp"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=ks_2samp"
             }
           ],
           "mappings": [],
@@ -1442,7 +1442,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=wasserstein"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=wasserstein"
             }
           ],
           "mappings": [],
@@ -1544,7 +1544,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=levene"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=levene"
             }
           ],
           "mappings": [],
@@ -1647,7 +1647,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=kl"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=kl"
             }
           ],
           "mappings": [],
@@ -1749,7 +1749,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=CvM"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=CvM"
             }
           ],
           "mappings": [],
@@ -1851,7 +1851,7 @@
             {
               "targetBlank": true,
               "title": "DriftDetailDashboard",
-              "url": "http://localhost:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=CvM"
+              "url": "http://35.184.68.209:3000/d/Zntdh-tVz/driftdetaildashboard?orgId=1&var-type=$type&var-model_id=$model_id&var-model_version=$model_version&var-feature_name=$feature_name&var-metric_name=CvM"
             }
           ],
           "mappings": [],
@@ -2732,7 +2732,7 @@
       "type": "row"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
@@ -2766,7 +2766,7 @@
       {
         "allValue": "",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "housing",
           "value": "housing"
         },
@@ -2863,13 +2863,13 @@
     ]
   },
   "time": {
-    "from": "2023-08-29T03:20:02.475Z",
-    "to": "2023-08-30T16:50:01.810Z"
+    "from": "now-7d",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Drift Dashboard",
   "uid": "y4-ZCkG4k",
-  "version": 7,
+  "version": 3,
   "weekStart": ""
 }
