@@ -32,6 +32,10 @@ from training_script import Classifier
 #     prediction = model.predict(test_data)
 
 # Below is the code for Pokemon model
+
+with open("/var/log/test_script.log", "a") as f:
+    f.write("Script started\n")
+    
 pokemon_test_data='/app/datasets/bank_num.csv'
 SAMPLE_SIZE=1000
 if __name__ == '__main__':

@@ -1,3 +1,9 @@
-*/10 * * * * /usr/local/bin/python /app/compute_metrics_script.py  > /proc/1/fd/1 2>/proc/1/fd/2
-*/5 * * * * /usr/local/bin/python /app/fake_data_script.py  > /proc/1/fd/1 2>/proc/1/fd/2
-# Don't remove the empty line at the end of this file. It is required to run the cron job
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+* * * * * root env > /var/log/cron_env.log 2>&1
+* * * * * root echo "Cron ran at $(date)" >> /var/log/cron_test.log 2>&1
+*/4 * * * * root /usr/local/bin/python /app/compute_metrics_script.py >> /var/log/cron.log 2>&1
+*/2 * * * * root /usr/local/bin/python /app/fake_data_script.py >> /var/log/cron.log 2>&1
+
+# Don't remove the empty line at the end of this file. It is required to run the cron job.
