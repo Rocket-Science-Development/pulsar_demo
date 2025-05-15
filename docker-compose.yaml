@@ -11,8 +11,11 @@ services:
     volumes:
       - influxdb-storage:/var/lib/influxdb
     environment:
+      - INFLUXDB_ADMIN_USER=${DB_USER}
+      - INFLUXDB_ADMIN_PASSWORD=${DB_PASSWORD}
       - INFLUXDB_USER=${DB_USER}
       - INFLUXDB_PASSWORD=${DB_PASSWORD}
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
     restart: always
   chronograf:
     image: chronograf:latest

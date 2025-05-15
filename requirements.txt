@@ -4,3 +4,6 @@ pulsar-data-collection
 copulas
 catboost==1.2
 scikit-learn
+numpy==1.21.0
+pysqlite3==0.4.7
+pandas==1.5.3
