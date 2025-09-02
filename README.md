@@ -4,17 +4,49 @@ This repository contains an example use-case demonstrating how to utilize [pulsa
 
 ## Quickstart
 
-1. Make sure that you have the Docker and Docker compose installed and execute the following commands:
+### Prerequisites
+- Docker and Docker Compose installed
 
-    ```bash
-        export GRAFANA_USERNAME=admin;
-        export GRAFANA_PASSWORD=pass123;
-        export DB_USER=admin;
-        export DB_PASSWORD=pass123;
-        docker-compose up --build
-    ```
+### Setup Instructions
 
-2. Open a web browser and go to localhost:3000. Enter the Grafana credentials set in the previous step.
+1. **Configure Environment Variables (Optional)**:
+   
+   Copy the example environment file and customize if needed:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your preferred credentials (optional)
+   ```
+   
+   Or export environment variables manually:
+   ```bash
+   export GRAFANA_USERNAME=admin
+   export GRAFANA_PASSWORD=pass123
+   export DB_USER=admin
+   export DB_PASSWORD=pass123
+   ```
+
+2. **Start the Services**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the Dashboard**:
+   Open a web browser and go to http://localhost:3000
+   
+   Use the credentials:
+   - Username: admin (or your custom GRAFANA_USERNAME)
+   - Password: pass123 (or your custom GRAFANA_PASSWORD)
+
+### Available Services
+- **Grafana Dashboard**: http://localhost:3000
+- **Chronograf**: http://localhost:8889
+- **InfluxDB**: http://localhost:8086
+
+### Environment Variables
+All services use consistent environment variables defined in `.env.example`:
+- `DB_USER` / `DB_PASSWORD`: InfluxDB credentials
+- `GRAFANA_USERNAME` / `GRAFANA_PASSWORD`: Grafana admin credentials
+- `DB_HOST` / `DB_PORT`: Database connection settings
 
 ## Pulsar.ML Architecture
 

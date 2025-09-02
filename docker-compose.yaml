@@ -3,6 +3,11 @@ services:
     build: .
     links:
       - influxdb
+    environment:
+      - DB_HOST=influxdb
+      - DB_PORT=8086
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-pass123}
   influxdb:
     build:
       context: ./docker/influxdb
@@ -11,11 +16,13 @@ services:
     volumes:
       - influxdb-storage:/var/lib/influxdb
     environment:
-      - INFLUXDB_ADMIN_USER=${DB_USER}
-      - INFLUXDB_ADMIN_PASSWORD=${DB_PASSWORD}
-      - INFLUXDB_USER=${DB_USER}
-      - INFLUXDB_PASSWORD=${DB_PASSWORD}
+      - INFLUXDB_ADMIN_USER=${DB_USER:-admin}
+      - INFLUXDB_ADMIN_PASSWORD=${DB_PASSWORD:-pass123}
+      - INFLUXDB_USER=${DB_USER:-admin}
+      - INFLUXDB_PASSWORD=${DB_PASSWORD:-pass123}
       - INFLUXDB_HTTP_AUTH_ENABLED=false
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-pass123}
     restart: always
   chronograf:
     image: chronograf:latest
@@ -27,8 +34,8 @@ services:
       - influxdb
     environment:
       - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_USERNAME=${DB_USER}
-      - INFLUXDB_PASSWORD=${DB_PASSWORD}
+      - INFLUXDB_USERNAME=${DB_USER:-admin}
+      - INFLUXDB_PASSWORD=${DB_PASSWORD:-pass123}
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -40,8 +47,10 @@ services:
     depends_on:
       - influxdb
     environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-pass123}
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-pass123}
 volumes:
   influxdb-storage:
   chronograf-storage:

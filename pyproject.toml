@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "pulsar_demo"}]
 
 [tool.poetry.dependencies]
-python = "3.9.6"
+python = "^3.9"
 
 
 [tool.poetry.group.dev.dependencies]
