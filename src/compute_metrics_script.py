@@ -1,4 +1,5 @@
 import uuid
+import os
 import pandas as pd
 from datetime import datetime
 from pulsar_data_collection.data_capture import DataCapture, DatabaseLogin
@@ -30,7 +31,13 @@ if __name__ == "__main__":
     df_ref['period'] = 'reference'
 
     # Reading the newest prediction data
-    database_login = DatabaseLogin(db_host="influxdb", db_port=8086, db_user="admin", db_password="pass123", protocol="line")
+    database_login = DatabaseLogin(
+        db_host=os.getenv("DB_HOST", "influxdb"), 
+        db_port=int(os.getenv("DB_PORT", "8086")), 
+        db_user=os.getenv("DB_USER", "admin"), 
+        db_password=os.getenv("DB_PASSWORD", "pass123"), 
+        protocol="line"
+    )
 
     dat_capture = DataCapture(
         storage_engine="influxdb",

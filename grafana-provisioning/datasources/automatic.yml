@@ -5,8 +5,8 @@ datasources:
   type: influxdb
   access: proxy
   url: http://influxdb:8086
-  password: pass123
-  user: admin
+  password: ${DB_PASSWORD}
+  user: ${DB_USER}
   database: PULSAR_DATA_COLLECTION
   basicAuth: false
   basicAuthUser:

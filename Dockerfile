@@ -1,4 +1,4 @@
-FROM python:3.9.6-slim-buster
+FROM python:3.9-slim-bullseye
 
 # Install dependencies
 RUN apt-get update && apt-get install -y git gcc cron procps
