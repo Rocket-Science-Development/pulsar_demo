@@ -1,6 +1,6 @@
 # Pulsar.ML Local demo
 
-This repository contains an example use-case demonstrating how to utilize [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management.
+This repo contains an example use-case demonstrating how to utilize [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management.
 
 ## Quickstart
 
