@@ -2,8 +2,9 @@ black
 pulsar-metrics
 pulsar-data-collection
 copulas
-catboost==1.2
+catboost>=1.2.2
 scikit-learn
-numpy==1.21.0
-pysqlite3==0.4.7
-pandas==1.5.3
+numpy>=1.21.0,<1.25.0
+pysqlite3
+pandas>=1.5.3,<2.0.0
+influxdb
