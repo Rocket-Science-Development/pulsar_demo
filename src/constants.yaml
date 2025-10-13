@@ -1,0 +1,73 @@
+
+database:
+  db_host: "influxdb"
+  db_port: 8086
+  db_user: "admin"
+  db_password: "pass123"
+  protocol: "line"
+
+
+model:
+  id: "1"
+  version: "2"
+  target_column: "default"
+  prediction_column: "y_pred"
+
+
+data:
+  reference_path: "/app/datasets/bank_num.csv"
+  conversion_mapping:
+    yes: 1
+    no: 0
+
+
+roi:
+  fpr_threshold: 0.5
+  fnr_threshold: 0.2
+  cost_per_fp: 100
+  cost_per_fn: 300
+
+
+drift_metrics:
+  - wasserstein
+  - ttest
+  - ks_2samp
+  - kl
+  - manwu
+  - levene
+  - bftest
+  - CvM
+  - psi
+
+
+performance_metrics:
+  - accuracy
+  - precision
+  - recall
+
+
+features:
+  - age
+  - job
+  - marital
+  - education
+  - balance
+  - housing
+  - loan
+  - contact
+  - day
+  - month
+  - duration
+  - campaign
+  - pdays
+  - previous
+  - poutcome
+  - deposit
+
+
+metric_options:
+  ttest:
+    alpha: 0.05
+    equal_var: false
+  wasserstein:
+    threshold: 0.2
