@@ -19,11 +19,12 @@ from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from pulsar_data_collection.genai import PulsarSpanExporter, PulseSink
+from pulsar_data_collection.models import CaptureOptions, PulseParameters
+
 from permit_agent import tools
 from permit_agent.agent import PermitAgent
 from permit_agent.tasks import DEFAULT_MIX, make_task
-from pulsar_data_collection.genai import PulsarSpanExporter, PulseSink
-from pulsar_data_collection.models import CaptureOptions, PulseParameters
 
 
 def main(argv=None):
@@ -36,6 +37,7 @@ def main(argv=None):
     parser.add_argument("--file-share", type=float, default=None, help="share of file-opening requests (question drift)")
     parser.add_argument("--french-share", type=float, default=0.5)
     parser.add_argument("--label", default="baseline", help="scenario label, written as the `scenario` tag")
+    parser.add_argument("--campaign", default="adhoc", help="campaign identifier, written as the `campaign` tag")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--spool-dir", default=str(Path(__file__).parent / ".spool"))
     args = parser.parse_args(argv)
@@ -54,7 +56,7 @@ def main(argv=None):
             "org": os.environ.get("INFLUX_ORG", "pulsarml"),
             "bucket_name": os.environ.get("INFLUX_BUCKET", "monitoring"),
         },
-        additional_tags={"scenario": args.label},
+        additional_tags={"scenario": args.label, "campaign": args.campaign},
     )
     sink = PulseSink(params, CaptureOptions(spool_dir=Path(args.spool_dir)))
     provider = TracerProvider(resource=Resource.create({"service.name": "permit-assistant"}))

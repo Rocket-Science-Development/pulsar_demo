@@ -1,3 +1,6 @@
 .spool/
 __pycache__/
 .venv/
+campaign_*.jsonl
+campaign_*.log
+results/

@@ -50,6 +50,34 @@ from(bucket: "monitoring")
   |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
 ```
 
+## Drift campaign
+
+`campaign.py` runs a calibrated drift study: 300 reference runs, a 60-run holdout (control), then three injected
+drifts of 90 runs each (30 % of `check_eligibility` calls time out; `granite3.3:2b` instead of `llama3.2:3b`; 60 % of
+file-opening requests). `analyze_drift.py` reads the `agent_run` records back and tests windows of 30 runs against
+the reference: chi-square and Kolmogorov-Smirnov tests calibrated by A/A resampling of the reference,
+Benjamini-Hochberg over the features, confirmation over 2 consecutive windows.
+
+```bash
+python campaign.py --campaign my-study
+python analyze_drift.py --campaign my-study --out results
+```
+
+Results on a T4 GPU (630 runs, about 20 minutes):
+
+| Phase | Windows with an alert | Confirmed | Confirmed features |
+|---|---|---|---|
+| holdout (no change) | 0 / 2 | no | — |
+| tool fault | 2 / 3 | yes, window 3 | `tool_error_rate` (3.7 % → 15.6 %) |
+| model change | 3 / 3 | yes, window 2 | `first_tool`, `steps`, `tool_calls`, `tool_error_rate`, `task_success`, `input_tokens`, `latency_s` |
+| question shift | 3 / 3 | yes, window 2 | `first_tool`, `input_tokens`, `task_success` |
+
+Drift monitoring cannot see a defect that is already present in the reference. In a first campaign, the model passed
+program names instead of identifiers and two tools failed on every call; the injected fault changed nothing and was
+rightly not reported, while the agent still answered as if the tools had worked. The tools now accept a name or a
+topic word, and absolute checks (tool error rate, consistency of the answer with the tool results) complement drift
+monitoring.
+
 ## Notes
 
 - Only features are stored (steps, tools, tokens, latency, termination...), never the requests or the answers.
