@@ -51,15 +51,24 @@ def search_programs(topic: str) -> list:
     ]
 
 
+def _program(program_id: str) -> dict:
+    """Program by identifier, or by a name or topic word (models often pass "rent assistance" instead of PRG-LOGE)"""
+    if program_id in PROGRAMS:
+        return PROGRAMS[program_id]
+    text = str(program_id).lower()
+    found = [pid for pid, words in TOPICS.items() if any(w in text for w in words)]
+    if len(found) != 1:
+        raise ValueError(f"unknown program {program_id}")
+    return PROGRAMS[found[0]]
+
+
 def check_eligibility(program_id: str, annual_income: float, age: int) -> dict:
     """Check whether an applicant is eligible to a program"""
     fault = FAULTS.get("check_eligibility", {})
     if random.random() < fault.get("timeout_rate", 0.0):
         raise TimeoutError("eligibility service timed out")
-    program = PROGRAMS.get(program_id)
-    if program is None:
-        raise ValueError(f"unknown program {program_id}")
-    if age < 18:
+    program = _program(program_id)
+    if int(age) < 18:
         return {"eligible": False, "reason": "applicant must be 18 or older"}
     eligible = float(annual_income) <= program["max_income"]
     return {"eligible": eligible, "reason": "income within limit" if eligible else "income above limit"}
@@ -67,9 +76,7 @@ def check_eligibility(program_id: str, annual_income: float, age: int) -> dict:
 
 def compute_amount(program_id: str, annual_income: float) -> dict:
     """Estimate the amount an eligible applicant could receive"""
-    program = PROGRAMS.get(program_id)
-    if program is None:
-        raise ValueError(f"unknown program {program_id}")
+    program = _program(program_id)
     amount = min(program["cap"], round(program["rate"] * max(0.0, program["max_income"] - float(annual_income)), 2))
     return {"program_id": program_id, "estimated_amount": amount, "currency": "CAD"}
 
