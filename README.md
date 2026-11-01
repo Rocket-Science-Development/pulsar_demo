@@ -14,6 +14,7 @@ then detect data drift, concept drift and performance degradation with calibrate
 | Demo | What it shows | Stack | Status |
 |---|---|---|---|
 | [**`genai_agent/`**](genai_agent/README.md) | A tool-calling agent (public-services assistant, 5 tools, French and English) monitored through OpenTelemetry GenAI: agent runs, tool calls and LLM calls, with drift scenarios (model change, tool fault, question shift, prompt change) | Python 3.12+, pulsar-data-collection ≥ 0.5, pulsar-metrics ≥ 0.5, InfluxDB 2.6, Ollama (llama3.2, granite3.3) | **Recommended** |
+| [**`ethics_validation/`**](ethics_validation/README.md) | Reproducible validation of the fairness, explanation and counterfactual-probe modules: injected biases of known size, power and false-alarm curves by sample size, export of the results for a governance layer | Python 3.12+, pulsar-metrics ≥ 0.9, pulsar-data-collection ≥ 0.6, matplotlib; Folktables for ACSIncome | New |
 | Classic demo (repository root) | A tabular model with synthetic data and simulated drift; metrics computed on a schedule and shown in Grafana | Python 3.9, pulsar-data-collection 0.1.1 and pulsar-metrics 0.1.3 from PyPI, InfluxDB 1.5 | Legacy, frozen on the 2023 versions |
 
 ## Quick start: agent demo
