@@ -1,53 +1,91 @@
-# Pulsar.ML Local demo
+<p align="center"><img src="images/pulsarml-logo.png" alt="pulsar.ml" width="260"></p>
 
-This repository contains an example use-case demonstrating how to utilize [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) to implement model monitoring and performance management.
+# Pulsar.ml demos
 
-## Quickstart
+Ready-to-run examples showing how [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection)
+and [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) monitor machine learning models,
+LLM applications and agents in production: collect the data without slowing the service down, store it in InfluxDB,
+then detect data drift, concept drift and performance degradation with calibrated thresholds.
 
-1. Make sure that you have the Docker and Docker compose installed and execute the following commands:
+![Pulsar.ml architecture](images/pulsarml-architecture.png)
 
-    ```bash
-        export GRAFANA_USERNAME=admin;
-        export GRAFANA_PASSWORD=pass123;
-        export DB_USER=admin;
-        export DB_PASSWORD=pass123;
-        docker-compose up --build
-    ```
+## Demos
 
-2. Open a web browser and go to localhost:3000. Enter the Grafana credentials set in the previous step.
+| Demo | What it shows | Stack | Status |
+|---|---|---|---|
+| [**`genai_agent/`**](genai_agent/README.md) | A tool-calling agent (public-services assistant, 5 tools, French and English) monitored through OpenTelemetry GenAI: agent runs, tool calls and LLM calls, with drift scenarios (model change, tool fault, question shift, prompt change) | Python 3.12+, pulsar-data-collection ≥ 0.5, pulsar-metrics ≥ 0.5, InfluxDB 2.6, Ollama (llama3.2, granite3.3) | **Recommended** |
+| Classic demo (repository root) | A tabular model with synthetic data and simulated drift; metrics computed on a schedule and shown in Grafana | Python 3.9, pulsar-data-collection 0.1.1 and pulsar-metrics 0.1.3 from PyPI, InfluxDB 1.5 | Legacy, frozen on the 2023 versions |
 
-## Pulsar.ML Architecture
+## Quick start: agent demo
 
-![Architecture](images/PulsarDemoFlowDiagram_v1.jpeg)
+```bash
+cd genai_agent
+docker compose up -d                                   # InfluxDB 2.6.1 and Ollama
+docker compose exec ollama ollama pull llama3.2:3b     # ~2.0 GB
 
-## Demo Components
+export INFLUX_URL=http://localhost:8086 INFLUX_TOKEN=demo-token-change-me INFLUX_BUCKET=monitoring
+uv run python run_agent.py --runs 20                   # reference traffic
+uv run python run_agent.py --runs 20 --timeout-rate 0.3 --label tool_fault   # a degraded tool
+```
 
-![Demo workflow](images/pulsar-demo-workflow.png)
+See [`genai_agent/README.md`](genai_agent/README.md) for the scenarios, the stored fields and how to query them.
+On a laptop CPU one agent run takes 20 to 60 s; point `LLM_BASE_URL` to a GPU-backed OpenAI-compatible endpoint
+(vLLM, Ollama) for larger studies.
 
-Here is a description of the steps within the workflow
+## What the architecture does
 
-1. Data is captured from an inference container or a notebook using [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection)
-2. Collected data point, predictions, and other relevant configured metadata are written into an index inside influxdb
-3. `compute-metrics` service will query the latest entries from the database then leverage [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) in order to compute the different metrics.
-4. All computed metrics are then written to another index in InfluxDB for display in Grafana.
+1. **Collect.** A classic model calls `Pulse.capture_data()`; an LLM application or an agent emits OpenTelemetry GenAI
+   spans (`invoke_agent`, `chat`, `execute_tool`) that `PulsarSpanExporter` turns into agent-run, tool-call and
+   LLM-call records. Capture is non-blocking (about 1 ms): a slow or unavailable database never slows predictions down,
+   and batches are kept on disk until it is back. Only features are stored, never prompts or answers.
+2. **Store.** Records go to InfluxDB 2.x, tagged by model, version and record type.
+3. **Analyze.** `pulsar-metrics` compares a reference window with the current window: distances (PSI, KL,
+   Wasserstein, MMD), statistical tests (KS, t, Mann-Whitney, Levene, Cramér-von Mises, χ²), performance metrics.
+   Thresholds are calibrated on A/A draws, corrected for multiple testing (Benjamini-Hochberg), and a drift is
+   confirmed only when it persists over several windows.
+4. **Act.** Results feed dashboards, alerts and reports.
 
-## About [Pulsar.ML](https://pulsar.ml/)
+## Classic demo (legacy)
 
-Pulsar.ML is an application designed to assist with monitoring your machine learning models and gaining powerful insights into their performance.
+Kept for reference. It relies on the 2023 releases of both packages (PyPI, Python 3.9) and on InfluxDB 1.5, and does
+not use the current APIs.
 
-We have released two open-source packages:
+```bash
+# set your own values; do not reuse these names as passwords
+export GRAFANA_USERNAME=admin GRAFANA_PASSWORD=<choose-a-password>
+export DB_USER=admin DB_PASSWORD=<choose-a-password>
+docker compose up --build
+```
 
-- [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection) :  A lightweight Python SDK for collecting features, predictions, and metadata from an ML model serving code or microservice.
-- [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics) : A library for evaluating and monitoring data and concept drift with an extensive set of metrics. It also provides the flexibility to use custom metrics defined by the user.
+Then open Grafana on http://localhost:3000 with the credentials above.
 
-We also created [pulsar demo](https://github.com/Rocket-Science-Development/pulsar_demo) to showcase an example use-case that demonstrates how to leverage both packages for model monitoring and performance management.
+![Classic demo workflow](images/pulsar-demo-workflow.png)
 
-For further interaction with our community, Please join our [slack channel](https://pulsarml.slack.com)
+1. Data is captured from an inference container or a notebook with pulsar-data-collection.
+2. Data points, predictions and metadata are written to InfluxDB.
+3. The `compute-metrics` service reads the latest entries and computes the metrics with pulsar-metrics on a schedule.
+4. The metrics are written back to InfluxDB and displayed in Grafana.
 
-Powered by [Rocket Science Development](https://rocketscience.one/)
+## Regenerating the architecture diagram
+
+```bash
+python images/draw_architecture.py images        # requires Pillow; see the script for fonts
+```
+
+## About [Pulsar.ml](https://pulsar.ml/)
+
+Pulsar.ml helps monitor machine learning models, LLM applications and agents in production. It is made of two
+open-source packages:
+
+- [pulsar-data-collection](https://github.com/Rocket-Science-Development/pulsar_data_collection): collects features,
+  predictions, metadata and agent traces (OpenTelemetry GenAI) without slowing the service down.
+- [pulsar-metrics](https://github.com/Rocket-Science-Development/pulsar_metrics): data drift, concept drift and
+  performance metrics with calibrated thresholds.
+
+Powered by [Rocket Science Development](https://rocketscience.one/).
 
 ## Contributing
 
-1. Fork this repository, develop, and test your changes
-2. open an issue
-3. Submit a pull request with a reference to the issue
+1. Open an issue describing the change.
+2. Fork the repository, develop on a branch, and test your changes.
+3. Submit a pull request referencing the issue.
