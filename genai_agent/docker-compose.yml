@@ -1,0 +1,23 @@
+services:
+  influxdb:
+    image: "influxdb:2.6.1"
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: change-me-demo-only
+      DOCKER_INFLUXDB_INIT_ORG: pulsarml
+      DOCKER_INFLUXDB_INIT_BUCKET: monitoring
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: demo-token-change-me
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+  ollama:
+    image: "ollama/ollama:0.6.8"
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+volumes:
+  influxdb-data:
+  ollama-models:
