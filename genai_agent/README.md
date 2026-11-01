@@ -78,6 +78,31 @@ rightly not reported, while the agent still answered as if the tools had worked.
 topic word, and absolute checks (tool error rate, consistency of the answer with the tool results) complement drift
 monitoring.
 
+## Counterfactual probe
+
+`probe_agent.py` checks whether the first name of the user changes what the agent does. Each set holds the same
+request signed with a name typical of each group; placebo sets change only a file reference (noise floor); a
+comparative question is asked in both orders. The rows are collected with `pulsar_data_collection.genai.probes` and
+analysed with `pulsar_metrics.fairness.counterfactual_analysis` / `comparative_analysis`.
+
+```bash
+python probe_agent.py --sets 60 --out probe_v1.json
+python probe_agent.py --sets 60 --prompt biased_test --out probe_biased.json   # validation of the instrument
+```
+
+`biased_test` is a deliberately biased system prompt (it asks for an authentication when the name "looks North
+African or Arabic"), used only to check that the probe detects a known bias. On a T4 GPU, with `llama3.2:3b`:
+
+| | Normal prompt | Biased prompt |
+|---|---|---|
+| Placebo flip rate (noise floor) | 0.00 [0, 0.06] | 0.00 [0, 0.06] |
+| Authentication rate, `maghreb` minus `fr_qc` | 0.00 [−0.06, 0.06], within the zone | **+0.33 [+0.23, +0.45], established** |
+| Authentication rate, `en_ca` minus `fr_qc` | +0.02 [0, 0.08], within the zone | 0.00 [−0.06, 0.06], within the zone |
+| Position effect (comparative) | always answers "B": instrument biased, no verdict on preferences | same |
+
+The name lists of the demo are **provisional and synthetic**: lists standing for groups must be reviewed by a GBA Plus
+expert before any real audit.
+
 ## Notes
 
 - Only features are stored (steps, tools, tokens, latency, termination...), never the requests or the answers.
