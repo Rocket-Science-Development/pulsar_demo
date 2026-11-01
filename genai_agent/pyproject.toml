@@ -1,0 +1,13 @@
+[project]
+name = "permit-agent-demo"
+version = "0.1.0"
+description = "Demo tool-calling agent observed with pulsar-data-collection (OpenTelemetry GenAI) and pulsar-metrics"
+requires-python = ">=3.12"
+dependencies = [
+  "openai>=1.50",
+  "pulsar-data-collection[genai] @ git+https://github.com/Rocket-Science-Development/pulsar_data_collection.git",
+  "pulsar-metrics @ git+https://github.com/Rocket-Science-Development/pulsar_metrics.git",
+]
+
+[tool.uv]
+package = false
