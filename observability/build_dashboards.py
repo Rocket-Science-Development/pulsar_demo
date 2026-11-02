@@ -453,6 +453,43 @@ def agents(bucket):
                 f'{base} |> filter(fn: (r) => r._field == "confirmed") |> toInt() |> group(columns: ["_time", "phase"]) |> sum()'
                 ' |> group() |> keep(columns: ["_time", "phase", "_value"]) |> rename(columns: {_value: "confirmed features"})',
                 overrides=[rename("phase", "Phase"), rename("_time", "Window end")], decimals=0, sort=("Window end", True)), 8, 9)
+    d.row("Detectors and behavioural rules (scores computed in-process, never the text)")
+    d.add(timeseries("Injection score per run, by scenario",
+                     f'{runs} |> filter(fn: (r) => r._field == "det_injection") |> group(columns: ["scenario"])',
+                     display="${__field.labels.scenario}", min_=0, max_=1, fill=0,
+                     thresholds=[{"color": "transparent", "value": None}, {"color": CRITICAL, "value": 0.5}],
+                     show_thresholds="dashed",
+                     description="Probability that the request is a prompt injection (protectai/deberta-v3-base-prompt-injection-v2)"), 12, 8)
+    d.add(timeseries("Faithfulness of answers to retrieved rules, by scenario",
+                     f'{runs} |> filter(fn: (r) => r._field == "det_faithfulness") |> group(columns: ["scenario"])',
+                     display="${__field.labels.scenario}", min_=0, max_=1, fill=0,
+                     description="Share of the answer entailed by the passages returned by search_documents (multilingual NLI)"), 12, 8)
+    tests = f'{RESULTS} |> filter(fn: (r) => r.model_id == "permit_assistant" and r.metric_type == "agents" and r.campaign == "${{campaign}}")'
+    d.add(table("Detector verdicts per window (S0 to S4) — p-value vs reference",
+                f'{tests} |> filter(fn: (r) => r.metric_name != "rule_compliance" and r._field == "p_value") |> last()'
+                ' |> group() |> pivot(rowKey: ["phase", "level"], columnKey: ["feature_name"], valueColumn: "_value")'
+                ' |> sort(columns: ["phase", "level"])',
+                overrides=[rename("phase", "Scenario"), rename("level", "Intensity"), rename("mmd", "MMD (inputs)"),
+                           rename("faithfulness", "Faithfulness (RAG)"), rename("injection", "Injection rate"),
+                           rename("compliance", "Rule violations")]
+                + [{"matcher": {"id": "byName", "options": name},
+                    "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "basic"}},
+                                   {"id": "thresholds", "value": {"mode": "absolute", "steps": [
+                                       {"color": CRITICAL, "value": None}, {"color": "transparent", "value": 0.05}]}}]}
+                   for name in ("mmd", "faithfulness", "injection", "compliance")],
+                order=["phase", "level", "mmd", "faithfulness", "injection", "compliance"],
+                description="Red: p < 0.05, the detector sees a change against the reference phase"), 14, 10)
+    d.add(table("Compliance with the behavioural rules (LTLf), by scenario",
+                f'{tests} |> filter(fn: (r) => r.metric_name == "rule_compliance" and r._field == "metric_value") |> last()'
+                ' |> group() |> pivot(rowKey: ["phase"], columnKey: ["feature_name"], valueColumn: "_value")',
+                unit="percentunit", decimals=1,
+                overrides=[rename("phase", "Scenario")]
+                + [{"matcher": {"id": "byType", "options": "number"},
+                    "properties": [{"id": "custom.cellOptions", "value": {"type": "color-text"}},
+                                   {"id": "thresholds", "value": {"mode": "absolute", "steps": [
+                                       {"color": CRITICAL, "value": None}, {"color": WARNING, "value": 0.95},
+                                       {"color": GOOD, "value": 1}]}}]}],
+                description="Share of runs complying with each rule of genai_agent/rules/permit_agent.yaml"), 10, 10)
     return d
 
 

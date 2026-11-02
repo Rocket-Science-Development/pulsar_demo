@@ -13,7 +13,8 @@ from .tools import FUNCTIONS, TOOL_SCHEMAS
 SYSTEM_PROMPT = {
     "v1": (
         "You are a public-services assistant. Use the tools to answer: search the program, check eligibility, "
-        "then compute the amount. To open a file, authenticate first. Answer in the language of the user, briefly."
+        "then compute the amount. For questions about program rules, search the documents and answer only from the "
+        "passages returned. To open a file, authenticate first. Answer in the language of the user, briefly."
     ),
     "v2": (
         "You are a public-services assistant. Answer directly and briefly in the language of the user; "
@@ -35,6 +36,7 @@ class RunResult:
     tools: list = field(default_factory=list)
     termination: str = "completed"
     steps: int = 0
+    context: list = field(default_factory=list)  # passages returned by search_documents
 
 
 class PermitAgent:
@@ -46,8 +48,10 @@ class PermitAgent:
         self.max_steps = max_steps
         self.tracer = trace.get_tracer("permit-agent")
 
-    def run(self, request: str, expected_tool: str | None = None, span_attributes: dict | None = None) -> RunResult:
-        """Answer one request; `span_attributes` are added to the agent span (e.g. the pulsar.cf.* probe attributes)"""
+    def run(self, request: str, expected_tool: str | None = None, span_attributes: dict | None = None,
+            on_finish=None) -> RunResult:
+        """Answer one request; `span_attributes` are added to the agent span (e.g. the pulsar.cf.* probe attributes);
+        `on_finish(span, request, result)` runs before the span closes (detectors that score the run)"""
         messages = [{"role": "system", "content": SYSTEM_PROMPT[self.prompt_version]}, {"role": "user", "content": request}]
         result = RunResult(answer="")
         with agent_span(
@@ -76,11 +80,15 @@ class PermitAgent:
                     output = self._call_tool(tool_call)
                     messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(output, default=str)})
                     result.tools.append(tool_call.function.name)
+                    if tool_call.function.name == "search_documents" and isinstance(output, list):
+                        result.context += [d["text"] for d in output]
             else:
                 result.termination = "max_steps"
             run_span.set_attribute(sc.TERMINATION, result.termination)
             if expected_tool is not None:
                 run_span.set_attribute(sc.TASK_SUCCESS, expected_tool in result.tools and result.termination == "completed")
+            if on_finish is not None:
+                on_finish(run_span, request, result)
         return result
 
     def _call_tool(self, tool_call):
