@@ -42,8 +42,7 @@
   "dataset": {
    "name": "Numenta Anomaly Benchmark",
    "url": "https://github.com/numenta/NAB",
-   "licence": "repo MIT",
-   "data unverified": null,
+   "licence": "repo MIT, data unverified",
    "size": "58 series"
   },
   "method": "Rolling windows on each series; count alerts inside / outside labelled anomaly windows.",
@@ -129,8 +128,7 @@
   "title": "Natural temporal drift across the 2008 crisis (bank marketing)",
   "capability": "chi2 / PSI on categoricals; performance decay",
   "dataset": {
-   "name": "Bank Marketing (full",
-   "date-ordered)": null,
+   "name": "Bank Marketing (full, date-ordered)",
    "url": "https://archive.ics.uci.edu/dataset/222",
    "licence": "CC BY 4.0",
    "size": "45k rows"
@@ -359,8 +357,7 @@
   "title": "Injection detector in French (known gap)",
   "capability": "InjectionDetector on French; threshold calibration per language",
   "dataset": {
-   "name": "rikka-snow/prompt-injection-multilingual (FR subset) + yanismiraoui/prompt_injections (FR) + benign FR (PIAF questions",
-   "Allociné)": null,
+   "name": "rikka-snow/prompt-injection-multilingual (FR subset) + yanismiraoui/prompt_injections (FR) + benign FR (PIAF questions, Allociné)",
    "url": "https://huggingface.co/datasets/rikka-snow/prompt-injection-multilingual",
    "licence": "MIT / Apache 2.0 / MIT",
    "size": "~2k FR"
@@ -413,10 +410,7 @@
   "title": "Canadian identifiers at scale with hard negatives",
   "capability": "SIN/RAMQ/postal code/phone rules; leak detection in agent outputs",
   "dataset": {
-   "name": "synthetic generator (Luhn-valid fake SIN",
-   "RAMQ format": null,
-   "A1A 1A1": null,
-   "NANP)": null,
+   "name": "synthetic generator (Luhn-valid fake SIN, RAMQ format, A1A 1A1, NANP)",
    "url": "repo",
    "licence": "Apache 2.0",
    "size": "100k sentences"
@@ -485,11 +479,7 @@
   "title": "Model equality power by canary size",
   "capability": "CanaryProbe + model_equality_test",
   "dataset": {
-   "name": "canary sets (12",
-   "24": null,
-   "48 prompts x 5": null,
-   "10": null,
-   "20 answers)": null,
+   "name": "canary sets (12, 24, 48 prompts x 5, 10, 20 answers)",
    "url": "repo",
    "licence": "Apache 2.0",
    "size": "generated"
@@ -560,9 +550,7 @@
   "title": "Function calling quality and trajectories (BFCL)",
   "capability": "agent trajectory capture, LTLf rules, drift between models",
   "dataset": {
-   "name": "Berkeley Function Calling Leaderboard (simple",
-   "multiple": null,
-   "parallel)": null,
+   "name": "Berkeley Function Calling Leaderboard (simple, multiple, parallel)",
    "url": "https://github.com/ShishirPatil/gorilla",
    "licence": "Apache 2.0",
    "size": "~2k cases"

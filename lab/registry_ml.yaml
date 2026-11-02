@@ -27,7 +27,7 @@ tests:
   - id: TS-03
     title: Labelled anomaly windows (NAB) — alerting precision/recall
     capability: drift on streams vs ground-truth windows; detection delay
-    dataset: {name: Numenta Anomaly Benchmark, url: "https://github.com/numenta/NAB", licence: repo MIT, data unverified, size: 58 series}
+    dataset: {name: Numenta Anomaly Benchmark, url: "https://github.com/numenta/NAB", licence: "repo MIT, data unverified", size: 58 series}
     method: Rolling windows on each series; count alerts inside / outside labelled anomaly windows.
     pass: precision, recall and median delay reported per series family; no crash on short series
     expected_limit: distribution-drift tests are not point-anomaly detectors — low recall on single spikes expected
@@ -71,7 +71,7 @@ tests:
   - id: TC-04
     title: Natural temporal drift across the 2008 crisis (bank marketing)
     capability: chi2 / PSI on categoricals; performance decay
-    dataset: {name: Bank Marketing (full, date-ordered), url: "https://archive.ics.uci.edu/dataset/222", licence: CC BY 4.0, size: 45k rows}
+    dataset: {name: "Bank Marketing (full, date-ordered)", url: "https://archive.ics.uci.edu/dataset/222", licence: CC BY 4.0, size: 45k rows}
     method: Rows in date order May 2008 - Nov 2010 (order inferred from the file); monthly windows.
     pass: drift around the crisis confirmed; macro features (euribor, employment) lead
     env: aws-cpu

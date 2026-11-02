@@ -21,7 +21,7 @@ tests:
   - id: LI-02
     title: Injection detector in French (known gap)
     capability: InjectionDetector on French; threshold calibration per language
-    dataset: {name: rikka-snow/prompt-injection-multilingual (FR subset) + yanismiraoui/prompt_injections (FR) + benign FR (PIAF questions, Allociné), url: "https://huggingface.co/datasets/rikka-snow/prompt-injection-multilingual", licence: MIT / Apache 2.0 / MIT, size: ~2k FR}
+    dataset: {name: "rikka-snow/prompt-injection-multilingual (FR subset) + yanismiraoui/prompt_injections (FR) + benign FR (PIAF questions, Allociné)", url: "https://huggingface.co/datasets/rikka-snow/prompt-injection-multilingual", licence: MIT / Apache 2.0 / MIT, size: ~2k FR}
     method: Same metrics in French; A/A-calibrated threshold per language; compare with English.
     pass: recall >= 0.85 in French; benign FR false positives quantified (2.8 % on imperatives seen in S4)
     expected_limit: English-centric classifier over-flags French imperatives — per-language calibration or a French fine-tune
@@ -48,7 +48,7 @@ tests:
   - id: LP-02
     title: Canadian identifiers at scale with hard negatives
     capability: SIN/RAMQ/postal code/phone rules; leak detection in agent outputs
-    dataset: {name: synthetic generator (Luhn-valid fake SIN, RAMQ format, A1A 1A1, NANP), url: "repo", licence: Apache 2.0, size: 100k sentences}
+    dataset: {name: "synthetic generator (Luhn-valid fake SIN, RAMQ format, A1A 1A1, NANP)", url: "repo", licence: Apache 2.0, size: 100k sentences}
     method: 100k FR/EN sentences, 30 % hard negatives (case numbers, amounts, dates, codes); scripted agent conversations with leaks.
     pass: precision and recall >= 0.95 per type; leaks counted exactly; throughput >= 1k sentences/s on CPU
     env: aws-cpu
@@ -83,7 +83,7 @@ tests:
   - id: LM-01
     title: Model equality power by canary size
     capability: CanaryProbe + model_equality_test
-    dataset: {name: canary sets (12, 24, 48 prompts x 5, 10, 20 answers), url: "repo", licence: Apache 2.0, size: generated}
+    dataset: {name: "canary sets (12, 24, 48 prompts x 5, 10, 20 answers)", url: "repo", licence: Apache 2.0, size: generated}
     method: >-
       Pairs: same model (A/A), quantization (q4 vs q8 vs fp16 on 3B and 8B), size (ministral-3:3b vs 8b), family
       (llama vs granite vs gemma vs mistral), system prompt change, temperature 0.3 vs 0.7. 5 repetitions each.
@@ -122,7 +122,7 @@ tests:
   - id: LA-01
     title: Function calling quality and trajectories (BFCL)
     capability: agent trajectory capture, LTLf rules, drift between models
-    dataset: {name: Berkeley Function Calling Leaderboard (simple, multiple, parallel), url: "https://github.com/ShishirPatil/gorilla", licence: Apache 2.0, size: ~2k cases}
+    dataset: {name: "Berkeley Function Calling Leaderboard (simple, multiple, parallel)", url: "https://github.com/ShishirPatil/gorilla", licence: Apache 2.0, size: ~2k cases}
     method: AST-evaluated calls with local models; capture spans; rule "required tool called"; drift llama3.2:3b -> llama3.1:8b.
     pass: per-model accuracy; trajectory features differ significantly between models; 0 malformed records
     env: aws-gpu
