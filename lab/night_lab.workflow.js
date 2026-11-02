@@ -20,7 +20,13 @@ Ground rules (non-negotiable):
 - Datasets are downloaded to C:/dev/pulsar-ml/data/lab/ (or /data/lab on AWS), never inside a repository. Folktables and
   Diabetes 130 contain real (anonymised) people: no re-identification, no joins with other sources.
 - No model of Chinese origin. No gated or non-commercial dataset. Never handle secrets: tokens come from existing env files.
-- AWS: region ca-central-1 only, tags Project=pulsar-lab, auto-stop at the approved time, never exceed the approved budget.
+- AWS: region ca-central-1 only, auto-stop at the approved time, never exceed the approved budget.
+- Tags: every instance or volume CREATED for the lab gets Project=pulsar-lab. A PRE-EXISTING instance reused by the lab
+  is never re-tagged: its Project, Name and other tags stay as they are; add only LabRun=pulsar-lab (removed at
+  teardown) so the lab can find it. Teardown targets Project=pulsar-lab OR LabRun=pulsar-lab.
+- Data: datasets, caches and models go on a separate EBS data volume per host, created for the lab (tag
+  Project=pulsar-lab, LabVolume=data, DeleteOnTermination=true) and mounted on /data/lab; never grow or reuse the root
+  volume or a disk of a pre-existing instance. The data volume is detached and DELETED at teardown.
 - A limit is a fact about Pulsar.ml found by a test, with numbers. A test bug is NOT a limit: fix the test.
 - Do not push, merge or open pull requests. Do not modify pulsar_metrics or pulsar_data_collection; propose changes instead.
 `
@@ -69,7 +75,8 @@ const preflight = await agent(`${RULES}
 Preflight for the Pulsar.ml night lab. Approved tests: ${approved.map(t => t.id).join(', ')}.
 Settings: ${JSON.stringify(settings)}.
 Check: python env C:/dev/pulsar-ml/validation_e2e/.venv works with pulsar_metrics and pulsar_data_collection (editable);
-lab/harness.py imports; Docker running; for AWS: credentials work in ca-central-1, quotas (G vCPU >= 8, standard >= 64),
+lab/harness.py imports and "python -m lab.harness --self-check" passes on every host; "python -m lab.check_registry"
+passes (no dataset field split by YAML); Docker running; for AWS: credentials work in ca-central-1, quotas (G vCPU >= 8, standard >= 64),
 approved budget covers the plan in lab/README.md. Return a short go/no-go with any blocker.`, { label: 'preflight' })
 log(`Preflight: ${String(preflight).slice(0, 300)}`)
 
@@ -77,8 +84,14 @@ phase('Provision')
 const provision = await agent(`${RULES}
 Provision the lab for environment "${settings.env}" (stop time ${settings.stop}, budget ${settings.budget_usd} USD).
 AWS plan (lab/README.md): lab-cpu c7i.4xlarge, lab-scale c7i.8xlarge, lab-db r7i.2xlarge (InfluxDB 2.6.1 + Grafana 11.3.0),
-lab-soak c7i.2xlarge, lab-gpu-1/2 g6.xlarge if capacity else g4dn.xlarge (restart the existing stopped g4dn i-008454b3ee3fa822f first).
-Every instance: tag Project=pulsar-lab, shutdown -h at the stop time, SSH only from the operator IP, Ollama bound to localhost.
+lab-soak c7i.2xlarge, lab-gpu-1/2 g6.xlarge if capacity else g4dn.xlarge (g6 had no capacity on 2026-11-02: try it,
+then fall back to g4dn). A pre-existing stopped instance may be restarted only if the operator instructions allow it, and
+then follows the pre-existing-instance tag rule (LabRun tag only, original tags untouched).
+Every instance: shutdown -h at the stop time, SSH only from the operator IP, Ollama bound to localhost.
+Every host: create and attach one data volume (gp3, sized for its family, tags Project=pulsar-lab and LabVolume=data),
+mount it on /data/lab, and put datasets, caches, venvs and models there. Return the volume ids.
+The GPU AMI ships Python 3.10: install Python 3.12 with uv. Use the Ollama release tarball, not the install script, if
+piping a remote script to a shell is not allowed.
 Pull the approved models; download the approved datasets outside repositories. Return hostnames/IPs, what failed, and the
 hourly cost actually provisioned.`, { label: 'provision' })
 
@@ -92,6 +105,7 @@ Operator instructions: ${settings.instructions || 'none'}
 For each approved test below: implement lab/tests/<id>.py on the harness, do a short dry run, then the full run; record every
 limit with numbers and an improvement proposal; never stop the whole family because one test fails.
 The full specification of each test (method, dataset, licence, pass criteria, expected limit) is in lab/registry.json.
+Before returning, write your complete result (the same JSON you return) to lab/results/run_${fam.key}.json.
 Approved tests of this family: ${fam.tests.map(t => t.id).join(', ')}`, { label: `run:${fam.key}`, phase: 'Run', schema: RESULT }),
   (res, fam) => {
     const limits = (res && res.tests || []).flatMap(t => t.limits.map(l => ({ id: t.id, ...l })))
@@ -99,23 +113,38 @@ Approved tests of this family: ${fam.tests.map(t => t.id).join(', ')}`, { label:
     return agent(`${RULES}
 Adversarially review the limits found by the "${fam.key}" family. For each, try to REFUTE it: is it a real property of
 Pulsar.ml, reproducible from the evidence and result files in lab/results/, or a defect of the test itself? Default to
-real=false when the evidence does not support it. Also judge whether the proposal would fix it.
+real=false when the evidence does not support it. Also judge whether the proposal would fix it. Before returning, write
+your complete verdicts (the same JSON you return) to lab/results/verify_${fam.key}.json.
 Limits: ${JSON.stringify(limits, null, 1)}`, { label: `verify:${fam.key}`, phase: 'Verify', schema: VERDICTS })
       .then(v => ({ family: fam.key, res, verdicts: (v && v.verdicts) || [] }))
   },
 )
 
 phase('Report')
+// The family results are never inlined in the prompt (the former slice(0, 60000) truncated them). The report agent
+// first writes them, complete, to a results file, then reads that file.
+const RESULTS_FILE = 'C:/dev/pulsar-ml/pulsar_demo/lab/results/night_full_results.json'
 const report = await agent(`${RULES}
-Write the morning report of the Pulsar.ml night lab, in French, to G:/My Drive/RocketScience/Pulsar.ml/notes/laboratoire/rapport_nuit.md:
-per family and per test the status and key numbers; every CONFIRMED limit (verdict real=true) with its evidence and
-improvement proposal, ranked by severity; refuted limits listed apart as test defects; tests not run and why; cost and
-health summary. Also write lab/results/summary.json (id -> status). Data:
-${JSON.stringify(results.filter(Boolean), null, 1).slice(0, 60000)}`, { label: 'report' })
+Write the morning report of the Pulsar.ml night lab, in French, to G:/My Drive/RocketScience/Pulsar.ml/notes/laboratoire/rapport_nuit.md.
+Source of truth: ${RESULTS_FILE}. Step 1: write it yourself, as a JSON object with one key "run:<family>" and one key
+"verify:<family>" per family, merged from lab/results/run_<family>.json and lab/results/verify_<family>.json (written by
+the family agents; a family without limits has no verify file); never truncate it.
+Families: ${results.filter(Boolean).map(r => r.family).join(', ')}. Step 2: read that file in full (by parts if large)
+and lab/results/<ID>.json for the numbers. Content: per family and per test the status and key numbers; every CONFIRMED
+limit (verdict real=true) with its evidence and improvement proposal, ranked by severity; refuted limits listed apart as
+test defects; tests not run and why; cost against the budget of ${settings.budget_usd} USD and health summary. Also write
+lab/results/summary.json (id -> status).`, { label: 'report' })
 
 phase('Teardown')
 const teardown = await agent(`${RULES}
-Stop every instance tagged Project=pulsar-lab in ca-central-1 (stop, do not terminate), close SSH tunnels, and report the final
-state of each instance and an estimate of the night's cost.`, { label: 'teardown' })
+Tear down the lab in ca-central-1. Approved budget: ${settings.budget_usd} USD; provisioned (from the provision step):
+${String(provision).slice(0, 1500)}
+1. Stop (do not terminate) every instance tagged Project=pulsar-lab or LabRun=pulsar-lab.
+2. On a pre-existing instance (LabRun tag): remove only the LabRun tag; check its original tags are unchanged.
+3. Detach and DELETE every data volume tagged LabVolume=data once its instance is stopped and the results it holds
+   have been copied back to lab/results/; never delete a root volume or a volume without that tag.
+4. Close SSH tunnels.
+Report the final state of each instance and volume, the cost of the night against the budget of ${settings.budget_usd} USD
+(say clearly if it was exceeded), and what still costs money (remaining volumes, IPs).`, { label: 'teardown' })
 
 return { started: true, preflight, results: results.filter(Boolean), report, teardown }
