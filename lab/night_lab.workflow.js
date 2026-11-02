@@ -90,8 +90,9 @@ You run the "${fam.key}" family of the Pulsar.ml night lab on ${fam.host}. Provi
 ${String(provision).slice(0, 1500)}
 Operator instructions: ${settings.instructions || 'none'}
 For each approved test below: implement lab/tests/<id>.py on the harness, do a short dry run, then the full run; record every
-limit with numbers and an improvement proposal; never stop the whole family because one test fails. Tests:
-${JSON.stringify(fam.tests, null, 1)}`, { label: `run:${fam.key}`, phase: 'Run', schema: RESULT }),
+limit with numbers and an improvement proposal; never stop the whole family because one test fails.
+The full specification of each test (method, dataset, licence, pass criteria, expected limit) is in lab/registry.json.
+Approved tests of this family: ${fam.tests.map(t => t.id).join(', ')}`, { label: `run:${fam.key}`, phase: 'Run', schema: RESULT }),
   (res, fam) => {
     const limits = (res && res.tests || []).flatMap(t => t.limits.map(l => ({ id: t.id, ...l })))
     if (!limits.length) return { family: fam.key, res, verdicts: [] }
