@@ -15,7 +15,7 @@ export const meta = {
 // args: { approved: [registry test objects], settings: {env, budget_usd, scope, stop, instructions}, stamp: "ISO time", report_file?: path }
 const RULES = `
 Ground rules (non-negotiable):
-- Work in C:/dev/pulsar-ml/pulsar_demo/lab (branch fonction/laboratoire-tests). Tests go in lab/tests/<id>.py and run through
+- Work in C:/dev/pulsar-ml/pulsar_demo/lab (the checked-out branch: do not switch, commit or stash). Tests go in lab/tests/<id>.py and run through
   lab/harness.py (run(ctx) -> metrics; ctx.limit(finding, evidence, proposal, severity) for every limit). Results land in lab/results/.
 - Datasets are downloaded to C:/dev/pulsar-ml/data/lab/ (or /data/lab on AWS), never inside a repository. Folktables and
   Diabetes 130 contain real (anonymised) people: no re-identification, no joins with other sources.
