@@ -3,6 +3,8 @@
 services:
   influxdb:
     image: "influxdb:2.6.1"
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }  # many concurrent writers (lab SC-01)
     ports:
       - "8086:8086"
     environment:
