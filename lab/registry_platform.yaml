@@ -1,0 +1,127 @@
+# Pulsar.ml lab — platform tests: scalability, hardware/software health, data loss, chaos.
+# Each test records: what it measures, how, pass criteria, where it runs, duration, and the limits found.
+# Status values: proposed -> approved -> running -> passed | failed | limit-found (with improvement proposals).
+
+family: platform
+tests:
+  - id: SC-01
+    title: Many models per instance — capture
+    capability: Pulse non-blocking capture (pulsar_data_collection)
+    method: >-
+      One process hosts N Pulse instances (N = 1, 10, 50, 100, 300, 500), each capturing batches of 50 rows of
+      20 features at 10 batches/s per model into one InfluxDB. Measure caller-side capture latency (p50/p99), rows/s
+      written, queue depth, RSS, threads, open sockets, CPU.
+    pass: capture p99 < 2 ms at every N; written = captured (0 loss) up to 300 models; RSS growth linear and < 30 MB/model
+    expected_limit: one writer thread and one HTTP client per Pulse — thread and socket count may cap N
+    env: aws-scale
+    duration_min: 60
+  - id: SC-02
+    title: High-volume sustained ingestion
+    capability: Pulse + InfluxDB write path
+    method: >-
+      Ramp from 10k to 1M rows/min (single model and 100 models), 15 min per step. Measure ingestion lag, drops,
+      InfluxDB CPU/RAM/disk, write latency, batch sizes; end-to-end reconciliation (rows queried back = rows captured).
+    pass: zero loss below the saturation point; saturation point documented; drops counted exactly beyond it
+    env: aws-scale + aws-db
+    duration_min: 90
+  - id: SC-03
+    title: Storage outage under load, with and without spool
+    capability: circuit breaker, spool directory, replay
+    method: >-
+      At 200k rows/min, stop InfluxDB for 60 s, 10 min and 30 min; repeat with spool_dir and without. Measure capture
+      latency during the outage, spooled/dropped rows, spool disk usage, replay duration, duplicates after replay.
+    pass: with spool — 0 loss, 0 duplicates, capture p99 < 2 ms during the outage; without — drops counted exactly
+    env: aws-scale + aws-db
+    duration_min: 75
+  - id: SC-04
+    title: Degraded network (latency, packet loss, bandwidth)
+    capability: write timeouts, retries, backoff
+    method: Toxiproxy between Pulse and InfluxDB — 200 ms / 1 s latency, 5 % / 20 % loss, 1 Mbit/s cap, flapping link.
+    pass: no blocking of the caller; no unbounded memory; losses only beyond the queue bound and counted
+    env: aws-scale
+    duration_min: 45
+  - id: SC-05
+    title: Queue saturation and memory bound
+    capability: bounded queue, oldest-first drop
+    method: max_queue_rows from 1k to 1M under a burst 10x the write rate; measure RSS ceiling and drop accounting.
+    pass: RSS stays under the bound implied by max_queue_rows; dropped_rows exact
+    env: local
+    duration_min: 20
+  - id: SC-06
+    title: Analysis at scale — hundreds of models per window
+    capability: Analyzer, AACalibrator, BH, DriftPersistence, FairnessAnalyzer, AttributionDrift
+    method: >-
+      300 models x 20 features, 6-hour windows: run calibrated drift + persistence, fairness (bootstrap 500) and
+      explanation drift per window; sequential and parallel (processes 1-32). Measure wall time, CPU-seconds, RAM per
+      model, results written/s.
+    pass: one window of 300 models analysed in < 10 min on 16 vCPU; linear scaling with processes up to 16
+    expected_limit: A/A calibration (200 draws x metrics) dominates; bootstrap cost of fairness with many groups
+    env: aws-scale
+    duration_min: 60
+  - id: SC-07
+    title: Results and dashboards at scale
+    capability: ResultsSink, Grafana dashboards (Flux)
+    method: >-
+      Write a week of results for 300 models; time every dashboard query (overview, drift, fairness) at 7 d and 30 d
+      ranges; Grafana with 20 concurrent viewers.
+    pass: every panel < 3 s at 7 d; variables list 300 models; no Flux timeouts
+    expected_limit: tag cardinality of pulsar_results (model x metric x feature x group)
+    env: aws-db
+    duration_min: 45
+  - id: SC-08
+    title: GenAI exporter and trajectory assembler under load
+    capability: PulsarSpanExporter, TrajectoryAssembler, PiiSession, detectors
+    method: >-
+      Synthetic OTel traffic: 50 to 500 agent runs/s with 3-10 spans each, 1 % orphan traces, sub-agents; measure
+      assembly latency, max_pending_traces memory, dropped traces, record correctness.
+    pass: 0 malformed records; memory bounded by max_pending_traces; orphans flushed after trace_timeout_s
+    env: aws-scale
+    duration_min: 30
+  - id: SC-09
+    title: Detectors throughput (CPU vs GPU)
+    capability: InjectionDetector, FaithfulnessScorer, ModelPiiDetector
+    method: Batch sizes 1-64, text lengths 50-2000 tokens; per-request latency and throughput on CPU and on GPU.
+    pass: documented budget per request; GPU >= 5x CPU; no truncation surprises (long texts)
+    env: aws-gpu + local
+    duration_min: 30
+  - id: SC-10
+    title: LLM endpoint concurrency
+    capability: demo agent on Ollama
+    method: workers 1/2/4/8/16 against llama3.2:3b, granite3.3:2b, llama3.1:8b; runs/min, p95 latency, GPU utilisation.
+    pass: optimum concurrency documented per model and GPU
+    env: aws-gpu
+    duration_min: 30
+  - id: SC-11
+    title: Soak — 8 hours steady state
+    capability: whole capture + analysis loop
+    method: >-
+      100 models at 50k rows/min + periodic analysis job + 1 agent at 1 run/s for 8 h; sample RSS, threads, file
+      descriptors, spool, InfluxDB disk every minute.
+    pass: no RSS growth beyond 5 %/h after warm-up; no thread or descriptor leak; 0 loss
+    env: aws-scale + aws-db
+    duration_min: 480
+  - id: SC-12
+    title: Hardware and software health telemetry
+    capability: StatsReporter + host metrics
+    method: >-
+      During every SC test, collect psutil (CPU, RSS, threads, fds, disk, network), InfluxDB /metrics, docker stats,
+      nvidia-smi into the lab bucket; dashboard "Lab health".
+    pass: every test has its health trace; alerts on CPU > 90 %, RSS growth, disk > 80 %
+    env: all
+    duration_min: 0
+  - id: SC-13
+    title: Process crash and restart
+    capability: spool replay after crash, idempotence
+    method: kill -9 the capturing process mid-burst (spool on), restart, replay; count losses and duplicates.
+    pass: losses limited to the in-memory queue at crash time, measured and documented; 0 duplicates
+    env: aws-scale
+    duration_min: 20
+  - id: SC-14
+    title: Schema evolution and type conflicts
+    capability: writer grouping by columns, rejected_rows
+    method: >-
+      Mix optional fields, change a field type mid-stream, add/remove features; verify rejected_rows accounting and
+      that valid rows are written.
+    pass: every rejection counted with its reason; no retry loop; valid rows written
+    env: local
+    duration_min: 15
