@@ -353,6 +353,14 @@ def run(ctx):
                 "major")
     for name in [n for n, (kind, _, _) in PAIRS.items() if kind == "quantisation"]:
         r12 = rate(name, PROMPT_SIZES[0], ANSWER_SIZES[0])
+        if name == "quant_3b_q8_fp16":
+            # Not a limit (refuted by the night's verifier): q8_0 vs fp16 is a near-zero change, so staying silent is
+            # the right behaviour. Documented only, with the largest size actually tested.
+            if r12 is not None:
+                ctx.note(f"q8_0 vs fp16 (llama3.2 3B): detection {r12:.0%} at {PROMPT_SIZES[0]}x{ANSWER_SIZES[0]}; "
+                         f"near-zero change, silence expected; not tested beyond "
+                         f"{metrics['largest_size_by_pair'].get(name)} answers")
+            continue
         if r12 is not None and r12 < 0.8:
             ctx.limit(
                 f"Quantisation change {name.replace('quant_', '')} is not reliably detected by the default canary "
@@ -363,7 +371,7 @@ def run(ctx):
                 "Document the canary size needed for quantisation (see the power table); default CanaryProbe to the "
                 "size that reaches 80 % here, or compare with the model's own tokenizer and a longer prefix "
                 "(length 30 -> 60), which keeps more of the subtle token differences.",
-                "minor" if name == "quant_3b_q8_fp16" else "major")
+                "major")
     for name, (kind, _, _) in PAIRS.items():
         if kind in ("family", "size") and rate(name, *smallest) is not None and rate(name, *smallest) < 0.8:
             ctx.limit(

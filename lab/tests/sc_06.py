@@ -60,7 +60,9 @@ def analyse_model(i: int) -> dict:
         s = time.perf_counter()
         an = Analyzer(name="w", model_id=mid, model_version="1")
         an.add_drift_metrics(metrics_list=["ks_2samp"], features_list=feats)
-        cal = AACalibrator(window_size=N_CUR, n_draws=200, contiguous=False).fit(ref, an._metrics_list)
+        # night parameters kept on the post-fix API: 2.5 windows of reference, fixed 200 draws (p-value floor)
+        cal = AACalibrator(window_size=N_CUR, n_draws=200, contiguous=False, allow_short=True,
+                           auto_draws=False).fit(ref, an._metrics_list)
         t["calibration"] = time.perf_counter() - s
         s = time.perf_counter()
         an.run(current=cur, reference=ref, options=cal.options())

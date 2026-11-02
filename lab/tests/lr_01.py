@@ -360,14 +360,11 @@ def run(ctx):
             "known-good answers, like AACalibrator) instead of a fixed 0.5 alert threshold.",
             "minor")
     d05 = thresholds["default_0.5"]
-    if d05["false_alarm"] > 0.2:
-        ctx.limit(
-            "A fixed 0.5 alert threshold floods with false alarms on real RAG answers",
-            f"at 0.5: false alarm {d05['false_alarm']:.1%}, recall {d05['recall']:.1%}, precision {d05['precision']:.1%}; "
-            f"train-chosen 5 % false-alarm threshold {thresholds['false_alarm_5pct_train']}",
-            "Never alert on a fixed faithfulness cut-off: derive the threshold from the application's own reference "
-            "window (5 % quantile of known-good answers) and alert on a drop of the window mean.",
-            "minor")
+    # Not a limit (refuted by the night's verifier): Pulsar.ml ships no fixed 0.5 faithfulness threshold; the product
+    # alert is a Mann-Whitney test of the window against the reference, and the score calibration is covered by M19.
+    ctx.note(f"Fixed 0.5 cut-off, for reference only (not a product setting): false alarm {d05['false_alarm']:.1%}, "
+             f"recall {d05['recall']:.1%}, precision {d05['precision']:.1%}; train-chosen 5 % false-alarm threshold "
+             f"{thresholds['false_alarm_5pct_train']}")
     for r in test_rec:
         r.pop("_premise", None), r.pop("_sents", None), r.pop("sent", None)
     (ctx.workdir / "scores_test.jsonl").write_text("\n".join(json.dumps(r) for r in test_rec), encoding="utf-8")

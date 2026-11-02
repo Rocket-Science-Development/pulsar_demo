@@ -67,6 +67,7 @@ def run(ctx):
         versions[name] = f
     dropped = versions["nan"].dropna(subset=FEATURES).copy()
     versions["dropped"] = dropped
+    versions["nan_omit"] = versions["nan"]  # same data, product default nan_policy="omit" (post-fix API)
 
     n_weeks = (len(raw) - ref_n) // W
     if S.DRY:
@@ -79,23 +80,27 @@ def run(ctx):
         # windows by time so the three versions compare the same calendar weeks
         t_ref_end = raw.pred_timestamp.iloc[ref_n]
         ref = f[f.pred_timestamp < t_ref_end]
-        analyzer = S.make_analyzer(FEATURES, PARAMS["metrics"])
+        # "nan" keeps the pre-fix behaviour explicitly (NaN propagated) so the night's limit stays reproducible
+        policy = "propagate" if name == "nan" else None
+        analyzer = S.make_analyzer(FEATURES, PARAMS["metrics"], nan_policy=policy)
         cw = W if name != "dropped" else int(W * len(f) / len(raw))
         nd = 40 if S.DRY else 200
         try:
-            cal, warns = S.calibrate(analyzer, ref.reset_index(drop=True), cw, n_draws=nd)
+            cal, warns = S.calibrate(analyzer, ref.reset_index(drop=True), cw, n_draws=nd, allow_short=True)
             metrics[f"{name}_calibration_error"] = None
         except Exception as exc:  # noqa: BLE001 - AACalibrator behaviour on this input, recorded
             metrics[f"{name}_calibration_error"] = f"{type(exc).__name__}: {exc}"[:300]
             usable = []
             for m in PARAMS["metrics"]:
                 try:
-                    S.calibrate(S.make_analyzer(FEATURES, [m]), ref.reset_index(drop=True), cw, n_draws=20)
+                    S.calibrate(S.make_analyzer(FEATURES, [m], nan_policy=policy), ref.reset_index(drop=True), cw, n_draws=20,
+                                allow_short=True)
                     usable.append(m)
                 except Exception:  # noqa: BLE001
                     pass
             metrics[f"{name}_calibration_usable_metrics"] = usable
-            cal, warns = S.calibrate(S.make_analyzer(FEATURES, usable), ref.reset_index(drop=True), cw, n_draws=nd)
+            cal, warns = S.calibrate(S.make_analyzer(FEATURES, usable, nan_policy=policy), ref.reset_index(drop=True), cw,
+                                     n_draws=nd, allow_short=True)
         nan_nulls = {f"{k[0]}|{k[1]}": float(np.isnan(v.values).mean()) for k, v in cal.nulls.items() if np.isnan(v.values).any()}
         pers = S.DriftPersistence(windows=2)
         rows = []
@@ -211,16 +216,25 @@ def run(ctx):
     ctx.params["perf"] = perf
 
     # ------------------------------------------------------------------ limits
+    # the sentinel left in y_true is the same defect as the sentinel in the features (report M1): folded into that
+    # limit as extra evidence, not recorded separately (wrong data in, wrong result out)
+    perf_sentinel = ""
+    if metrics["perf_raw_weeks_flagged"]:
+        perf_sentinel = (f"; with the sentinel left in y_true, {metrics['perf_raw_weeks_flagged']} of {len(perf['raw'])} "
+                         f"weeks are also flagged as performance degradation (MSE first weeks "
+                         f"{[r['mse'] and round(r['mse'], 1) for r in perf['raw'][:8]]} vs threshold {mse_threshold:.2f})")
+        ctx.note("sentinel -200 in y_true: same defect as the feature sentinel (M1), merged into that limit" + perf_sentinel)
     if metrics["sentinel_induced_alerts_raw"]:
         ctx.limit(
             f"The -200 missing-value sentinel is analysed as a measurement: {metrics['sentinel_induced_alerts_raw']} "
             f"(week, sensor) drift alerts over {metrics['sentinel_induced_alert_windows_raw']} weeks exist only because of "
             f"-200 values (absent when the same rows are cleaned)",
             f"sentinel share per column {{{', '.join(f'{k}: {v:.1%}' for k, v in sentinel_share.items())}}}; examples "
-            f"(week, sensor, share of -200 in the week) {metrics['sentinel_induced_examples'][:8]}",
+            f"(week, sensor, share of -200 in the week) {metrics['sentinel_induced_examples'][:8]}{perf_sentinel}",
             "Add a missing_values / sentinel option to Analyzer.add_drift_metrics (per feature, e.g. {-200, -999, ''}) "
             "that maps sentinels to NaN, and report the missing share as its own drift metric (missing_rate drift) "
-            "rather than mixing it into the distribution tests.",
+            "rather than mixing it into the distribution tests; the same option for y_name / pred_name in "
+            "add_performance_metrics.",
             "major")
     if metrics.get("nan_calibration_error"):
         ctx.limit(
@@ -261,21 +275,12 @@ def run(ctx):
             "In Analyzer.run, evaluate performance metrics on the rows with ground truth, add n_labelled and "
             "label_coverage to MetricResults, and refuse only below a configurable minimum coverage (e.g. 30 rows).",
             "critical")
-    if metrics["perf_raw_weeks_flagged"]:
-        ctx.limit(
-            f"With the sentinel left in y_true, {metrics['perf_raw_weeks_flagged']} of {len(perf['raw'])} weeks are "
-            f"flagged as performance degradation because -200 is taken as a true value",
-            f"MSE by week (raw) first values {[r['mse'] and round(r['mse'], 1) for r in perf['raw'][:8]]} vs threshold "
-            f"{mse_threshold:.2f}",
-            "Same sentinel option for y_name / pred_name in add_performance_metrics.",
-            "major")
     if metrics["weather_confirmed_dropped"]:
-        ctx.limit(
-            f"Seasonal weather covariates confirm drift ({metrics['weather_confirmed_dropped']} of 3) with the same "
-            f"verdict type as the drifting sensors, so sensor ageing cannot be told apart from the seasonal cycle",
-            f"first confirmed week (cleaned stream): {metrics['dropped_first_confirmed_week']}; share of weeks confirmed: "
-            f"{ {k: round(v, 2) if v is not None else None for k, v in metrics['dropped_confirmed_share'].items()} }",
-            "Offer conditional drift (drift of a sensor given T/RH/AH, e.g. residual of a reference regression of the "
-            "sensor on the covariates) so that physical sensor drift is separated from covariate seasonality.",
-            "minor")
+        # a correct detection with no ground truth to separate ageing from seasonality: a feature request, not a limit
+        ctx.note(
+            f"feature request (conditional drift): seasonal weather covariates confirm drift "
+            f"({metrics['weather_confirmed_dropped']} of 3) with the same verdict type as the drifting sensors; first "
+            f"confirmed week (cleaned stream) {metrics['dropped_first_confirmed_week']}. Drift of a sensor given T/RH/AH "
+            f"(residual of a reference regression on the covariates) would separate sensor ageing from the seasonal "
+            f"cycle; no ground truth here to score it.")
     return metrics

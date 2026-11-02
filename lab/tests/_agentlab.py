@@ -257,7 +257,7 @@ class WindowTester:
     """Calibrated drift on agent_run features (KS / chi2, A/A thresholds, BH over features), like analyze_drift.py"""
 
     def __init__(self, reference: pd.DataFrame, window: int, n_draws: int = 200, alpha: float = 0.05,
-                 numeric=None, categorical=None):
+                 numeric=None, categorical=None, **calibrator_options):
         from pulsar_metrics.analyzers.base import Analyzer
         from pulsar_metrics.calibration import AACalibrator
 
@@ -271,7 +271,8 @@ class WindowTester:
         self._metrics(template)
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", UserWarning)
-            self.calibrator = AACalibrator(window_size=window, n_draws=n_draws).fit(self.reference, template._metrics_list)
+            self.calibrator = AACalibrator(window_size=window, n_draws=n_draws, **calibrator_options).fit(
+                self.reference, template._metrics_list)
         self.calibration_warnings = [str(w.message) for w in caught if "reference" in str(w.message)]
         self.options = self.calibrator.options()
 

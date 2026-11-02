@@ -106,7 +106,9 @@ def run(ctx):
                                            pred_timestamp=datetime.now(timezone.utc))
                     an = Analyzer(name="soak", model_id=f"soak{i:03d}", model_version="1")
                     an.add_drift_metrics(metrics_list=["ks_2samp"], features_list=feats)
-                    cal = AACalibrator(window_size=200, n_draws=50, contiguous=False).fit(ref, an._metrics_list)
+                    # night load kept on the post-fix API: fixed 50 draws
+                    cal = AACalibrator(window_size=200, n_draws=50, contiguous=False, allow_short=True,
+                                       auto_draws=False).fit(ref, an._metrics_list)
                     an.run(current=cur, reference=ref, options=cal.options())
                     res = an.results_to_pandas()
                     res["p_empirical"] = cal.empirical_pvalues(res)

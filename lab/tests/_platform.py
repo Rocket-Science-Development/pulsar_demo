@@ -162,6 +162,46 @@ def remote_influx_stats(env=None) -> dict:
     return out
 
 
+def influx_fds(env=None, container: str = None) -> dict:
+    """File descriptors of the InfluxDB server: open and limit from its /metrics (process_open_fds, process_max_fds),
+    and, when `container` (or LAB_INFLUX_CONTAINER) names a local Docker container, the count of /proc/1/fd inside it
+    and its soft limit (/proc/1/limits), and the number of "too many open files" lines in its logs. InfluxDB 2.6 does
+    not export process_open_fds, so the container source is the one that works there. Missing sources are left out,
+    never guessed."""
+    import shutil
+    import subprocess
+    import urllib.request
+
+    env = env or influx_env()
+    out = {}
+    try:
+        text = urllib.request.urlopen(env["url"] + "/metrics", timeout=10).read().decode()
+        for line in text.splitlines():
+            for key in ("process_open_fds", "process_max_fds"):
+                if line.startswith(key + " "):
+                    out[key] = float(line.rsplit(" ", 1)[1])
+    except Exception as exc:  # noqa: BLE001
+        out["metrics_error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    container = container or os.environ.get("LAB_INFLUX_CONTAINER")
+    if container and shutil.which("docker"):
+        try:
+            r = subprocess.run(["docker", "exec", container, "sh", "-c", "ls /proc/1/fd | wc -l"],
+                               capture_output=True, text=True, timeout=20)
+            if r.returncode == 0 and r.stdout.strip().isdigit():
+                out["container_fds"] = int(r.stdout.strip())
+            lim = subprocess.run(["docker", "exec", container, "sh", "-c", "grep 'Max open files' /proc/1/limits"],
+                                 capture_output=True, text=True, timeout=20).stdout.split()
+            if len(lim) >= 4 and lim[3].isdigit():  # Max open files <soft> <hard> files
+                out["container_max_fds"] = int(lim[3])
+            logs = subprocess.run(["docker", "logs", "--since", "24h", container], capture_output=True, text=True,
+                                  timeout=60)
+            out["too_many_open_files_log_lines"] = sum(
+                "too many open files" in line.lower() for line in (logs.stdout + logs.stderr).splitlines())
+        except Exception as exc:  # noqa: BLE001
+            out["docker_error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+    return out
+
+
 def wait_until(predicate, timeout_s, step_s=0.5):
     deadline = time.monotonic() + timeout_s
     while time.monotonic() < deadline:

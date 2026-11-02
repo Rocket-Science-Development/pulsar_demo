@@ -8,6 +8,11 @@ Feature drift: ks_2samp, wasserstein, psi on the 10 numeric features, calibrated
 BH over the window; confirmation = DriftPersistence(2) over consecutive replicate windows at the same p.
 Explanation drift: TreeSHAP (pulsar_metrics.explain.tree_attributions) on the window, AttributionDrift against the
 reference window; importance_by_group by wilderness area on the mixed window.
+
+AttributionDrift applies a documented share tolerance (0.05 by default): an alert exactly at the crossing of that
+tolerance is the documented behaviour, not a lag. The test therefore varies `share_tolerance` (SHARE_TOLERANCES) and
+reports the dose-response per tolerance, with the A/A alert rate at 0 % for each; a limit is recorded only when a
+share difference well beyond the tolerance in force (> 2 x tolerance) gets no alert.
 """
 
 import gzip
@@ -29,10 +34,11 @@ SOIL = [f"Soil_Type{i}" for i in range(1, 41)]
 COLUMNS = NUMERIC + WILD + SOIL + ["Cover_Type"]
 N = 2000
 DOSES = [0.0, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.75, 1.0]
+SHARE_TOLERANCES = [0.01, 0.02, 0.05]  # 0.05 = AttributionDrift default
 CRITERIA = {"far_p0_wilderness": ("<=", 0.05), "far_p0_elevation": ("<=", 0.05), "attribution_alert_p0": ("<=", 0.05),
             "attribution_moves_with_shift": ("==", True)}
 PARAMS = {"window_rows": N, "doses": DOSES, "replicates_drift": 30, "replicates_shap": 6, "model": "GradientBoosting 150x3",
-          "metrics": ["ks_2samp", "wasserstein", "psi"]}
+          "metrics": ["ks_2samp", "wasserstein", "psi"], "share_tolerances": SHARE_TOLERANCES}
 
 
 def load() -> pd.DataFrame:
@@ -70,6 +76,8 @@ def run(ctx):
 
     ref_attr = tree_attributions(model, ref_win[feats])
     ad = AttributionDrift(k=5, n_bootstrap=100 if S.DRY else 200, seed=0).fit(ref_attr)
+    ads = {tol: AttributionDrift(k=5, n_bootstrap=100 if S.DRY else 200, seed=0, share_tolerance=tol).fit(ref_attr)
+           for tol in SHARE_TOLERANCES}
     ref_imp = importance(ref_attr)
     metrics = {"reference_attribution_stability": ad.stability, "elevation_cut_p80": elev_cut,
                "reference_top5_importance": ref_imp.sort_values(ascending=False).head(5).round(4).to_dict(),
@@ -107,6 +115,10 @@ def run(ctx):
                     jc = out[out.metric_name == "attribution_top_k_jaccard"].iloc[0]
                     sh = out[out.metric_name == "importance_share_difference"]
                     cur_imp = importance(cur_attr)
+                    tol_alerts = {}
+                    for tol, adt in ads.items():
+                        o = pd.DataFrame([x.model_dump() for x in adt.run(cur_attr)])
+                        tol_alerts[tol] = int((o[o.metric_name == "importance_share_difference"].drift_status == True).sum())  # noqa: E712
                     g, gdiff = None, None
                     if kind == "wilderness" and 0 < p < 1:
                         grp = pd.Series(np.where(w.Wilderness_Area3 == 1, "area3", "area1"), index=w.index, name="area")
@@ -124,6 +136,7 @@ def run(ctx):
                         "soil_share": float(cur_imp[SOIL].sum()),
                         "max_abs_share_diff": float(sh.metric_value.abs().max()),
                         "group_alerts": g, "group_max_point_diff": gdiff,
+                        **{f"share_alerts_tol{tol}": n for tol, n in tol_alerts.items()},
                     })
             row = {"p": p, "detect_raw": float(np.mean(raw_flags)), "detect_confirmed": float(np.mean(conf_flags[1:])) if reps > 1 else None,
                    "mean_bh_rejections": float(np.mean(n_rej)), "accuracy": float(np.mean(accs)), "replicates": reps}
@@ -138,6 +151,7 @@ def run(ctx):
                     "soil_share": float(A.soil_share.mean()), "max_abs_share_diff": float(A.max_abs_share_diff.mean()),
                     "group_alerts_mean": None if A.group_alerts.isna().all() else float(A.group_alerts.mean()),
                     "group_max_point_diff": None if A.group_max_point_diff.isna().all() else float(A.group_max_point_diff.mean()),
+                    **{f"share_alert_share_tol{tol}": float((A[f"share_alerts_tol{tol}"] > 0).mean()) for tol in SHARE_TOLERANCES},
                 })
             curve.append(row)
         curves[kind] = curve
@@ -149,6 +163,10 @@ def run(ctx):
         metrics[f"min_dose_80pct_power_{kind}"] = mdd
         amd = next((c["p"] for c in curve if c.get("attr_any_alert_share", 0) >= 0.8), None)
         metrics[f"min_dose_80pct_attribution_alert_{kind}"] = amd
+        for tol in SHARE_TOLERANCES:
+            metrics[f"attr_share_alert_p0_{kind}_tol{tol}"] = c0.get(f"share_alert_share_tol{tol}")
+            metrics[f"min_dose_80pct_share_alert_{kind}_tol{tol}"] = next(
+                (c["p"] for c in curve if c.get(f"share_alert_share_tol{tol}", 0) >= 0.8), None)
     metrics["curves"] = curves
     metrics["attribution_alert_p0"] = max(metrics["attr_alert_p0_wilderness"] or 0, metrics["attr_alert_p0_elevation"] or 0)
     cw = curves["wilderness"]
@@ -169,19 +187,28 @@ def run(ctx):
     for kind in ("wilderness", "elevation"):
         cur = curves[kind]
         mdd_f, mdd_a = metrics[f"min_dose_80pct_power_{kind}"], metrics[f"min_dose_80pct_attribution_alert_{kind}"]
-        if mdd_f is not None and (mdd_a is None or mdd_a > mdd_f):
-            ctx.limit(
-                f"Explanation drift lags feature drift ({kind} shift): feature drift reaches 80 % detection at p = "
-                f"{mdd_f:.0%}, AttributionDrift at p = {('%.0f %%' % (100 * mdd_a)) if mdd_a is not None else 'never (up to 100 %)'}",
-                "; ".join(f"p={c['p']:.0%}: feat {c['detect_raw']:.0%}, attr {c.get('attr_any_alert_share', float('nan')):.0%}, "
-                          f"ndcg {c.get('attr_ndcg', float('nan')):.3f}, max share diff {c.get('max_abs_share_diff', float('nan')):.3f}, "
-                          f"inconclusive {c.get('attr_inconclusive_mean', float('nan')):.1f}/54"
-                          for c in cur if "attr_ndcg" in c)[:900],
-                "The +/-5 % share tolerance and the top-5 NDCG/Jaccard thresholds are fixed; calibrate AttributionDrift on "
-                "A/A draws like AACalibrator (null distribution of ndcg and share differences at the window size) and "
-                "report a per-feature attribution-shift p-value; offer grouping of one-hot columns (Soil_Type*, "
-                "Wilderness_Area*) into one feature before the comparison.",
-                "minor")
+        sweep = {tol: metrics[f"min_dose_80pct_share_alert_{kind}_tol{tol}"] for tol in SHARE_TOLERANCES}
+        ctx.note(f"{kind}: feature drift 80 % at p = {mdd_f}, AttributionDrift (default tolerance) at p = {mdd_a}; share "
+                 f"alerts 80 % by share_tolerance {sweep}; A/A share alert rate by tolerance "
+                 f"{ {tol: metrics[f'attr_share_alert_p0_{kind}_tol{tol}'] for tol in SHARE_TOLERANCES} }. An alert at "
+                 f"the crossing of the documented tolerance is the expected behaviour, not a lag.")
+        # a limit only when a share difference well beyond the tolerance in force gets no alert
+        for tol in SHARE_TOLERANCES:
+            missed = [c for c in cur if "max_abs_share_diff" in c and c["max_abs_share_diff"] > 2 * tol
+                      and c.get(f"share_alert_share_tol{tol}", 1) < 0.5]
+            if missed:
+                ctx.limit(
+                    f"AttributionDrift misses share differences beyond twice its tolerance ({kind} shift, "
+                    f"share_tolerance {tol}): {len(missed)} dose(s) with a mean max share difference > {2 * tol:.2f} "
+                    f"alerted in fewer than half of the windows",
+                    "; ".join(f"p={c['p']:.0%}: max share diff {c['max_abs_share_diff']:.3f}, alert share "
+                              f"{c[f'share_alert_share_tol{tol}']:.0%}, inconclusive "
+                              f"{c.get('attr_inconclusive_mean', float('nan')):.1f}/54" for c in missed)[:900],
+                    "Report a per-feature attribution-shift p-value from A/A draws at the window size (like "
+                    "AACalibrator) next to the tolerance verdict, and offer grouping of one-hot columns (Soil_Type*, "
+                    "Wilderness_Area*) into one feature before the comparison.",
+                    "minor")
+                break
     ws = [c for c in cw if c.get("group_alerts_mean") is not None]
     missed = [c for c in ws if c["group_alerts_mean"] == 0 and (c["group_max_point_diff"] or 0) > 0.10]
     if missed:

@@ -18,7 +18,7 @@ from collections import Counter, defaultdict
 import numpy as np
 import pandas as pd
 
-from ._llm_common import DATA, DRY, offline, wilson
+from ._llm_common import DATA, DRY, GLINER_MODEL, offline, wilson
 
 GLINER_LOCAL = "/data/lab/work/gliner_multi_pii-v1-local"  # copy whose backbone points to the local mdeberta-v3-base
 CRITERIA = {"names_recall_gain": (">", 0.0), "addresses_recall_gain": (">", 0.0), "values_written": ("==", 0)}
@@ -208,9 +208,55 @@ def run(ctx):
                   f"(p95 {metrics['latency_ms_gliner_cpu_p95']}), vs {metrics['latency_ms_gliner_gpu_p50']} ms on the T4 "
                   "after a manual move", f"{len(cpu_lat)} docs on 4 vCPU; rules alone p50 {metrics['latency_ms_rules_p50']} ms",
                   "Add a `device` argument to ModelPiiDetector (like InjectionDetector) and batch predict_entities.", "minor")
-    ctx.limit("ModelPiiDetector cannot load offline from a local GLiNER copy: the GLiNER config names its backbone "
-              "'microsoft/mdeberta-v3-base' and the hub is contacted (OSError with HF_HUB_OFFLINE=1)",
-              f"local copy {GLINER_LOCAL} with a rewritten gliner_config.json was needed; load {load_s:.0f} s",
-              "Document air-gapped installation (download the backbone, rewrite model_name) or accept a "
-              "`backbone_path` argument; air-gapped deployments are common in the public sector.", "minor")
+    # Offline load from the UNPATCHED local copy, actually attempted (the first run asserted the failure without trying):
+    # once with the host's Hugging Face cache, once with an empty cache (true air-gapped host). Limit only on failure.
+    offline_load = {"host_cache": offline_load_attempt(GLINER_MODEL, empty_cache=False),
+                    "empty_cache": offline_load_attempt(GLINER_MODEL, empty_cache=True)}
+    metrics["offline_load_unpatched"] = offline_load
+    failed = {k: v for k, v in offline_load.items() if v["ok"] is False}
+    if failed:
+        ctx.limit("ModelPiiDetector cannot load offline from an unpatched local GLiNER copy (HF_HUB_OFFLINE=1): " +
+                  "; ".join(f"{k}: {v['error']}" for k, v in failed.items()),
+                  f"copy {GLINER_MODEL} as downloaded; subprocess load with HF_HUB_OFFLINE=1 and TRANSFORMERS_OFFLINE=1 "
+                  f"({', '.join(failed)}); the patched copy {GLINER_LOCAL} loads in {load_s:.0f} s",
+                  "Document air-gapped installation (download the backbone, rewrite model_name) or accept a "
+                  "`backbone_path` argument; air-gapped deployments are common in the public sector.", "minor")
+    else:
+        ctx.note(f"Unpatched GLiNER copy loads offline: {offline_load}")
     return metrics
+
+
+def offline_load_attempt(model_dir, empty_cache, timeout_s=900):
+    """Load ModelPiiDetector from `model_dir` in a fresh process with the hub disabled; returns ok/error/seconds"""
+    import os
+    import subprocess
+    import sys
+    import tempfile
+
+    if not os.path.isdir(model_dir):
+        return {"ok": None, "error": f"copy not found: {model_dir}", "seconds": 0.0}
+    env = {**os.environ, "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}
+    tmp = tempfile.TemporaryDirectory() if empty_cache else None
+    if tmp:
+        env["HF_HOME"] = tmp.name
+        env.pop("HF_HUB_CACHE", None)
+        env.pop("TRANSFORMERS_CACHE", None)
+    code = ("import sys\n"
+            "from pulsar_data_collection.genai import ModelPiiDetector\n"
+            "try:\n"
+            "    ModelPiiDetector(model=sys.argv[1])\n"
+            "except Exception as e:\n"
+            "    print('ERR', type(e).__name__, str(e).splitlines()[0][:300] if str(e) else '')\n"
+            "    sys.exit(3)\n")
+    t0 = time.perf_counter()
+    try:
+        r = subprocess.run([sys.executable, "-c", code, model_dir], env=env, capture_output=True, text=True, timeout=timeout_s)
+        err = next((l[4:] for l in r.stdout.splitlines() if l.startswith("ERR ")), None)
+        if r.returncode != 0 and err is None:
+            err = (r.stderr.strip().splitlines() or ["exit code %d" % r.returncode])[-1][:300]
+        return {"ok": r.returncode == 0, "error": err, "seconds": round(time.perf_counter() - t0, 1)}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": f"timeout after {timeout_s} s", "seconds": float(timeout_s)}
+    finally:
+        if tmp:
+            tmp.cleanup()

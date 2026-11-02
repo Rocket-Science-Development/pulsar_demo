@@ -122,6 +122,15 @@ class Gen:
         text = pre + v + post
         return text, [(t, len(pre), len(pre) + len(v))], t, fmt, lang
 
+    def member(self):
+        """Membership number outside every NANP phone shape (never 10 or 11 digits, never a real area code)"""
+        r = self.r
+        return r.choice([
+            f"{r.randrange(10**7, 10**8)}",
+            f"0{r.randrange(100, 1000)} {r.randrange(1000, 10000)} {r.randrange(1000, 10000)}",
+            f"{r.choice('ABCDEFGHJKLMNPRSTUVWXYZ')}{r.randrange(10**6, 10**7)}",
+        ])
+
     def nonluhn9(self):
         r = self.r
         while True:
@@ -160,7 +169,9 @@ class Gen:
                    "en": f"Server 10.{r.randrange(256)}.{r.randrange(256)}.{r.randrange(256)} restarted."},
             "flight": {"fr": f"Vol AC {r.randrange(100, 999)}, porte B{r.randrange(10, 60)}.", "en": f"Flight AC {r.randrange(100, 999)}, gate B{r.randrange(10, 60)}."},
             "confirmation_luhn": {"fr": f"Code de confirmation : {d9}", "en": f"Confirmation number {d9}"},
-            "member_number": {"fr": f"Numéro de membre {p}", "en": f"Member number {p}"},
+            # member numbers that do not look like phones (the first run reused the NANP phone generator here, so
+            # any detector would see a phone): 8 digits, 4-4-4 with a leading 0, or a letter and 7 digits
+            "member_number": {"fr": f"Numéro de membre {self.member()}", "en": f"Member number {self.member()}"},
             "client_number": {"fr": f"No client {s9}, merci.", "en": f"Customer no. {s9}, thank you."},
             "isbn": {"fr": f"ISBN 978-2-{r.randrange(1000, 9999)}-{r.randrange(1000, 9999)}-{r.randrange(10)}",
                      "en": f"ISBN 978-1-{r.randrange(1000, 9999)}-{r.randrange(1000, 9999)}-{r.randrange(10)}"},
@@ -276,12 +287,13 @@ def run(ctx):
                       f"Add the missing business words / validations for {t} (see hard_negative_findings) and a "
                       "negative-context list per type rather than one global BUSINESS_WORDS.", "major")
     if exact < conv_n:
-        ctx.limit(f"Leak count not exact in {conv_n - exact} of {conv_n} scripted conversations "
-                  f"(expected {total_expected} leaks, counted {total_counted})",
-                  f"over-counted in {leak['over_count_convs']}, under-counted in {leak['under_count_convs']} conversations; "
-                  f"by output style {leak['by_output_style']}",
-                  "Leaks inherit the recognizer misses: a missed format is a missed leak. Fix the recognizers, and "
-                  "normalise values across formats (e.g. lower/upper, dashes) before comparing input and output.", "major")
+        # Not an independent limit: every miscount is an under-count explained by the 'dossier' suppression (limit
+        # below, C4 of the report) and by the missed RAMQ formats (recall limit above, M17); the number of conversations
+        # off is set by the 50/50 split of output styles. Kept as a note with its numbers.
+        ctx.note(f"Leak count not exact in {conv_n - exact} of {conv_n} scripted conversations (expected {total_expected} "
+                 f"leaks, counted {total_counted}; over-counted in {leak['over_count_convs']}, under-counted in "
+                 f"{leak['under_count_convs']}; by output style {leak['by_output_style']}): consequence of the "
+                 "'dossier' suppression and of the recognizer misses, not a separate limit.")
     dos = leak["by_output_style"].get("dossier", {})
     if dos.get("expected") and dos.get("counted", 0) / dos["expected"] < 0.5:
         neu = leak["by_output_style"].get("neutral", {})

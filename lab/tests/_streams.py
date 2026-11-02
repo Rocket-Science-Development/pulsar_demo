@@ -40,9 +40,12 @@ def tag(df: pd.DataFrame, start=None) -> pd.DataFrame:
     return out
 
 
-def make_analyzer(features, drift_metrics=("ks_2samp", "wasserstein", "psi"), perf_metrics=(), **perf_kwargs):
+def make_analyzer(features, drift_metrics=("ks_2samp", "wasserstein", "psi"), perf_metrics=(), nan_policy=None,
+                  **perf_kwargs):
+    """nan_policy: None keeps the product default ("omit" since the calibration fix); "propagate" is the old behaviour"""
     a = Analyzer(name="lab", model_id=MODEL_ID, model_version=MODEL_VERSION)
-    a.add_drift_metrics(metrics_list=list(drift_metrics), features_list=list(features))
+    extra = {"nan_policy": nan_policy} if nan_policy is not None else {}
+    a.add_drift_metrics(metrics_list=list(drift_metrics), features_list=list(features), **extra)
     if perf_metrics:
         a.add_performance_metrics(metrics_list=list(perf_metrics), **perf_kwargs)
     return a
@@ -54,9 +57,13 @@ def quiet(fn, *args, **kwargs):
         return fn(*args, **kwargs)
 
 
-def calibrate(analyzer, reference: pd.DataFrame, window: int, n_draws: int = 200, seed: int = 0):
-    """AACalibrator on the reference; returns (calibrator, warnings raised)"""
-    cal = AACalibrator(window_size=window, n_draws=n_draws, contiguous=True, seed=seed)
+def calibrate(analyzer, reference: pd.DataFrame, window: int, n_draws: int = 200, seed: int = 0, **options):
+    """AACalibrator on the reference; returns (calibrator, warnings raised)
+
+    `options` go to AACalibrator (post-fix API): allow_short=True for references shorter than 10 windows (refused
+    otherwise), auto_draws=False to keep n_draws fixed and reproduce the old p-value floor 1/(n_draws+1).
+    """
+    cal = AACalibrator(window_size=window, n_draws=n_draws, contiguous=True, seed=seed, **options)
     with warnings.catch_warnings(record=True) as caught, contextlib.redirect_stdout(io.StringIO()):
         warnings.simplefilter("always")
         cal.fit(reference, analyzer._metrics_list)

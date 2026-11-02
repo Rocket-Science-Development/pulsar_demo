@@ -10,10 +10,20 @@ Substitute with exact ground truth (same structure as INSECTS: abrupt, gradual, 
 (mean shift of DELTA sd). Pipeline: ks_2samp, wasserstein, psi calibrated by AACalibrator, BH over the window,
 DriftPersistence(2). Measured per type: false alarms before the drift, delay to raw and to confirmed alert, and for
 recurring drift the re-alerts with a static reference vs a reference updated after each confirmed drift.
+
+Two controls make the delays interpretable:
+- a baseline comparison detector on the same windows, outside Pulsar.ml: two-sample KS per feature (scipy), Bonferroni
+  over the features, the same persistence of 2 windows;
+- a run with m < 30 tests per window (SMALL_D features x 3 metrics), so that the delays are not confounded with the
+  empirical p-value floor x BH limit (report C1, which bites from m = 30).
+The gradual / incremental delay is recorded as a limit only when Pulsar.ml is slower than the baseline at m < 30. The
+return of an old concept after a reference update is reported as a feature request (concept library), not a limit:
+the update policy is written by the test and the alert is correct against the reference in force.
 """
 
 import numpy as np
 import pandas as pd
+from scipy.stats import ks_2samp
 
 from lab.tests import _streams as S
 
@@ -25,6 +35,9 @@ PARAMS = {"features": D, "window_rows": W, "reference_windows": N_REF_WIN, "onse
           "gradual_windows": 10, "incremental_windows": 15, "recurring": "on 20-29, off 30-39, on 40-49, off 50-59",
           "replicates": 10, "dataset": "synthetic substitute (INSECTS unavailable, licence unverified)"}
 COLS = [f"x{i}" for i in range(D)]
+SMALL_D = 6  # 6 features x 3 metrics = 18 tests per window, below the m = 30 floor of report C1
+SMALL_COLS = COLS[:SMALL_D]
+PARAMS.update({"small_features": SMALL_D, "baseline": "scipy KS per feature, Bonferroni over features, persistence 2"})
 
 
 def shift_profile(kind: str, w: int) -> float:
@@ -53,14 +66,25 @@ def make_window(kind, w, rng):
     return pd.DataFrame(x, columns=COLS)
 
 
-def run_stream(kind, rng, analyzer, cal, reference, policy="static"):
+def baseline_flag(cur: pd.DataFrame, ref: pd.DataFrame, alpha: float = 0.05) -> bool:
+    """Comparison detector outside Pulsar.ml: KS per feature, Bonferroni over the features"""
+    cols = list(cur.columns)
+    return any(ks_2samp(cur[c], ref[c]).pvalue < alpha / len(cols) for c in cols)
+
+
+def run_stream(kind, rng, analyzer, cal, reference, policy="static", cols=None):
     pers = S.DriftPersistence(2)
     ref, c = reference, cal
     recent = []
     out = []
     update_at = None
+    base_run = 0
     for w in range(N_REF_WIN, N_WIN):
         cur = make_window(kind, w, rng)
+        if cols is not None:
+            cur = cur[cols]
+        b = baseline_flag(cur, ref)
+        base_run = base_run + 1 if b else 0
         res = S.analyze(analyzer, cur, ref, cal=c)
         drift = res[res.metric_type == "drift"]
         v = pers.update_to_pandas(S.persistence_frame(drift, "drift_fdr"))
@@ -70,13 +94,14 @@ def run_stream(kind, rng, analyzer, cal, reference, policy="static"):
                     "drifting_hit": bool(drift[drift.feature_name.isin(DRIFTING)].drift_fdr.fillna(False).astype(bool).any()),
                     "stable_hit": bool(drift[~drift.feature_name.isin(DRIFTING)].drift_fdr.fillna(False).astype(bool).any()),
                     "R": int(drift.drift_fdr.fillna(False).astype(bool).sum()),
-                    "V": int(drift[~drift.feature_name.isin(DRIFTING)].drift_fdr.fillna(False).astype(bool).sum())})
+                    "V": int(drift[~drift.feature_name.isin(DRIFTING)].drift_fdr.fillna(False).astype(bool).sum()),
+                    "baseline_raw": b, "baseline_confirmed": base_run >= 2})
         recent = (recent + [cur])[-N_REF_WIN:]
         if policy == "update" and changed_on:
             update_at = w + 2  # accept the new concept once 4 windows of it are available
         if policy == "update" and update_at == w:
             ref = pd.concat(recent[-4:]).reset_index(drop=True)
-            c, _ = S.calibrate(analyzer, ref, W, n_draws=100)
+            c, _ = S.calibrate(analyzer, ref, W, n_draws=100, allow_short=True)
             pers.reset()
             update_at = None
     return out
@@ -102,9 +127,11 @@ def run(ctx):
     analyzer = S.make_analyzer(COLS, ["ks_2samp", "wasserstein", "psi"])
     summary = {}
     ks_alphas = []
+    small_an = S.make_analyzer(SMALL_COLS, ["ks_2samp", "wasserstein", "psi"])
     for kind in ("abrupt", "gradual", "incremental", "recurring"):
         delays_raw, delays_conf, pre_fa, pre_n, realerts_static, realerts_update, clear_delays = [], [], 0, 0, [], [], []
         stable_hits, fdr_R, fdr_V, fdr_win = 0, 0, 0, 0
+        base_delays, small_delays, small_base_delays, base_pre_fa = [], [], [], 0
         for r in range(reps):
             reference = pd.concat([make_window(kind, w, rng) for w in range(N_REF_WIN)]).reset_index(drop=True)
             cal, _ = S.calibrate(analyzer, reference, W, n_draws=200, seed=r)
@@ -116,6 +143,15 @@ def run(ctx):
             post = [x for x in rows if x["w"] >= ONSET]
             delays_raw.append(S.first_index([x["drifting_hit"] for x in post]))
             delays_conf.append(S.first_index([x["confirmed"] for x in post]))
+            base_delays.append(S.first_index([x["baseline_confirmed"] for x in post]))
+            base_pre_fa += sum(x["baseline_raw"] for x in pre)
+            # same stream type with m = 18 tests per window (below the C1 floor), Pulsar.ml and the baseline
+            sref = reference[SMALL_COLS]
+            scal, _ = S.calibrate(small_an, sref, W, n_draws=200, seed=r)
+            srows = run_stream(kind, rng, small_an, scal, sref, cols=SMALL_COLS)
+            spost = [x for x in srows if x["w"] >= ONSET]
+            small_delays.append(S.first_index([x["confirmed"] for x in spost]))
+            small_base_delays.append(S.first_index([x["baseline_confirmed"] for x in spost]))
             stable_hits += sum(x["stable_hit"] for x in post)
             fdr_R += sum(x["R"] for x in post if shift_profile(kind, x["w"]) > 0)
             fdr_V += sum(x["V"] for x in post if shift_profile(kind, x["w"]) > 0)
@@ -136,7 +172,13 @@ def run(ctx):
             "stable_feature_alert_windows_post": stable_hits,
             "discoveries_in_drift_windows": fdr_R, "false_discoveries_in_drift_windows": fdr_V, "drift_windows": fdr_win,
             "observed_fdr": fdr_V / fdr_R if fdr_R else None,
+            "baseline_delay_confirmed_windows": base_delays, "baseline_pre_drift_far_window": base_pre_fa / max(pre_n, 1),
+            "small_m_delay_confirmed_windows": small_delays, "small_m_baseline_delay_confirmed_windows": small_base_delays,
         }
+        for key in ("baseline_delay_confirmed_windows", "small_m_delay_confirmed_windows",
+                    "small_m_baseline_delay_confirmed_windows"):
+            vals = [x for x in summary[kind][key] if x is not None]
+            summary[kind][key.replace("_windows", "_median")] = float(np.median(vals)) if vals else None
         if kind == "recurring":
             summary[kind].update({"episodes_static": realerts_static, "clear_delay_windows": clear_delays,
                                   "update_policy": realerts_update})
@@ -146,26 +188,35 @@ def run(ctx):
                                           "min": float(ka.min()), "p10": float(np.quantile(ka, 0.1)),
                                           "p90": float(np.quantile(ka, 0.9)), "max": float(ka.max())}
 
-    # empirical p-value floor x BH: one feature with a large shift, growing number of features
-    floor = {}
-    for d in ([3, 20] if S.DRY else [3, 10, 11, 20, 40]):
-        cols = [f"x{i}" for i in range(d)]
-        an = S.make_analyzer(cols, ["ks_2samp", "wasserstein", "psi"])
-        hits = []
-        for r in range(2 if S.DRY else 5):
-            ref = pd.DataFrame(rng.normal(size=(W * N_REF_WIN, d)), columns=cols)
-            c, _ = S.calibrate(an, ref, W, n_draws=200, seed=r)
-            cur = pd.DataFrame(rng.normal(size=(W, d)), columns=cols)
-            cur["x0"] += 2.0
-            res = S.analyze(an, cur, ref, cal=c)
-            drift = res[res.metric_type == "drift"]
-            hits.append({"bh_any": S.window_flag(drift, "drift_fdr"),
-                         "min_p_empirical": float(drift.p_empirical.min()),
-                         "x0_raw_calibrated": int(drift[drift.feature_name == "x0"].drift_status.fillna(False).astype(bool).sum())})
-        floor[d] = {"tests": 3 * d, "detect_bh": float(np.mean([h["bh_any"] for h in hits])),
-                    "min_p_empirical": min(h["min_p_empirical"] for h in hits),
-                    "bh_first_rank_bound": 0.05 / (3 * d), "x0_tests_flagged_before_bh_mean": float(np.mean([h["x0_raw_calibrated"] for h in hits]))}
+    # empirical p-value floor x BH: one feature with a large shift, growing number of features.
+    # "fixed" keeps n_draws=200 (auto_draws=False: the pre-fix behaviour, evidence of C1); "auto" is the post-fix
+    # default, which raises n_draws until 1/(n_draws+1) <= alpha/(2m).
+    floors = {}
+    for mode in ("fixed", "auto"):
+        floor = {}
+        for d in ([3, 20] if S.DRY else [3, 10, 11, 20, 40]):
+            cols = [f"x{i}" for i in range(d)]
+            an = S.make_analyzer(cols, ["ks_2samp", "wasserstein", "psi"])
+            hits = []
+            for r in range(2 if S.DRY else 5):
+                ref = pd.DataFrame(rng.normal(size=(W * N_REF_WIN, d)), columns=cols)
+                c, _ = S.calibrate(an, ref, W, n_draws=200, seed=r, auto_draws=(mode == "auto"))
+                cur = pd.DataFrame(rng.normal(size=(W, d)), columns=cols)
+                cur["x0"] += 2.0
+                res = S.analyze(an, cur, ref, cal=c)
+                drift = res[res.metric_type == "drift"]
+                hits.append({"bh_any": S.window_flag(drift, "drift_fdr"),
+                             "min_p_empirical": float(drift.p_empirical.min()),
+                             "n_draws_used": getattr(c, "n_draws_used", None),
+                             "x0_raw_calibrated": int(drift[drift.feature_name == "x0"].drift_status.fillna(False).astype(bool).sum())})
+            floor[d] = {"tests": 3 * d, "detect_bh": float(np.mean([h["bh_any"] for h in hits])),
+                        "min_p_empirical": min(h["min_p_empirical"] for h in hits),
+                        "n_draws_used": max((h["n_draws_used"] or 0) for h in hits) or None,
+                        "bh_first_rank_bound": 0.05 / (3 * d), "x0_tests_flagged_before_bh_mean": float(np.mean([h["x0_raw_calibrated"] for h in hits]))}
+        floors[mode] = floor
+    floor = floors["fixed"]
     metrics["empirical_floor_vs_bh"] = floor
+    metrics["empirical_floor_vs_bh_auto_draws"] = floors["auto"]
 
     # AACalibrator contiguous draws on a reference barely longer than 2 windows
     import time
@@ -176,10 +227,15 @@ def run(ctx):
     for mult in (2.0, 2.05, 2.5, 4.0):
         ref = pd.DataFrame({"x0": rng.normal(size=int(mult * w))})
         t0 = time.perf_counter()
-        c = S.quiet(AACalibrator(window_size=w, n_draws=30, seed=0).fit, ref, [DriftTestMetric("ks_2samp", "x0")])
+        try:  # post-fix API: contiguous draws below 4 windows are refused, even with allow_short=True
+            c = S.quiet(AACalibrator(window_size=w, n_draws=30, seed=0, allow_short=True).fit, ref,
+                        [DriftTestMetric("ks_2samp", "x0")])
+        except Exception as exc:  # noqa: BLE001 - the refusal is the fixed behaviour, recorded
+            short[mult] = {"rows": len(ref), "refused": f"{type(exc).__name__}: {exc}"[:200]}
+            continue
         null = c.nulls[("ks_2samp", "x0")].values
         short[mult] = {"rows": len(ref), "fit_seconds": round(time.perf_counter() - t0, 2),
-                       "distinct_null_values": int(np.unique(null).size), "n_draws": 30,
+                       "distinct_null_values": int(np.unique(null).size), "n_draws": 30, "refused": None,
                        "calibrated_alpha": float(c.options()["ks_2samp|x0"]["alpha"])}
     metrics["short_reference_calibration"] = short
     metrics["abrupt_confirmed_delay"] = max((x for x in summary["abrupt"]["delay_confirmed_windows"] if x is not None), default=None)
@@ -190,7 +246,9 @@ def run(ctx):
 
     # ------------------------------------------------------------------ limits
     sr = metrics["short_reference_calibration"]
-    if sr[2.0]["distinct_null_values"] <= 2 or sr[2.0]["fit_seconds"] > 10 * sr[4.0]["fit_seconds"]:
+    if sr[2.0].get("refused"):
+        ctx.note(f"AACalibrator refuses a contiguous reference of 2 windows (post-fix API): {sr[2.0]['refused']}")
+    elif sr[2.0]["distinct_null_values"] <= 2 or sr[2.0]["fit_seconds"] > 10 * sr[4.0].get("fit_seconds", 0):
         ctx.limit(
             "AACalibrator with contiguous=True on a reference of about 2 windows returns a degenerate null "
             "distribution (the only disjoint pair is drawn every time) after a slow rejection loop, with only a warning",
@@ -199,7 +257,11 @@ def run(ctx):
             "and warn when the number of distinct A/A draws is far below n_draws.",
             "minor")
     blind = {d: v for d, v in floor.items() if v["detect_bh"] == 0}
-    if blind:
+    blind_auto = {d: v for d, v in floors["auto"].items() if v["detect_bh"] == 0}
+    if blind and not blind_auto:
+        ctx.note(f"C1 reproduced with auto_draws=False (n_draws fixed at 200): blind at {sorted(3 * d for d in blind)} "
+                 f"tests; with the post-fix default auto_draws=True every case is detected: {floors['auto']}")
+    if blind and blind_auto:
         ctx.limit(
             "A drift on a single feature, however large, can never pass Benjamini-Hochberg on AACalibrator empirical "
             f"p-values once a window holds more than about 30 (metric, feature) tests (10 features x 3 metrics): "
@@ -224,32 +286,35 @@ def run(ctx):
             "the nominal alpha when the reference is short, and raise the recommended minimum to 30+ windows.",
             "major")
     g, a, inc = summary["gradual"], summary["abrupt"], summary["incremental"]
-    if a["delay_confirmed_median"] is not None and ((g["delay_confirmed_median"] or 99) > a["delay_confirmed_median"] + 1 or g["missed"]):
+    ctx.note("confirmation delay medians (Pulsar m=30 / baseline / Pulsar m=18 / baseline m=18): " + "; ".join(
+        f"{k} {v['delay_confirmed_median']} / {v['baseline_delay_confirmed_median']} / {v['small_m_delay_confirmed_median']}"
+        f" / {v['small_m_baseline_delay_confirmed_median']}" for k, v in summary.items()))
+    slow = []
+    for name, v in (("gradual", g), ("incremental", inc)):
+        mine, ref_d = v["small_m_delay_confirmed_median"], v["small_m_baseline_delay_confirmed_median"]
+        if ref_d is not None and (mine is None or mine > ref_d + 1):
+            slow.append(f"{name}: Pulsar.ml {mine} vs baseline {ref_d} windows")
+    if slow:
         ctx.limit(
-            f"Gradual and incremental drifts are confirmed late: median confirmation delay {g['delay_confirmed_median']} "
-            f"windows (gradual, 10-window transition) and {inc['delay_confirmed_median']} (incremental, 15 windows) vs "
-            f"{a['delay_confirmed_median']} for the same final shift applied abruptly",
-            f"{reps} replicates, shift {DELTA} sd on 3 of 10 features, windows of {W}; delays raw / confirmed: abrupt "
-            f"{a['delay_raw_windows']} / {a['delay_confirmed_windows']}; gradual {g['delay_raw_windows']} / "
-            f"{g['delay_confirmed_windows']}; incremental {inc['delay_raw_windows']} / {inc['delay_confirmed_windows']}",
+            f"Gradual / incremental drifts are confirmed later than by a plain KS + Bonferroni baseline with the same "
+            f"persistence, at m = {3 * SMALL_D} tests per window (below the C1 floor): {'; '.join(slow)}",
+            f"{reps} replicates, shift {DELTA} sd on 3 features, windows of {W}; delays (Pulsar m=18 / baseline m=18): "
+            f"gradual {g['small_m_delay_confirmed_windows']} / {g['small_m_baseline_delay_confirmed_windows']}; "
+            f"incremental {inc['small_m_delay_confirmed_windows']} / {inc['small_m_baseline_delay_confirmed_windows']}; "
+            f"abrupt {a['small_m_delay_confirmed_windows']} / {a['small_m_baseline_delay_confirmed_windows']}",
             "Add a cumulative detector on the per-window statistics (CUSUM / Page-Hinkley on the calibrated empirical "
-            "p-values or on wasserstein) next to DriftPersistence, which only counts consecutive threshold crossings; "
-            "and an expanding-window comparison (current = last k windows) for slow drifts.",
+            "p-values or on wasserstein) next to DriftPersistence, and an expanding-window comparison for slow drifts.",
             "major")
     rec = summary["recurring"]
     upd = rec["update_policy"]
     off_alerts = [u["confirmed_in_off_phase"] for u in upd]
     if any(x > 0 for x in off_alerts):
-        ctx.limit(
-            "With a reference updated after a confirmed drift (accepting the new concept), the return of the old "
-            "concept is reported as a new drift: recurring concepts are not recognised",
-            f"confirmed windows in the 'off' phases (old concept back) with update policy: {off_alerts} over {reps} "
-            f"replicates; episodes with update policy {[u['episodes'] for u in upd]} vs static reference "
-            f"{rec['episodes_static']}; clear delay after the drift ends (static) {rec['clear_delay_windows']}",
-            "Keep a library of past references (concepts) and test the current window against each: report 'known "
-            "concept k is back' instead of a new drift; DriftPersistence.reset() should be explicit and logged when "
-            "the reference changes.",
-            "minor")
+        # correct against the reference in force (the update policy is the test's): a feature request, not a limit
+        ctx.note(
+            f"feature request (concept library): with a reference updated after a confirmed drift, the return of the old "
+            f"concept is reported as a new drift ({off_alerts} confirmed windows in the off phases over {reps} "
+            f"replicates; episodes update {[u['episodes'] for u in upd]} vs static {rec['episodes_static']}). Keeping "
+            f"past references and testing the window against each would report 'known concept k is back'.")
     if (rec["clear_delay_windows"] and any(x is None or x > 1 for x in rec["clear_delay_windows"])):
         ctx.limit(
             "After a drift ends, the confirmed state takes more than 2 windows to clear",

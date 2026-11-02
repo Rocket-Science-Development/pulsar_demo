@@ -104,7 +104,8 @@ def run(ctx):
     ref = ref[ref["error"].isna() & (ref["matched"].astype(str) == "True")]
     # latency_s is left out: tonight it follows the load of the shared GPU endpoint, not the agent
     tester = A.WindowTester(ref, window=p["window"], n_draws=p["n_draws"], alpha=p["alpha"],
-                            numeric=[c for c in A.NUMERIC if c != "latency_s"])
+                            numeric=[c for c in A.NUMERIC if c != "latency_s"],
+                            allow_short=True)  # post-fix API: the filtered reference may hold < 10 windows
     monitor = ComplianceMonitor(load_rules(str(A.RULES)), version="permit-agent-rules/1")
     ref_viol = {r.id: int(sum(not r.check(trace_from(str(s))) for s in ref["tool_sequence"])) for r in monitor.rules}
     n_ref = len(ref)
