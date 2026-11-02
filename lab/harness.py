@@ -6,6 +6,7 @@ in `lab/results/<id>.json`. A test that finds a limit records it with `ctx.limit
 limits and the improvement proposals are the main output of the lab, not a side note.
 
     python -m lab.harness SC-05            # run one test registered in lab/tests/
+    python -m lab.harness --self-check     # check that the health sampler records on this host
 """
 
 import importlib
@@ -60,6 +61,7 @@ class HealthSampler:
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._proc = psutil.Process()
+        self.errors, self.last_error = 0, None
 
     def _gpu(self) -> dict:
         if not shutil.which("nvidia-smi"):
@@ -71,17 +73,25 @@ class HealthSampler:
         except Exception:  # noqa: BLE001 - health sampling never fails a test
             return {}
 
+    def _open_files(self) -> int:
+        # num_fds exists on POSIX only, num_handles on Windows only: test before calling. The former
+        # getattr(proc, "num_fds", proc.num_handles) evaluated proc.num_handles eagerly and raised on Linux.
+        return self._proc.num_fds() if hasattr(self._proc, "num_fds") else self._proc.num_handles()
+
+    def sample(self) -> dict:
+        return {
+            "t": time.time(), "cpu": self.psutil.cpu_percent(), "mem": self.psutil.virtual_memory().percent,
+            "rss_mb": self._proc.memory_info().rss / 2**20, "threads": self._proc.num_threads(),
+            "fds": self._open_files(), "disk": self.psutil.disk_usage(str(RESULTS.anchor or "/")).percent, **self._gpu(),
+        }
+
     def _run(self):
         while not self._stop.is_set():
             try:
-                self.samples.append({
-                    "t": time.time(), "cpu": self.psutil.cpu_percent(), "mem": self.psutil.virtual_memory().percent,
-                    "rss_mb": self._proc.memory_info().rss / 2**20, "threads": self._proc.num_threads(),
-                    "fds": getattr(self._proc, "num_fds", self._proc.num_handles)(),
-                    "disk": self.psutil.disk_usage(str(RESULTS.anchor or "/")).percent, **self._gpu(),
-                })
-            except Exception:  # noqa: BLE001
-                pass
+                self.samples.append(self.sample())
+            except Exception as exc:  # noqa: BLE001 - health sampling never fails a test, but the cause is kept
+                self.errors += 1
+                self.last_error = f"{type(exc).__name__}: {exc}"
             self._stop.wait(self.interval_s)
 
     def __enter__(self):
@@ -94,14 +104,28 @@ class HealthSampler:
 
     def summary(self) -> dict:
         if not self.samples:
-            return {}
+            return {"samples": 0, "errors": self.errors, "last_error": self.last_error}
         keys = [k for k in self.samples[0] if k != "t"]
         out = {f"{k}_max": max(s.get(k, 0) for s in self.samples) for k in keys}
         rss = [s["rss_mb"] for s in self.samples]
         hours = max((self.samples[-1]["t"] - self.samples[0]["t"]) / 3600, 1e-9)
         out["rss_growth_mb_per_h"] = (rss[-1] - rss[0]) / hours
         out["samples"] = len(self.samples)
+        if self.errors:
+            out["errors"], out["last_error"] = self.errors, self.last_error
         return out
+
+
+def self_check() -> int:
+    """Quick check that the health sampler records on this host (it recorded nothing on Linux before the fix)"""
+    with HealthSampler(interval_s=0.2) as health:
+        time.sleep(1.0)
+    summary = health.summary()
+    expected = {"cpu_max", "mem_max", "rss_mb_max", "threads_max", "fds_max", "disk_max"}
+    missing = expected - set(summary)
+    ok = summary.get("samples", 0) >= 2 and not missing and summary["fds_max"] > 0
+    print(f"health sampler on {platform.system()}: {'OK' if ok else 'FAILED'} {json.dumps(summary, default=str)}")
+    return 0 if ok else 1
 
 
 def check(metrics: dict, criteria: dict) -> dict:
@@ -140,6 +164,8 @@ def run_test(test_id: str, fn: Callable[[Context], dict], criteria: Optional[dic
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["--self-check"]:
+        sys.exit(self_check())
     test = sys.argv[1]
     module = importlib.import_module(f"lab.tests.{test.lower().replace('-', '_')}")
     run_test(test, module.run, getattr(module, "CRITERIA", None), env=os.environ.get("LAB_ENV", "local"),
