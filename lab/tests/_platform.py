@@ -16,6 +16,55 @@ import pandas as pd
 ENV_FILE = Path(os.environ.get("LAB_INFLUX_ENV", Path.home() / ".pulsar-lab" / "influx.env"))
 FAR_FUTURE = "2100-01-01T00:00:00Z"
 
+# Write profile of the platform tests (pulsar_data_collection >= 0.10):
+# - "default": CaptureOptions as each test sets them, one private writer per Pulse (the behaviour measured on 2026-11-02,
+#   plus the fixes that are always on: 1 us row spacing, /ping probe, 422 split, uncertain_rows);
+# - "tuned": the options a multi-model server should use: capture_options(tuned=...) of each test, and one
+#   SharedWriter per step.
+PROFILE = os.environ.get("LAB_PROFILE", "default")
+WRITE_CONCURRENCY = int(os.environ.get("LAB_WRITE_CONCURRENCY", 4))
+if PROFILE not in ("default", "tuned"):
+    raise ValueError(f"LAB_PROFILE must be default or tuned, not {PROFILE!r}")
+
+
+def capture_options(tuned: dict = None, **base):
+    """CaptureOptions(**base); under the tuned profile, `tuned` is applied on top"""
+    from pulsar_data_collection.models import CaptureOptions
+
+    return CaptureOptions(**{**base, **((tuned or {}) if PROFILE == "tuned" else {})})
+
+
+def shared_writer():
+    """One SharedWriter for the Pulse of a step under the tuned profile, else None (private writers); close it after
+    the Pulse"""
+    if PROFILE != "tuned":
+        return None
+    from pulsar_data_collection.writer import SharedWriter
+
+    return SharedWriter(concurrency=WRITE_CONCURRENCY)
+
+
+def versions() -> dict:
+    """Write profile and package versions; for an editable install, the version of the source tree's pyproject (the
+    installed metadata keeps the version of the first install)"""
+    import importlib
+    import re
+    from importlib.metadata import PackageNotFoundError, version
+
+    out = {"profile": PROFILE, "write_concurrency": WRITE_CONCURRENCY if PROFILE == "tuned" else None}
+    for name in ("pulsar-data-collection", "pulsar-metrics", "influxdb-client", "pandas"):
+        try:
+            out[name] = version(name)
+        except PackageNotFoundError:
+            out[name] = None
+            continue
+        if name.startswith("pulsar-"):
+            source = Path(importlib.import_module(name.replace("-", "_")).__file__).parent.parent / "pyproject.toml"
+            found = re.search(r'^version = "([^"]+)"', source.read_text(encoding="utf-8"), re.M) if source.exists() else None
+            if found:
+                out[name] = found.group(1)
+    return out
+
 
 def influx_env() -> dict:
     values = {}
@@ -25,7 +74,15 @@ def influx_env() -> dict:
             key, value = line.split("=", 1)
             values[key.strip()] = value.strip().strip('"')
     url = os.environ.get("LAB_INFLUX_URL_OVERRIDE") or values.get("LAB_INFLUX_URL") or values["INFLUX_URL"]
-    return {"url": url, "token": values["INFLUX_TOKEN"], "org": values["INFLUX_ORG"]}
+    # An InfluxDB docker .env (DOCKER_INFLUXDB_INIT_*) is accepted too, e.g. the local validation stack
+    token = values.get("INFLUX_TOKEN") or values["DOCKER_INFLUXDB_INIT_ADMIN_TOKEN"]
+    org = values.get("INFLUX_ORG") or values["DOCKER_INFLUXDB_INIT_ORG"]
+    return {"url": url, "token": token, "org": org}
+
+
+def platform_env_file() -> str:
+    """Env file of the dedicated platform InfluxDB (lab-db :8087); LAB_PLATFORM_INFLUX_ENV points elsewhere"""
+    return os.environ.get("LAB_PLATFORM_INFLUX_ENV", str(Path.home() / ".pulsar-lab" / "influx2.env"))
 
 
 def client(env=None, timeout_s=120):
@@ -55,7 +112,7 @@ def ensure_bucket(name: str, env=None) -> str:
     return name
 
 
-def make_pulse(model_id: str, bucket: str, options=None, env=None, version="1", tags=None):
+def make_pulse(model_id: str, bucket: str, options=None, env=None, version="1", tags=None, writer=None):
     from pulsar_data_collection.models import CaptureOptions, PulseParameters
     from pulsar_data_collection.pulse import Pulse
 
@@ -65,7 +122,7 @@ def make_pulse(model_id: str, bucket: str, options=None, env=None, version="1", 
         storage_engine="influxdb", login={**env, "bucket_name": bucket}, timestamp_column_name="_time",
         additional_tags=tags,
     )
-    return Pulse(params, options or CaptureOptions())
+    return Pulse(params, options or CaptureOptions(), writer=writer)
 
 
 def frames_pool(n_rows=50, n_features=20, pool=64, seed=0, with_seq=False):

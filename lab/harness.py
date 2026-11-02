@@ -138,7 +138,10 @@ def check(metrics: dict, criteria: dict) -> dict:
 def run_test(test_id: str, fn: Callable[[Context], dict], criteria: Optional[dict] = None, env: str = "local",
              params: Optional[dict] = None) -> dict:
     RESULTS.mkdir(parents=True, exist_ok=True)
-    workdir = RESULTS / test_id
+    # LAB_RUN_TAG keeps several runs of one test apart: results/<id>.<tag>.json and results/<id>.<tag>/
+    tag = os.environ.get("LAB_RUN_TAG")
+    name = f"{test_id}.{tag}" if tag else test_id
+    workdir = RESULTS / name
     workdir.mkdir(exist_ok=True)
     ctx = Context(test_id, env, workdir, params or {})
     started = datetime.now(timezone.utc)
@@ -153,13 +156,13 @@ def run_test(test_id: str, fn: Callable[[Context], dict], criteria: Optional[dic
     checks = check(metrics, criteria or {})
     status = "error" if error else ("limit-found" if ctx.limits else ("passed" if all(checks.values()) else "failed"))
     result = {
-        "id": test_id, "status": status, "env": env, "host": platform.node(), "python": sys.version.split()[0],
+        "id": test_id, "run_tag": tag, "status": status, "env": env, "host": platform.node(), "python": sys.version.split()[0],
         "started": started.isoformat(timespec="seconds"), "seconds": round(seconds, 1), "params": ctx.params,
         "metrics": metrics, "criteria": {k: list(v) for k, v in (criteria or {}).items()}, "checks": checks,
         "limits": [asdict(x) for x in ctx.limits], "notes": ctx.notes, "health": health.summary(), "error": error,
     }
-    (RESULTS / f"{test_id}.json").write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
-    print(f"{test_id}: {status} in {seconds:.0f} s; {len(ctx.limits)} limit(s)", flush=True)
+    (RESULTS / f"{name}.json").write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
+    print(f"{name}: {status} in {seconds:.0f} s; {len(ctx.limits)} limit(s)", flush=True)
     return result
 
 

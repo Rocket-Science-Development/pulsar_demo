@@ -13,7 +13,6 @@ import shutil
 import threading
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 
 import numpy as np
 
@@ -24,7 +23,8 @@ MODELS, BATCH, ROWS_PER_MIN = 10, 50, 200_000
 PRE_S, POST_S = float(os.environ.get("LAB_PRE_S", 60)), float(os.environ.get("LAB_POST_S", 60))
 PARAMS = {"outages_s": OUTAGES, "models": MODELS, "batch_rows": BATCH, "rows_per_min": ROWS_PER_MIN, "pre_s": PRE_S,
           "post_s": POST_S, "outage": "local TCP proxy closed (refused) / black hole (hang)",
-          "storage": "lab-db InfluxDB 2.6.1 :8087 (dedicated)"}
+          "storage": "lab-db InfluxDB 2.6.1 :8087 (dedicated)", "write": C.versions(),
+          "tuned_spool": "spool_compression=gzip (with spool)"}
 CRITERIA = {"spool_lost_total": ("==", 0), "spool_duplicates_total": ("==", 0), "spool_outage_p99_ms_max": ("<", 2.0),
             "nospool_drops_exact_all": ("==", True)}
 
@@ -40,9 +40,18 @@ def _distinct_and_points(bucket, measurement, env):
     return val(pts), val(dis)
 
 
-def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
-    from pulsar_data_collection.models import CaptureOptions
+def _spool_bytes(root):
+    """Size of the spool files (.json, .json.gz); a file replayed and removed while it is measured counts 0"""
+    total = 0
+    for f in root.rglob("*.json*"):
+        try:
+            total += f.stat().st_size
+        except FileNotFoundError:
+            pass
+    return total
 
+
+def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     name = f"{mode}_{outage_s}s_{'spool' if spool else 'nospool'}"
     bucket = C.ensure_bucket(f"lab_sc03_{datetime.now(timezone.utc):%m%d%H%M}_{name}", env)
     spool_root = ctx.workdir / "spool" / name
@@ -51,7 +60,11 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     proxy.up()
     proxy.hang = False
     penv = {**env, "url": proxy.url}
-    pulses = [C.make_pulse(f"o{i}", bucket, CaptureOptions(spool_dir=(spool_root / f"m{i}") if spool else None), penv)
+    writer = C.shared_writer()
+    pulses = [C.make_pulse(f"o{i}", bucket,
+                           C.capture_options(tuned={"spool_compression": "gzip"} if spool else None,
+                                             spool_dir=(spool_root / f"m{i}") if spool else None),
+                           penv, writer=writer)
               for i in range(MODELS)]
     pool = C.frames_pool(BATCH, 20, pool=32)
     seq = [i * 100_000_000 for i in range(MODELS)]
@@ -81,7 +94,7 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
         t0 = time.time()
         while not stop.wait(5):
             st = [p.stats() for p in pulses]
-            du = sum(f.stat().st_size for f in spool_root.rglob("*.json")) if spool else 0
+            du = _spool_bytes(spool_root) if spool else 0
             trace.append({"t": time.time() - t0, "phase": phase["name"], "spool_mb": du / 2**20,
                           "spool_files": sum(s["spool_files"] for s in st), "queued": sum(s["queued_rows"] for s in st),
                           "spooled": sum(s["spooled_rows"] for s in st), "dropped": sum(s["dropped_rows"] for s in st),
@@ -124,6 +137,8 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     stats = [p.stats() for p in pulses]
     for p in pulses:
         p.close()
+    if writer is not None:
+        writer.close()
     points = distinct = 0
     for i in range(MODELS):
         pt, ds = _distinct_and_points(bucket, f"o{i}_1_input_data", env)
@@ -134,7 +149,8 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     dropped = sum(s["dropped_rows"] for s in stats)
     row = {"case": name, "outage_s": outage_s, "spool": spool, "mode": mode, "captured": captured, "submitted": submitted,
            "stored_points": points, "distinct": distinct, "lost": submitted - distinct, "duplicates": points - distinct,
-           "dropped": dropped, "spooled": sum(s["spooled_rows"] for s in stats),
+           "dropped": dropped, "uncertain": sum(s.get("uncertain_rows", 0) for s in stats),
+           "spooled": sum(s["spooled_rows"] for s in stats),
            "replayed": sum(s["replayed_rows"] for s in stats), "written": sum(s["written_rows"] for s in stats),
            "write_errors": sum(s["write_errors"] for s in stats), "flushed": flushed,
            "spooled_during_outage": sum(s["spooled_rows"] for s in st_out),
@@ -155,7 +171,7 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
 
 
 def run(ctx):
-    os.environ["LAB_INFLUX_ENV"] = str(Path.home() / ".pulsar-lab" / "influx2.env")
+    os.environ["LAB_INFLUX_ENV"] = C.platform_env_file()
     env = C.influx_env()
     proxy = C.OutageProxy(env["url"], port=18103)
     cases = [(o, s, "refuse") for o in OUTAGES for s in (True, False)]
@@ -222,7 +238,12 @@ def run(ctx):
                       "minor")
     for r in ns:
         if not r["drops_exact"]:
-            ctx.limit(f"[{r['case']}] without spool: drops not counted exactly",
-                      f"captured {r['captured']}, stored {r['stored_points']}, dropped {r['dropped']}",
-                      "Count every lost row in dropped_rows", "major")
+            over = r["dropped"] - (r["captured"] - r["stored_points"])
+            what = (f"{over} rows counted as dropped were stored (a write cut by the outage has an unknown outcome)"
+                    if over > 0 else f"{-over} lost rows not counted as dropped")
+            ctx.limit(f"[{r['case']}] without spool: drops not counted exactly: {what}",
+                      f"captured {r['captured']}, stored {r['stored_points']}, dropped {r['dropped']}, "
+                      f"uncertain {r['uncertain']}, write errors {r['write_errors']}",
+                      "Count a write whose connection broke after the request was sent as uncertain (like a timeout), "
+                      "not as dropped" if over > 0 else "Count every lost row in dropped_rows", "major")
     return metrics

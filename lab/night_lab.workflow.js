@@ -65,6 +65,12 @@ const VERDICTS = {
 
 const approved = (args && args.approved) || []
 const settings = (args && args.settings) || {}
+// Optional settings of a partial run (e.g. the scalability rerun of lab/rerun_scale.md):
+// - run_name: suffix of every lab-level result file (run_<family>.<run_name>.json...), so the night's files stay intact;
+// - hosts: the only machines to provision; profiles: write profiles to run each test with (LAB_PROFILE, LAB_RUN_TAG);
+// - teardown: "terminate" terminates the instances created for the lab (never a pre-existing one); default "stop".
+const SUFFIX = settings.run_name ? `.${settings.run_name}` : ''
+const PROFILES = settings.profiles || []
 if (!approved.length || !settings.env) {
   log('Nothing approved or no run settings: the lab does not start.')
   return { started: false }
@@ -83,6 +89,7 @@ log(`Preflight: ${String(preflight).slice(0, 300)}`)
 phase('Provision')
 const provision = await agent(`${RULES}
 Provision the lab for environment "${settings.env}" (stop time ${settings.stop}, budget ${settings.budget_usd} USD).
+Machines to provision: ${settings.hosts ? settings.hosts.join(', ') + ' only; create no other machine' : 'the whole plan'}.
 AWS plan (lab/README.md): lab-cpu c7i.4xlarge, lab-scale c7i.8xlarge, lab-db r7i.2xlarge (InfluxDB 2.6.1 + Grafana 11.3.0),
 lab-soak c7i.2xlarge, lab-gpu-1/2 g6.xlarge if capacity else g4dn.xlarge (g6 had no capacity on 2026-11-02: try it,
 then fall back to g4dn). A pre-existing stopped instance may be restarted only if the operator instructions allow it, and
@@ -102,10 +109,13 @@ const results = await pipeline(
 You run the "${fam.key}" family of the Pulsar.ml night lab on ${fam.host}. Provisioned environment:
 ${String(provision).slice(0, 1500)}
 Operator instructions: ${settings.instructions || 'none'}
-For each approved test below: implement lab/tests/<id>.py on the harness, do a short dry run, then the full run; record every
-limit with numbers and an improvement proposal; never stop the whole family because one test fails.
+For each approved test below: implement lab/tests/<id>.py on the harness (or use the existing module), do a short dry run,
+then the full run; record every limit with numbers and an improvement proposal; never stop the whole family because one
+test fails.${PROFILES.length ? `
+Run every test once per write profile, in this order: ${PROFILES.join(', ')}; for profile <p> set LAB_PROFILE=<p> and
+LAB_RUN_TAG=<p>, which writes lab/results/<id>.<p>.json. Report each profile run as its own entry, id "<id>.<p>".` : ''}
 The full specification of each test (method, dataset, licence, pass criteria, expected limit) is in lab/registry.json.
-Before returning, write your complete result (the same JSON you return) to lab/results/run_${fam.key}.json.
+Before returning, write your complete result (the same JSON you return) to lab/results/run_${fam.key}${SUFFIX}.json.
 Approved tests of this family: ${fam.tests.map(t => t.id).join(', ')}`, { label: `run:${fam.key}`, phase: 'Run', schema: RESULT }),
   (res, fam) => {
     const limits = (res && res.tests || []).flatMap(t => t.limits.map(l => ({ id: t.id, ...l })))
@@ -114,7 +124,7 @@ Approved tests of this family: ${fam.tests.map(t => t.id).join(', ')}`, { label:
 Adversarially review the limits found by the "${fam.key}" family. For each, try to REFUTE it: is it a real property of
 Pulsar.ml, reproducible from the evidence and result files in lab/results/, or a defect of the test itself? Default to
 real=false when the evidence does not support it. Also judge whether the proposal would fix it. Before returning, write
-your complete verdicts (the same JSON you return) to lab/results/verify_${fam.key}.json.
+your complete verdicts (the same JSON you return) to lab/results/verify_${fam.key}${SUFFIX}.json.
 Limits: ${JSON.stringify(limits, null, 1)}`, { label: `verify:${fam.key}`, phase: 'Verify', schema: VERDICTS })
       .then(v => ({ family: fam.key, res, verdicts: (v && v.verdicts) || [] }))
   },
@@ -123,25 +133,28 @@ Limits: ${JSON.stringify(limits, null, 1)}`, { label: `verify:${fam.key}`, phase
 phase('Report')
 // The family results are never inlined in the prompt (the former slice(0, 60000) truncated them). The report agent
 // first writes them, complete, to a results file, then reads that file.
-const RESULTS_FILE = 'C:/dev/pulsar-ml/pulsar_demo/lab/results/night_full_results.json'
+const RESULTS_FILE = `C:/dev/pulsar-ml/pulsar_demo/lab/results/night_full_results${SUFFIX}.json`
 // The report goes where the caller says (args.report_file); by default next to the results.
-const REPORT_FILE = args.report_file || 'C:/dev/pulsar-ml/pulsar_demo/lab/results/rapport_nuit.md'
+const REPORT_FILE = args.report_file || `C:/dev/pulsar-ml/pulsar_demo/lab/results/rapport_nuit${SUFFIX}.md`
 const report = await agent(`${RULES}
 Write the morning report of the Pulsar.ml night lab, in French, to ${REPORT_FILE}.
 Source of truth: ${RESULTS_FILE}. Step 1: write it yourself, as a JSON object with one key "run:<family>" and one key
-"verify:<family>" per family, merged from lab/results/run_<family>.json and lab/results/verify_<family>.json (written by
+"verify:<family>" per family, merged from lab/results/run_<family>${SUFFIX}.json and lab/results/verify_<family>${SUFFIX}.json (written by
 the family agents; a family without limits has no verify file); never truncate it.
 Families: ${results.filter(Boolean).map(r => r.family).join(', ')}. Step 2: read that file in full (by parts if large)
 and lab/results/<ID>.json for the numbers. Content: per family and per test the status and key numbers; every CONFIRMED
 limit (verdict real=true) with its evidence and improvement proposal, ranked by severity; refuted limits listed apart as
 test defects; tests not run and why; cost against the budget of ${settings.budget_usd} USD and health summary. Also write
-lab/results/summary.json (id -> status).`, { label: 'report' })
+lab/results/summary${SUFFIX}.json (id -> status).${settings.report_instructions ? `
+${settings.report_instructions}` : ''}`, { label: 'report' })
 
 phase('Teardown')
 const teardown = await agent(`${RULES}
 Tear down the lab in ca-central-1. Approved budget: ${settings.budget_usd} USD; provisioned (from the provision step):
 ${String(provision).slice(0, 1500)}
-1. Stop (do not terminate) every instance tagged Project=pulsar-lab or LabRun=pulsar-lab.
+1. ${settings.teardown === 'terminate'
+    ? 'Terminate every instance tagged Project=pulsar-lab (created for the lab), after its results are copied back; stop (never terminate) an instance tagged LabRun=pulsar-lab.'
+    : 'Stop (do not terminate) every instance tagged Project=pulsar-lab or LabRun=pulsar-lab.'}
 2. On a pre-existing instance (LabRun tag): remove only the LabRun tag; check its original tags are unchanged.
 3. Detach and DELETE every data volume tagged LabVolume=data once its instance is stopped and the results it holds
    have been copied back to lab/results/; never delete a root volume or a volume without that tag.
