@@ -1,4 +1,5 @@
-#  Author:  Jananjoy Rajkumar <jrajkumar@rocketscience.one>
+#  Copyright Développement Science Fusée inc.
+#  SPDX-License-Identifier: Apache-2.0
 import numpy as np
 from sklearn.metrics import confusion_matrix
 """ Implementation of ROI calculation for wrong or bad prediction """

@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// args: { approved: [registry test objects], settings: {env, budget_usd, scope, stop, instructions}, stamp: "ISO time" }
+// args: { approved: [registry test objects], settings: {env, budget_usd, scope, stop, instructions}, stamp: "ISO time", report_file?: path }
 const RULES = `
 Ground rules (non-negotiable):
 - Work in C:/dev/pulsar-ml/pulsar_demo/lab (branch fonction/laboratoire-tests). Tests go in lab/tests/<id>.py and run through
@@ -124,8 +124,10 @@ phase('Report')
 // The family results are never inlined in the prompt (the former slice(0, 60000) truncated them). The report agent
 // first writes them, complete, to a results file, then reads that file.
 const RESULTS_FILE = 'C:/dev/pulsar-ml/pulsar_demo/lab/results/night_full_results.json'
+// The report goes where the caller says (args.report_file); by default next to the results.
+const REPORT_FILE = args.report_file || 'C:/dev/pulsar-ml/pulsar_demo/lab/results/rapport_nuit.md'
 const report = await agent(`${RULES}
-Write the morning report of the Pulsar.ml night lab, in French, to G:/My Drive/RocketScience/Pulsar.ml/notes/laboratoire/rapport_nuit.md.
+Write the morning report of the Pulsar.ml night lab, in French, to ${REPORT_FILE}.
 Source of truth: ${RESULTS_FILE}. Step 1: write it yourself, as a JSON object with one key "run:<family>" and one key
 "verify:<family>" per family, merged from lab/results/run_<family>.json and lab/results/verify_<family>.json (written by
 the family agents; a family without limits has no verify file); never truncate it.

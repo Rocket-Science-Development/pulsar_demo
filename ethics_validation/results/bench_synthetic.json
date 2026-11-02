@@ -21,7 +21,7 @@
     "tolerance": 0.05,
     "alpha": 0.05,
     "seed": 0,
-    "out": "G:/My Drive/RocketScience/Pulsar.ml/notes/validation_e2e/banc_equite_synthetique.json"
+    "out": "notes/validation_e2e/banc_equite_synthetique.json"
   },
   "cells": [
     {
