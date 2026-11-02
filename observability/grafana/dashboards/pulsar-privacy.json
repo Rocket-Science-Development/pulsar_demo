@@ -1,0 +1,711 @@
+{
+  "uid": "pulsar-privacy",
+  "title": "Pulsar.ml — Personal information",
+  "description": "Personal information detected and masked before writing; leaks of agents",
+  "tags": [
+    "pulsar.ml"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "monitoring",
+        "current": {
+          "text": "monitoring",
+          "value": "monitoring"
+        },
+        "hide": 0
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id != \"permit_assistant\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "admissibilite",
+          "value": "admissibilite"
+        }
+      },
+      {
+        "name": "version",
+        "label": "Version",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_version\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "1.0",
+          "value": "1.0"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "Values are **never stored**: tabular captures keep the masked text and a `pii_count` per row; agent records keep counts and types by role. A **leak** is personal information in an agent output that the user did not provide."
+      },
+      "datasource": null,
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 2
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Findings masked (period)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"pii_count\") |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 2,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Rows with personal information",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"pii_count\") |> map(fn: (r) => ({r with _value: if r._value > 0 then 1.0 else 0.0})) |> group() |> mean()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 6,
+        "y": 2,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Agent leaks",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_leak_count\") |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 2,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Agent runs with a leak",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_leak_count\") |> map(fn: (r) => ({r with _value: if r._value > 0 then 1.0 else 0.0})) |> group() |> mean()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 0.0001
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 18,
+        "y": 2,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Findings masked in tabular captures, per hour",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"pii_count\") |> group() |> aggregateWindow(every: 1h, fn: sum, createEmpty: false) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": null,
+          "max": null,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 70,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "bars",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "displayName": "findings masked"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Agent personal information by role",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_input_count\") |> group() |> aggregateWindow(every: 1m, fn: sum, createEmpty: false) |> set(key: \"role\", value: \"input\") |> group(columns: [\"role\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_context_count\") |> group() |> aggregateWindow(every: 1m, fn: sum, createEmpty: false) |> set(key: \"role\", value: \"context\") |> group(columns: [\"role\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_output_count\") |> group() |> aggregateWindow(every: 1m, fn: sum, createEmpty: false) |> set(key: \"role\", value: \"output\") |> group(columns: [\"role\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_leak_count\") |> group() |> aggregateWindow(every: 1m, fn: sum, createEmpty: false) |> set(key: \"role\", value: \"leak\") |> group(columns: [\"role\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": null,
+          "max": null,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 70,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "bars",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "displayName": "${__field.labels.role}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "input"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "context"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "output"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9085e9"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "leak"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d03b3b"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Types leaked by agents",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_leak_types\" and r._value != \"none\") |> group(columns: [\"_value\"]) |> count(column: \"_field\") |> group() |> rename(columns: {_value: \"type\", _field: \"leaks\"})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#d03b3b"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xTickLabelRotation": 0,
+        "legend": {
+          "showLegend": false
+        },
+        "barWidth": 0.7,
+        "groupWidth": 0.7,
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Types provided by users",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\") |> filter(fn: (r) => r._field == \"pii_input_types\" and r._value != \"none\") |> group(columns: [\"_value\"]) |> count(column: \"_field\") |> group() |> rename(columns: {_value: \"type\", _field: \"runs\"})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xTickLabelRotation": 0,
+        "legend": {
+          "showLegend": false
+        },
+        "barWidth": 0.7,
+        "groupWidth": 0.7,
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    }
+  ],
+  "links": [
+    {
+      "title": "Pulsar.ml",
+      "type": "dashboards",
+      "tags": [
+        "pulsar.ml"
+      ],
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+# Observability stack of Pulsar.ml: InfluxDB 2 (captures and results) and Grafana with the provisioned dashboards.
+# Demo credentials only: change them, or pass them through an .env file, before any shared use.
+services:
+  influxdb:
+    image: "influxdb:2.6.1"
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:-change-me-demo-only}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG:-pulsarml}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET:-monitoring}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:-demo-token-change-me}
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+  grafana:
+    image: "grafana/grafana-oss:11.3.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+    environment:
+      INFLUX_URL: ${INFLUX_URL:-http://influxdb:8086}
+      INFLUX_ORG: ${INFLUX_ORG:-pulsarml}
+      INFLUX_BUCKET: ${INFLUX_BUCKET:-monitoring}
+      INFLUX_TOKEN: ${INFLUX_TOKEN:-demo-token-change-me}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-change-me-demo-only}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/pulsar-overview.json
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+volumes:
+  influxdb-data:
+  grafana-data:

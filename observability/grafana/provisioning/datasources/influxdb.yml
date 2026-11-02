@@ -1,0 +1,15 @@
+apiVersion: 1
+datasources:
+  - name: Pulsar InfluxDB
+    uid: pulsar-influx
+    type: influxdb
+    access: proxy
+    url: ${INFLUX_URL}
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: ${INFLUX_ORG}
+      defaultBucket: ${INFLUX_BUCKET}
+      timeout: 60
+    secureJsonData:
+      token: ${INFLUX_TOKEN}
