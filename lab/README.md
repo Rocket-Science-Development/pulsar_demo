@@ -80,7 +80,7 @@ merges them into `results/night_full_results.json` and reads that file; nothing 
 
 ## Lessons from the night of 2026-11-02
 
-The report is `notes/laboratoire/rapport_nuit.md` in the Pulsar.ml notes folder.
+The report is written to `args.report_file` (default `lab/results/rapport_nuit.md`).
 
 - **Cost.** About 40 USD for 8.8 hours with 6 instances (about 4.50 USD/h plus 0.85 USD of disks), against an
   approved budget of 100 USD. This is an estimate from on-demand prices; Cost Explorer lags by up to 24 h. The EBS
