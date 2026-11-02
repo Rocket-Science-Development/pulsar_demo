@@ -1,0 +1,1157 @@
+{
+  "uid": "pulsar-fairness",
+  "title": "Pulsar.ml — Fairness",
+  "description": "Disparities between groups with confidence intervals, anytime-valid monitoring and counterfactual probes",
+  "tags": [
+    "pulsar.ml"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "monitoring",
+        "current": {
+          "text": "monitoring",
+          "value": "monitoring"
+        },
+        "hide": 0
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id != \"permit_assistant\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "admissibilite",
+          "value": "admissibilite"
+        }
+      },
+      {
+        "name": "version",
+        "label": "Version",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_version\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "1.0",
+          "value": "1.0"
+        }
+      },
+      {
+        "name": "attribute",
+        "label": "Attribute",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"feature_name\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "language",
+          "value": "language"
+        }
+      },
+      {
+        "name": "group",
+        "label": "Group",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"group\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\" and r.feature_name == \"${attribute}\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "language=other",
+          "value": "language=other"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "**How to read**: a disparity is **established** only when its confidence interval lies entirely outside the acceptable zone (disparate impact ratio 0.8 to 1.25, the 4/5 rule; parity difference ±0.10). Small groups (< 30) are never shown. The anytime-valid monitor keeps its false-alarm rate below 5 % however often it is looked at."
+      },
+      "datasource": null,
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "type": "table",
+      "title": "Latest window, by group",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\" and r.feature_name == \"${attribute}\") |> filter(fn: (r) => r._field == \"metric_value\" or r._field == \"ci_low\" or r._field == \"ci_high\" or r._field == \"n\" or r._field == \"status\") |> last() |> toFloat() |> group() |> pivot(rowKey: [\"group\", \"metric_name\", \"reference_group\"], columnKey: [\"_field\"], valueColumn: \"_value\") |> keep(columns: [\"group\", \"reference_group\", \"metric_name\", \"n\", \"metric_value\", \"ci_low\", \"ci_high\", \"status\"])"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "group": 0,
+              "reference_group": 1,
+              "metric_name": 2,
+              "n": 3,
+              "metric_value": 4,
+              "ci_low": 5,
+              "ci_high": 6,
+              "status": 7
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "group"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Group"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reference_group"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Reference"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Criterion"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Value"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_low"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CI low"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_high"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CI high"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "n"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "▲ Established",
+                        "color": "#d03b3b",
+                        "index": 0
+                      },
+                      "0": {
+                        "text": "✓ Within zone",
+                        "color": "#0ca30c",
+                        "index": 1
+                      },
+                      "-1": {
+                        "text": "? Inconclusive",
+                        "color": "#8a8980",
+                        "index": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": [
+          {
+            "displayName": "Group",
+            "desc": false
+          }
+        ]
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Disparate impact ratio by group (zone 0.8 – 1.25)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\" and r.feature_name == \"${attribute}\") |> filter(fn: (r) => r.metric_name == \"disparate_impact_ratio\" and r._field == \"metric_value\") |> group(columns: [\"group\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0.3,
+          "max": 1.5,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "area"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d03b3b",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": 0.8
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1.25
+              }
+            ]
+          },
+          "displayName": "${__field.labels.group}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Parity difference of ${group}, with its confidence interval",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\" and r.feature_name == \"${attribute}\") |> filter(fn: (r) => r.metric_name == \"demographic_parity_difference\" and r.group == \"${group}\" and r._field == \"metric_value\") |> group() |> set(key: \"s\", value: \"difference\") |> group(columns: [\"s\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\" and r.feature_name == \"${attribute}\") |> filter(fn: (r) => r.metric_name == \"demographic_parity_difference\" and r.group == \"${group}\" and r._field == \"ci_high\") |> group() |> set(key: \"s\", value: \"CI high\") |> group(columns: [\"s\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"fairness\" and r.test_type == \"fixed\" and r.feature_name == \"${attribute}\") |> filter(fn: (r) => r.metric_name == \"demographic_parity_difference\" and r.group == \"${group}\" and r._field == \"ci_low\") |> group() |> set(key: \"s\", value: \"CI low\") |> group(columns: [\"s\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": -0.4,
+          "max": 0.2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "area"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d03b3b",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": -0.1
+              },
+              {
+                "color": "#d03b3b",
+                "value": 0.1
+              }
+            ]
+          },
+          "displayName": "${__field.labels.s}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "difference"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CI high"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "CI low"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 20
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CI low"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Anytime-valid monitoring (sequential test by betting)",
+      "id": 5,
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Evidence of a disparity (e-value, log scale) — alarm at 40",
+      "description": "1 / (alpha / number of groups) = 1 / (0.05 / 2) = 40. Once reached, the disparity is established for good.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.test_type == \"sequential\") |> filter(fn: (r) => r._field == \"e_value\") |> group(columns: [\"group\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0.01,
+          "max": 1000,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "line+area"
+            },
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 40
+              }
+            ]
+          },
+          "displayName": "${__field.labels.group}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Cumulative selection-rate difference vs reference",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.test_type == \"sequential\") |> filter(fn: (r) => r._field == \"metric_value\") |> group(columns: [\"group\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": null,
+          "max": null,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "area"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d03b3b",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": -0.05
+              },
+              {
+                "color": "#d03b3b",
+                "value": 0.05
+              }
+            ]
+          },
+          "displayName": "${__field.labels.group}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Intersections (language × region), latest window",
+      "id": 8,
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "table",
+      "title": "Disparate impact ratio of intersectional groups",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_name == \"disparate_impact_ratio\" and r.feature_name == \"language|region\") |> filter(fn: (r) => r._field == \"metric_value\" or r._field == \"n\" or r._field == \"status\" or r._field == \"suppressed\") |> last() |> toFloat() |> group() |> pivot(rowKey: [\"group\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "group": 0,
+              "n": 1,
+              "metric_value": 2,
+              "status": 3,
+              "suppressed": 4
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "group"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Group"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ratio"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "▲ Established",
+                        "color": "#d03b3b",
+                        "index": 0
+                      },
+                      "0": {
+                        "text": "✓ Within zone",
+                        "color": "#0ca30c",
+                        "index": 1
+                      },
+                      "-1": {
+                        "text": "? Inconclusive",
+                        "color": "#8a8980",
+                        "index": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "suppressed"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "< 30, withheld"
+                      },
+                      "0": {
+                        "text": ""
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "n"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": [
+          {
+            "displayName": "Ratio",
+            "desc": false
+          }
+        ]
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 12,
+        "h": 10
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "table",
+      "title": "Counterfactual probe of the demo agent (first name)",
+      "description": "Requests identical except for the first name; placebo sets change a file reference. The biased prompt is a deliberate test of the instrument.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.campaign == \"probe-e4\") |> filter(fn: (r) => r._field == \"metric_value\" or r._field == \"ci_low\" or r._field == \"ci_high\" or r._field == \"status\") |> last() |> toFloat() |> group() |> pivot(rowKey: [\"scenario\", \"metric_name\", \"group\"], columnKey: [\"_field\"], valueColumn: \"_value\") |> filter(fn: (r) => r.metric_name == \"counterfactual_action_rate_difference\" or r.metric_name == \"placebo_flip_rate\" or r.metric_name == \"position_effect\" or r.metric_name == \"counterfactual_excess_flip_rate\")"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "scenario": 0,
+              "metric_name": 1,
+              "group": 2,
+              "metric_value": 3,
+              "ci_low": 4,
+              "ci_high": 5,
+              "status": 6
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "scenario"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Prompt"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Measure"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "group"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Group"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Value"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_low"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CI low"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ci_high"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CI high"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "▲ Established",
+                        "color": "#d03b3b",
+                        "index": 0
+                      },
+                      "0": {
+                        "text": "✓ Within zone",
+                        "color": "#0ca30c",
+                        "index": 1
+                      },
+                      "-1": {
+                        "text": "? Inconclusive",
+                        "color": "#8a8980",
+                        "index": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": [
+          {
+            "displayName": "Prompt",
+            "desc": true
+          }
+        ]
+      },
+      "id": 10,
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 12,
+        "h": 10
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    }
+  ],
+  "links": [
+    {
+      "title": "Pulsar.ml",
+      "type": "dashboards",
+      "tags": [
+        "pulsar.ml"
+      ],
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}

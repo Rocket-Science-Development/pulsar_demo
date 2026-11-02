@@ -1,0 +1,773 @@
+{
+  "uid": "pulsar-drift",
+  "title": "Pulsar.ml — Data drift",
+  "description": "Calibrated drift tests per feature and window: raw alerts, confirmation, adjusted p-values, distributions",
+  "tags": [
+    "pulsar.ml"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "monitoring",
+        "current": {
+          "text": "monitoring",
+          "value": "monitoring"
+        },
+        "hide": 0
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id != \"permit_assistant\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "admissibilite",
+          "value": "admissibilite"
+        }
+      },
+      {
+        "name": "version",
+        "label": "Version",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_version\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "1.0",
+          "value": "1.0"
+        }
+      },
+      {
+        "name": "feature",
+        "label": "Feature",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"feature_name\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\" and r.metric_type == \"drift\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "income",
+          "value": "income"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "**How to read**: each window is tested against the reference with thresholds calibrated by A/A resampling of the reference; p-values are adjusted for the number of features (Benjamini-Hochberg, 5 %). A raw alert becomes **confirmed** only when it persists over two consecutive windows."
+      },
+      "datasource": null,
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "type": "status-history",
+      "title": "Raw alerts (BH-adjusted), by feature",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\") |> filter(fn: (r) => r._field == \"status\") |> group() |> keep(columns: [\"_time\", \"_value\", \"feature_name\"]) |> pivot(rowKey: [\"_time\"], columnKey: [\"feature_name\"], valueColumn: \"_value\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "▲ Drift",
+                  "color": "#d03b3b",
+                  "index": 0
+                },
+                "0": {
+                  "text": "✓ Stable",
+                  "color": "#0ca30c",
+                  "index": 1
+                },
+                "-1": {
+                  "text": "? n/a",
+                  "color": "#8a8980",
+                  "index": 2
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8a8980",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 85
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showValue": "never",
+        "rowHeight": 0.85,
+        "colWidth": 0.95,
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "status-history",
+      "title": "Confirmed drift (2 windows), by feature",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\") |> filter(fn: (r) => r._field == \"confirmed\") |> toInt() |> group() |> keep(columns: [\"_time\", \"_value\", \"feature_name\"]) |> pivot(rowKey: [\"_time\"], columnKey: [\"feature_name\"], valueColumn: \"_value\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "▲ Confirmed",
+                  "color": "#d03b3b",
+                  "index": 0
+                },
+                "0": {
+                  "text": "✓ Not confirmed",
+                  "color": "#0ca30c",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8a8980",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 85
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showValue": "never",
+        "rowHeight": 0.85,
+        "colWidth": 0.95,
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Adjusted p-value by feature (log scale)",
+      "description": "Below the dashed red line (0.05) the window raises a raw alert for that feature",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\") |> filter(fn: (r) => r._field == \"p_adjusted\") |> group(columns: [\"feature_name\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0.001,
+          "max": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "dashed"
+            },
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d03b3b",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": 0.05
+              }
+            ]
+          },
+          "displayName": "${__field.labels.feature_name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 14,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Windows with a confirmed drift, by feature (period)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\") |> filter(fn: (r) => r._field == \"confirmed\") |> toInt() |> group(columns: [\"feature_name\"]) |> sum() |> group() |> keep(columns: [\"feature_name\", \"_value\"]) |> rename(columns: {_value: \"windows\"}) |> sort(columns: [\"windows\"], desc: true)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "xTickLabelRotation": 0,
+        "legend": {
+          "showLegend": false
+        },
+        "barWidth": 0.7,
+        "groupWidth": 0.7,
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 14,
+        "y": 11,
+        "w": 10,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Distribution of the selected feature: ${feature}",
+      "id": 6,
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Hourly quantiles of ${feature}",
+      "description": "Numeric features: the band spans the 10th to 90th percentiles of each hour; a shift of the band is the drift that the tests measure",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"${feature}\") |> group() |> aggregateWindow(every: 1h, fn: (column, tables=<-) => tables |> quantile(q: 0.9, column: column), createEmpty: false) |> set(key: \"q\", value: \"p90\") |> group(columns: [\"q\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"${feature}\") |> group() |> aggregateWindow(every: 1h, fn: median, createEmpty: false) |> set(key: \"q\", value: \"median\") |> group(columns: [\"q\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"${feature}\") |> group() |> aggregateWindow(every: 1h, fn: (column, tables=<-) => tables |> quantile(q: 0.1, column: column), createEmpty: false) |> set(key: \"q\", value: \"p10\") |> group(columns: [\"q\"]) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": null,
+          "max": null,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "line",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "displayName": "${__field.labels.q}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p90"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.fillBelowTo",
+                "value": "p10"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "median"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p10"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 16,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "table",
+      "title": "Latest window: tests by feature",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\") |> filter(fn: (r) => r._field == \"metric_value\" or r._field == \"p_adjusted\" or r._field == \"status\" or r._field == \"confirmed\") |> last() |> toFloat() |> group() |> pivot(rowKey: [\"feature_name\", \"metric_name\"], columnKey: [\"_field\"], valueColumn: \"_value\") |> keep(columns: [\"feature_name\", \"metric_name\", \"metric_value\", \"p_adjusted\", \"status\", \"confirmed\"])"
+        }
+      ],
+      "transformations": [],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "feature_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Feature"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Test"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Statistic"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p_adjusted"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "p (adjusted)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "▲ Drift",
+                        "color": "#d03b3b",
+                        "index": 0
+                      },
+                      "0": {
+                        "text": "✓ Stable",
+                        "color": "#0ca30c",
+                        "index": 1
+                      },
+                      "-1": {
+                        "text": "? n/a",
+                        "color": "#8a8980",
+                        "index": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "confirmed"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "▲ Confirmed",
+                        "color": "#d03b3b",
+                        "index": 0
+                      },
+                      "0": {
+                        "text": "✓ Not confirmed",
+                        "color": "#0ca30c",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": []
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 16,
+        "y": 21,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    }
+  ],
+  "links": [
+    {
+      "title": "Pulsar.ml",
+      "type": "dashboards",
+      "tags": [
+        "pulsar.ml"
+      ],
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1049 @@
+{
+  "uid": "pulsar-overview",
+  "title": "Pulsar.ml — Overview",
+  "description": "State of every monitored model: captures, confirmed drift, fairness, personal information, capture health",
+  "tags": [
+    "pulsar.ml"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "bucket",
+        "label": "Bucket",
+        "type": "textbox",
+        "query": "monitoring",
+        "current": {
+          "text": "monitoring",
+          "value": "monitoring"
+        },
+        "hide": 0
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id != \"permit_assistant\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "admissibilite",
+          "value": "admissibilite"
+        }
+      },
+      {
+        "name": "version",
+        "label": "Version",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "pulsar-influx"
+        },
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_version\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id == \"${model}\", start: -30d)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "current": {
+          "text": "1.0",
+          "value": "1.0"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "### Pulsar.ml — monitoring overview\nEvery tile shows the **latest verdict**, never a raw score: a drift counts only once confirmed over two windows, a disparity only when its confidence interval leaves the acceptable zone. Click a tile to open the detailed dashboard."
+      },
+      "datasource": null,
+      "id": 1,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Predictions captured (period)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"y_pred\") |> group() |> count()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open performance",
+              "url": "/d/pulsar-performance?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 2,
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Confirmed drift (latest window)",
+      "description": "Features whose drift persisted over two consecutive windows (BH-adjusted, A/A-calibrated)",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r.metric_type == \"drift\" and r._field == \"confirmed\") |> last() |> toInt() |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open data drift",
+              "url": "/d/pulsar-drift?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 3,
+      "gridPos": {
+        "x": 4,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Disparities established (latest)",
+      "description": "Groups whose confidence interval lies entirely outside the acceptable zone (latest analysis, fixed test on a rolling window). Inconclusive groups are listed on the fairness dashboard.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r._field == \"status\") |> filter(fn: (r) => r.metric_type == \"fairness\" and r.test_type == \"fixed\") |> last() |> map(fn: (r) => ({r with _value: if r._value == 1 then 1 else 0})) |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open fairness",
+              "url": "/d/pulsar-fairness?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 4,
+      "gridPos": {
+        "x": 8,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Explanation changes (latest)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r._field == \"status\") |> filter(fn: (r) => r.metric_type == \"explainability\" and r.metric_name == \"importance_share_difference\") |> last() |> map(fn: (r) => ({r with _value: if r._value == 1 then 1 else 0})) |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#fab219",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open explanations",
+              "url": "/d/pulsar-explain?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 5,
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Personal information masked (period)",
+      "description": "Findings replaced by a label before writing (CaptureOptions(pii=PiiPolicy()))",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"${model}_${version}_input_data\") |> filter(fn: (r) => r._field == \"pii_count\") |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open personal information",
+              "url": "/d/pulsar-privacy?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 6,
+      "gridPos": {
+        "x": 16,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Rows dropped by the capture",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_capture_stats\") |> filter(fn: (r) => r.model_id == \"${model}\" and r._field == \"dropped_rows\") |> last() |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open capture health",
+              "url": "/d/pulsar-capture?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 7,
+      "gridPos": {
+        "x": 20,
+        "y": 3,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Alerts over time, by kind",
+      "description": "Number of results establishing a change in each 6-hour window",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r._field == \"status\") |> filter(fn: (r) => r._value == 1 and (r.metric_type == \"drift\" or r.metric_type == \"fairness\" or r.metric_type == \"explainability\" or r.metric_type == \"performance\")) |> group(columns: [\"metric_type\"]) |> aggregateWindow(every: 6h, fn: count, createEmpty: false) |> drop(fn: (column) => column == \"_start\" or column == \"_stop\")"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": null,
+          "max": null,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 70,
+            "pointSize": 6,
+            "showPoints": "auto",
+            "drawStyle": "bars",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "axisSoftMin": null,
+            "barAlignment": 0,
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "displayName": "${__field.labels.metric_type}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "drift"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "fairness"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "explainability"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "performance"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9085e9"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 8,
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 14,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "table",
+      "title": "Latest verdict by kind",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"${model}\" and r._field == \"status\") |> filter(fn: (r) => r.metric_type != \"statistics\") |> last() |> group(columns: [\"metric_type\"]) |> reduce(identity: {established: 0, within: 0, inconclusive: 0}, fn: (r, accumulator) => ({established: accumulator.established + (if r._value == 1 then 1 else 0), within: accumulator.within + (if r._value == 0 then 1 else 0), inconclusive: accumulator.inconclusive + (if r._value == -1 then 1 else 0)})) |> group()"
+        }
+      ],
+      "transformations": [],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "metric_type"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Kind"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "established"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "▲ established"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "within"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "✓ within zone"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "inconclusive"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "? inconclusive"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "sortBy": []
+      },
+      "id": 9,
+      "gridPos": {
+        "x": 14,
+        "y": 7,
+        "w": 10,
+        "h": 9
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "row",
+      "title": "Agents and LLM applications",
+      "id": 10,
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Agent runs (period)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\" and r._field == \"steps\") |> group() |> count()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open agents",
+              "url": "/d/pulsar-agents?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 11,
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Tool error rate",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\" and r._field == \"tool_error_rate\") |> group() |> mean()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#fab219",
+                "value": 0.1
+              },
+              {
+                "color": "#d03b3b",
+                "value": 0.25
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "links": [
+            {
+              "title": "Open agents",
+              "url": "/d/pulsar-agents?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 12,
+      "gridPos": {
+        "x": 6,
+        "y": 17,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Personal-information leaks",
+      "description": "Personal information in an agent output that the user did not provide",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"permit_assistant_1.0_input_data\") |> filter(fn: (r) => r.record_type == \"agent_run\" and r._field == \"pii_leak_count\") |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open personal information",
+              "url": "/d/pulsar-privacy?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 13,
+      "gridPos": {
+        "x": 12,
+        "y": 17,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Agent drift confirmed (latest window)",
+      "description": "",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "pulsar-influx"
+          },
+          "query": "from(bucket: \"${bucket}\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"pulsar_results\") |> filter(fn: (r) => r.model_id == \"permit_assistant\" and r.metric_type == \"drift\" and r._field == \"confirmed\") |> group(columns: [\"feature_name\"]) |> sort(columns: [\"_time\"]) |> last() |> toInt() |> group() |> sum()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0ca30c",
+                "value": null
+              },
+              {
+                "color": "#d03b3b",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [
+            {
+              "title": "Open agents",
+              "url": "/d/pulsar-agents?${__url_time_range}&${__all_variables}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "center",
+        "orientation": "auto"
+      },
+      "id": 14,
+      "gridPos": {
+        "x": 18,
+        "y": 17,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "pulsar-influx"
+      }
+    }
+  ],
+  "links": [
+    {
+      "title": "Pulsar.ml",
+      "type": "dashboards",
+      "tags": [
+        "pulsar.ml"
+      ],
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  }
+}
