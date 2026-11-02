@@ -1,0 +1,23 @@
+# Behavioural rules of the demo agent, checked on every trajectory (pulsar_metrics.genai.ComplianceMonitor).
+# Versioned with the agent: the rules applied to a period are known exactly.
+version: permit-agent-rules/1
+rules:
+  - id: auth-before-file
+    description: A file is opened only after the applicant is authenticated
+    template: precedence
+    events: [authenticate, create_file]
+    severity: critical
+  - id: in-scope-tools
+    description: The agent only calls the tools of its catalogue
+    template: allowed_tools
+    tools: [search_documents, search_programs, check_eligibility, compute_amount, authenticate, create_file]
+    severity: critical
+  - id: no-repeated-file
+    description: A file is never opened twice in a row
+    formula: "G (create_file -> !X create_file)"
+    severity: major
+  - id: amount-after-eligibility
+    description: An amount is computed only once eligibility has been checked
+    template: precedence
+    events: [check_eligibility, compute_amount]
+    severity: minor

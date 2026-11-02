@@ -95,7 +95,49 @@ def create_file(program_id: str, token: str) -> dict:
     return {"file_id": f"DOS-{uuid.uuid4().hex[:8].upper()}", "program_id": program_id, "status": "open"}
 
 
+# Small synthetic corpus of program rules (French and English) for the retrieval tool (RAG)
+DOCUMENTS = [
+    {"id": "DOC-LOGE-1", "text": "Aide au loyer : le revenu annuel du ménage doit être inférieur à 40 000 $. "
+     "L'aide représente 12 % de l'écart avec ce plafond, jusqu'à 5 000 $ par année."},
+    {"id": "DOC-LOGE-2", "text": "Rent assistance: household income must be below $40,000 a year. The benefit is 12% "
+     "of the gap to that limit, up to $5,000 a year. Proof of lease is required."},
+    {"id": "DOC-RENO-1", "text": "Subvention à la rénovation : offerte aux propriétaires dont le revenu est inférieur à "
+     "80 000 $. Elle couvre 15 % des travaux admissibles, jusqu'à 10 000 $."},
+    {"id": "DOC-RENO-2", "text": "Home renovation grant: for owners with an income below $80,000. It covers 15% of "
+     "eligible work, up to $10,000. Quotes from licensed contractors are required."},
+    {"id": "DOC-GARDE-1", "text": "Allocation pour la garde d'enfants : revenu familial inférieur à 60 000 $; jusqu'à "
+     "6 000 $ par année, selon le nombre d'enfants de moins de 12 ans."},
+    {"id": "DOC-GARDE-2", "text": "Child care benefit: family income below $60,000; up to $6,000 a year depending on "
+     "the number of children under 12. A daycare receipt is required."},
+    {"id": "DOC-EMPLOI-1", "text": "Aide à la formation professionnelle : revenu inférieur à 50 000 $; couvre 8 % de "
+     "l'écart avec le plafond, jusqu'à 4 000 $, pour une formation reconnue."},
+    {"id": "DOC-EMPLOI-2", "text": "Job training support: income below $50,000; covers 8% of the gap to the limit, up "
+     "to $4,000, for an accredited training program."},
+    {"id": "DOC-GEN-1", "text": "Toute demande exige une authentification avant l'ouverture d'un dossier. Les "
+     "demandes incomplètes sont refusées après 30 jours."},
+    {"id": "DOC-GEN-2", "text": "Every application requires authentication before a file is opened. Incomplete "
+     "applications are rejected after 30 days."},
+]
+
+
+def _words(text: str) -> set:
+    return {w for w in "".join(c.lower() if c.isalnum() else " " for c in text).split() if len(w) > 3}
+
+
+def search_documents(query: str) -> list:
+    """Retrieve the two passages of the program rules that share the most words with the query
+
+    Scenario S3 removes documents with FAULTS["search_documents"] = {"removed": {ids}}.
+    """
+    removed = FAULTS.get("search_documents", {}).get("removed", set())
+    corpus = [d for d in DOCUMENTS if d["id"] not in removed]
+    terms = _words(query)
+    ranked = sorted(corpus, key=lambda d: len(terms & _words(d["text"])), reverse=True)
+    return [{"id": d["id"], "text": d["text"]} for d in ranked[:2] if terms & _words(d["text"])]
+
+
 FUNCTIONS = {
+    "search_documents": search_documents,
     "search_programs": search_programs,
     "check_eligibility": check_eligibility,
     "compute_amount": compute_amount,
@@ -116,6 +158,13 @@ def _schema(name, description, properties, required):
 
 
 TOOL_SCHEMAS = [
+    _schema(
+        "search_documents",
+        "Search the official rules of the programs (conditions, limits, required documents). Use it to answer questions "
+        "about rules, and base the answer on the passages returned.",
+        {"query": {"type": "string"}},
+        ["query"],
+    ),
     _schema("search_programs", "Find public programs matching a topic.", {"topic": {"type": "string"}}, ["topic"]),
     _schema(
         "check_eligibility",
