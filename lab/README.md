@@ -15,6 +15,7 @@ limit found is recorded with its evidence and an improvement proposal.
 | `tests/<id>.py` | One module per test (`run(ctx) -> metrics`, `ctx.limit(...)` for each limit); `_*.py` are shared helpers |
 | `approved_tonight.json` | The 29 tests approved for the night of 2026-11-02 |
 | `night_lab.workflow.js` | Agent orchestration: preflight, provision, run by family, adversarial verification of limits, report, teardown |
+| `rerun_scale.md`, `rerun_scale.json` | Scalability rerun after the 0.10 / 0.11 fixes: plan, cost, and the workflow arguments |
 
 Datasets and models were verified on their source pages (licence, gated flag) on 2026-11-01/02. Downloads go to
 `data/lab/` outside the repositories. Resources that are gated, non-commercial or of Chinese origin are excluded.

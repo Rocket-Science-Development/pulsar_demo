@@ -1,0 +1,92 @@
+{
+ "approved": [
+  {
+   "id": "SC-01",
+   "title": "Many models per instance — capture",
+   "capability": "Pulse non-blocking capture (pulsar_data_collection)",
+   "method": "One process hosts N Pulse instances (N = 1, 10, 50, 100, 300, 500), each capturing batches of 50 rows of 20 features at 10 batches/s per model into one InfluxDB. Measure caller-side capture latency (p50/p99), rows/s written, queue depth, RSS, threads, open sockets, CPU.",
+   "pass": "capture p99 < 2 ms at every N; written = captured (0 loss) up to 300 models; RSS growth linear and < 30 MB/model",
+   "expected_limit": "one writer thread and one HTTP client per Pulse — thread and socket count may cap N",
+   "env": "aws-scale",
+   "duration_min": 60,
+   "family": "platform",
+   "priority": "P1"
+  },
+  {
+   "id": "SC-02",
+   "title": "High-volume sustained ingestion",
+   "capability": "Pulse + InfluxDB write path",
+   "method": "Ramp from 10k to 1M rows/min (single model and 100 models), 15 min per step. Measure ingestion lag, drops, InfluxDB CPU/RAM/disk, write latency, batch sizes; end-to-end reconciliation (rows queried back = rows captured).",
+   "pass": "zero loss below the saturation point; saturation point documented; drops counted exactly beyond it",
+   "env": "aws-scale + aws-db",
+   "duration_min": 90,
+   "family": "platform",
+   "priority": "P1"
+  },
+  {
+   "id": "SC-03",
+   "title": "Storage outage under load, with and without spool",
+   "capability": "circuit breaker, spool directory, replay",
+   "method": "At 200k rows/min, stop InfluxDB for 60 s, 10 min and 30 min; repeat with spool_dir and without. Measure capture latency during the outage, spooled/dropped rows, spool disk usage, replay duration, duplicates after replay.",
+   "pass": "with spool — 0 loss, 0 duplicates, capture p99 < 2 ms during the outage; without — drops counted exactly",
+   "env": "aws-scale + aws-db",
+   "duration_min": 75,
+   "family": "platform",
+   "priority": "P1"
+  },
+  {
+   "id": "SC-13",
+   "title": "Process crash and restart",
+   "capability": "spool replay after crash, idempotence",
+   "method": "kill -9 the capturing process mid-burst (spool on), restart, replay; count losses and duplicates.",
+   "pass": "losses limited to the in-memory queue at crash time, measured and documented; 0 duplicates",
+   "env": "aws-scale",
+   "duration_min": 20,
+   "family": "platform",
+   "priority": "P1"
+  },
+  {
+   "id": "SC-05",
+   "title": "Queue saturation and memory bound",
+   "capability": "bounded queue, oldest-first drop",
+   "method": "max_queue_rows from 1k to 1M under a burst 10x the write rate; measure RSS ceiling and drop accounting.",
+   "pass": "RSS stays under the bound implied by max_queue_rows; dropped_rows exact",
+   "env": "local",
+   "duration_min": 20,
+   "family": "platform",
+   "priority": "P1"
+  },
+  {
+   "id": "SC-14",
+   "title": "Schema evolution and type conflicts",
+   "capability": "writer grouping by columns, rejected_rows",
+   "method": "Mix optional fields, change a field type mid-stream, add/remove features; verify rejected_rows accounting and that valid rows are written.",
+   "pass": "every rejection counted with its reason; no retry loop; valid rows written",
+   "env": "local",
+   "duration_min": 15,
+   "family": "platform",
+   "priority": "P1"
+  }
+ ],
+ "settings": {
+  "env": "aws",
+  "budget_usd": 25,
+  "stop": "<heure UTC d'arrêt automatique, à fixer au lancement : départ + 7 h>",
+  "run_name": "relance-scale",
+  "hosts": [
+   "lab-scale",
+   "lab-db"
+  ],
+  "profiles": [
+   "default",
+   "tuned"
+  ],
+  "teardown": "terminate",
+  "scope": "SC-01, SC-02, SC-03, SC-13 in both write profiles; SC-05 and SC-14 once (default)",
+  "instructions": "Rerun of the platform tests after pulsar_data_collection 0.10.0 / pulsar_metrics 0.11.0 (installed from main on every host). The modules lab/tests/sc_*.py exist and are final: do not rewrite them; fix only a crash, and say so. Same sizes as the night of 2026-11-02 so the numbers compare: SC-01 LAB_LEVELS=1,10,50,100,300,500 LAB_STEP_S=60; SC-02 LAB_STEP_S=180 (default rates and model sets); SC-03 LAB_OUTAGES=60,600,1800 with the black hole; SC-13 LAB_REPS=3. SC-05 and SC-14 use no shared writer: run them once with LAB_PROFILE=default LAB_RUN_TAG=default. InfluxDB 2.6.1 on lab-db with ulimit nofile 65536 and LAB_INFLUX_CONTAINER set so SC-01 measures server descriptors. Run the tests one after the other (they share InfluxDB). Never lab-soak, lab-cpu or GPU hosts.",
+  "report_instructions": "This is the scalability rerun, not a night lab: write the report in French as a comparison. For each test and metric, give the night's value (lab/results/<id>.json, profile before the fixes), the default profile and the tuned profile (lab/results/<id>.<profile>.json), and say for each limit M31-M38, m18-m24 of the night report (settings.night_report) whether it is fixed, improved or still present, with the numbers.",
+  "night_report": "<chemin du rapport de la nuit du 2026-11-02, fourni au lancement>"
+ },
+ "stamp": "<ISO UTC au lancement>",
+ "report_file": "C:/dev/pulsar-ml/pulsar_demo/lab/results/rapport_relance_scale.md"
+}

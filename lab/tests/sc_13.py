@@ -21,21 +21,21 @@ import numpy as np
 
 from lab.tests import _platform as C
 
-ENV_FILE = Path.home() / ".pulsar-lab" / "influx2.env"
+ENV_FILE = Path(C.platform_env_file())
 BATCH = 500
 RATE = 50_000  # rows/s during the burst
 PARAMS = {"batch_rows": BATCH, "burst_rows_per_s": RATE, "kill": "SIGKILL", "spool": True,
           "storage": "lab-db InfluxDB 2.6.1 dedicated container :8087 through a local TCP proxy",
-          "repetitions": int(os.environ.get("LAB_REPS", 3))}
+          "repetitions": int(os.environ.get("LAB_REPS", 3)), "write": C.versions(),
+          "tuned": 'durability="wal" (write-ahead copy of each batch in the spool)'}
 CRITERIA = {"duplicates_total": ("==", 0), "loss_within_queue_all": ("==", True)}
 
 
 def child(url, bucket, spool, seq0, seconds, progress, replay_only):
     os.environ["LAB_INFLUX_URL_OVERRIDE"] = url
-    from pulsar_data_collection.models import CaptureOptions
-
     env = C.influx_env()
-    p = C.make_pulse("sc13", bucket, CaptureOptions(spool_dir=spool, max_retry_delay_s=2.0), env)
+    p = C.make_pulse("sc13", bucket, C.capture_options(tuned={"durability": "wal"}, spool_dir=spool, max_retry_delay_s=2.0),
+                     env)
     pool = C.frames_pool(BATCH, 20, pool=8)
     fd = os.open(progress, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)
     seq = seq0
@@ -67,6 +67,13 @@ def child(url, bucket, spool, seq0, seconds, progress, replay_only):
     p.close()
     os.write(fd, (json.dumps({"final": True, "seq_next": seq, **st}, default=str) + "\n").encode())
     os.close(fd)
+
+
+def _spool_files(spool):
+    """Spooled batches and WAL copies still on disk (.json, .json.gz, .wal, .wal.gz)"""
+    if not spool.exists():
+        return 0
+    return sum(1 for f in spool.iterdir() if ".json" in f.name or ".wal" in f.name)
 
 
 def _last(progress):
@@ -112,7 +119,7 @@ def run(ctx):
             p1.wait()
             at_kill = _last(prog1)
             submitted = at_kill.get("seq_next", seq0) - seq0
-            spool_files_after_kill = len(list(spool.glob("*.json"))) if spool.exists() else 0
+            spool_files_after_kill = _spool_files(spool)
             tmp_orphans = len(list(spool.glob("*.tmp"))) if spool.exists() else 0
             proxy.up()
             replay_runs = []
@@ -135,12 +142,15 @@ def run(ctx):
             replayed_total = sum(r.get("replayed_rows", 0) for r in replay_runs)
             row = {"scenario": scenario, "rep": rep, "kill_after_s": kill_after, "submitted": int(submitted),
                    "stored_points": int(len(seqs)), "distinct_seq": distinct, "lost": lost,
-                   "duplicates": int(len(seqs) - distinct), "extra_seq": int((~np.isin(seqs, expected)).sum()),
+                   "duplicates": int(len(seqs) - distinct),
+                   # the batch captured between the last progress line and the kill (durable under WAL) is not extra
+                   "captured_after_progress": int(((seqs >= seq0 + submitted) & (seqs < seq0 + submitted + BATCH)).sum()),
+                   "extra_seq": int((~np.isin(seqs, np.arange(seq0, seq0 + submitted + BATCH))).sum()),
                    "queued_at_kill": at_kill.get("queued_rows"), "written_at_kill": at_kill.get("written_rows"),
                    "spooled_at_kill": at_kill.get("spooled_rows"), "spool_files_after_kill": spool_files_after_kill,
                    "tmp_orphans": tmp_orphans, "tmp_left_at_end": len(list(spool.glob("*.tmp"))) if spool.exists() else 0,
                    "replayed_rows_reported": replayed_total,
-                   "spool_files_end": len(list(spool.glob("*.json"))) if spool.exists() else 0,
+                   "spool_files_end": _spool_files(spool),
                    "lost_contiguous_tail": bool(lost == 0 or (~present)[-lost:].all())}
             # in-memory queue at the kill = queued rows + the batch being written (at most max_batch_rows) + last batches
             # submitted after the last progress line (none: progress is written after every capture)

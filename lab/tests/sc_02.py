@@ -11,7 +11,6 @@ import os
 import threading
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 
 from lab.tests import _platform as C
 
@@ -21,17 +20,19 @@ STEP_S = float(os.environ.get("LAB_STEP_S", 180))
 BATCH = 50
 PARAMS = {"rates_rows_per_min": RATES, "model_sets": MODEL_SETS, "step_s": STEP_S, "batch_rows": BATCH, "features": 20,
           "storage": "lab-db InfluxDB 2.6.1 :8087 (dedicated container, r7i.2xlarge)",
-          "deviation": "3 min per step instead of 15 (night budget); saturation located on the same ramp"}
+          "deviation": "3 min per step instead of 15 (night budget); saturation located on the same ramp",
+          "write": C.versions()}
 CRITERIA = {"loss_below_saturation": ("==", 0), "drops_counted_exactly": ("==", True)}
 
 
 def _step(env, n_models, rate):
-    from pulsar_data_collection.models import CaptureOptions
-
     bucket = C.ensure_bucket(f"lab_sc02_{datetime.now(timezone.utc):%m%d%H%M}_m{n_models}_r{rate}", env)
-    pulses = [C.make_pulse(f"v{i:03d}", bucket, CaptureOptions(), env) for i in range(n_models)]
+    writer = C.shared_writer()
+    pulses = [C.make_pulse(f"v{i:03d}", bucket, C.capture_options(), env, writer=writer) for i in range(n_models)]
     writes = []
-    for p in pulses:  # count rows per write call (wraps the instance's write_frame; connector code unchanged)
+    # Rows per write call: wraps the instance's write_frame (private writers). A SharedWriter sends line protocol
+    # without write_frame; rows per write then come from the InfluxDB write requests.
+    for p in pulses if writer is None else []:
         orig = p.storage_engine.write_frame
 
         def wrapped(*a, _orig=orig, **kw):
@@ -76,6 +77,8 @@ def _step(env, n_models, rate):
     stats = [p.stats() for p in pulses]
     for p in pulses:
         p.close()
+    if writer is not None:
+        writer.close()
     m1 = C.remote_influx_stats(env)
     wall_end = datetime.now(timezone.utc)
     stored = C.count_rows(bucket, "f0", None, env, timeout_s=1800)
@@ -87,22 +90,29 @@ def _step(env, n_models, rate):
     ahead_s = (last_ts - wall_end).total_seconds() if last_ts else None
     captured = sum(s["captured_rows"] for s in stats)
     dropped = sum(s["dropped_rows"] for s in stats)
+    requests = m1.get("write_requests", 0) - m0.get("write_requests", 0)
+    n_writes = len(writes) if writer is None else int(requests)
+    if writer is None:
+        rows_per_write = sum(writes) / len(writes) if writes else None
+    else:
+        rows_per_write = stored / requests if requests else None
     return {"models": n_models, "target_rows_per_min": rate, "achieved_rows_per_min": k * BATCH / elapsed * 60,
             "captured": captured, "dropped": dropped, "dropped_at_step_end": sum(s["dropped_rows"] for s in st_end),
             "rejected": sum(s["rejected_rows"] for s in stats), "write_errors": sum(s["write_errors"] for s in stats),
             "stored": stored, "lost_unaccounted": captured - dropped - stored, "flushed": flushed,
+            "uncertain": sum(s.get("uncertain_rows", 0) for s in stats),
             "ingestion_lag_s": lag_s, "queued_at_step_end": sum(s["queued_rows"] for s in st_end),
             "queued_max": max([t["queued"] for t in trace], default=0),
             "written_rows_per_s": (stored) / (elapsed + lag_s),
-            "writes": len(writes), "rows_per_write_mean": (sum(writes) / len(writes)) if writes else None,
+            "writes": n_writes, "rows_per_write_mean": rows_per_write,
             "capture_p50_ms": C.pct(lat, 50) * 1000, "capture_p99_ms": C.pct(lat, 99) * 1000,
-            "influx_write_requests": m1.get("write_requests", 0) - m0.get("write_requests", 0),
+            "influx_write_requests": requests,
             "influx_heap_mb_max": max([t.get("influx_go_memstats_alloc_bytes", 0) for t in trace], default=0) / 2**20,
             "last_row_ahead_of_wall_clock_s": ahead_s, "wall_start": wall0.isoformat()}
 
 
 def run(ctx):
-    os.environ["LAB_INFLUX_ENV"] = str(Path.home() / ".pulsar-lab" / "influx2.env")
+    os.environ["LAB_INFLUX_ENV"] = C.platform_env_file()
     env = C.influx_env()
     rows = []
     for n in MODEL_SETS:
@@ -134,12 +144,17 @@ def run(ctx):
                       "One synchronous writer thread per Pulse caps throughput: write with several in-flight requests "
                       "(async write_api or a pool), gzip, and larger batches when the queue grows; document the per-Pulse "
                       "ceiling", "major")
-    lost = sum(abs(r["lost_unaccounted"]) for r in ok)  # 0 when every lost row is counted
+    # A row of a timed-out write (uncertain_rows, pulsar_data_collection >= 0.10) may or may not be stored: rows are
+    # unaccounted only beyond the uncertain ones
     for r in ok:
-        if r["lost_unaccounted"] > 0:
-            ctx.limit(f"{r['lost_unaccounted']} rows neither stored nor counted as dropped ({r['models']} models, "
+        gap = r["lost_unaccounted"]
+        r["unexplained"] = max(0, gap - r.get("uncertain", 0)) if gap > 0 else gap
+    lost = sum(abs(r["unexplained"]) for r in ok)  # 0 when every lost row is counted
+    for r in ok:
+        if r["unexplained"] > 0:
+            ctx.limit(f"{r['unexplained']} rows neither stored nor counted as dropped or uncertain ({r['models']} models, "
                       f"{r['target_rows_per_min']:,} rows/min)",
-                      json.dumps({k: r[k] for k in ("captured", "dropped", "rejected", "stored", "write_errors")}),
+                      json.dumps({k: r[k] for k in ("captured", "dropped", "uncertain", "rejected", "stored", "write_errors")}),
                       "Reconcile counters: count timeouts with unknown outcome separately", "critical")
         elif r["lost_unaccounted"] < 0:
             ctx.limit(f"{-r['lost_unaccounted']} rows counted as dropped were stored ({r['models']} models, "
@@ -167,5 +182,5 @@ def run(ctx):
                   "queries with range(stop: now()) miss these rows", "major")
     below = [r for r in ok if sat.get(r["models"]) is None or r["target_rows_per_min"] < sat[r["models"]]]
     return {"steps": rows, "saturation_rows_per_min": {str(k): v for k, v in sat.items()},
-            "loss_below_saturation": sum(r["dropped"] + abs(r["lost_unaccounted"]) for r in below),
+            "loss_below_saturation": sum(r["dropped"] + abs(r["unexplained"]) for r in below),
             "drops_counted_exactly": lost == 0}

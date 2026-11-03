@@ -17,7 +17,6 @@ import os
 import threading
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 
 import psutil
 
@@ -27,14 +26,13 @@ LEVELS = [int(v) for v in os.environ.get("LAB_LEVELS", "1,10,50,100,300,500").sp
 STEP_S = float(os.environ.get("LAB_STEP_S", 60))
 BATCH, FEATURES, BATCHES_PER_S = 50, 20, 10
 PARAMS = {"levels": LEVELS, "step_s": STEP_S, "batch_rows": BATCH, "features": FEATURES, "batches_per_s_per_model": 10,
-          "generator": "one thread, round robin, pre-built frames", "storage": "lab-db InfluxDB 2.6.1 :8087 (dedicated)"}
+          "generator": "one thread, round robin, pre-built frames", "storage": "lab-db InfluxDB 2.6.1 :8087 (dedicated)",
+          "write": C.versions()}
 CRITERIA = {"capture_p99_ms_max": ("<", 2.0), "lost_rows_upto_300": ("==", 0), "rss_mb_per_model_max": ("<", 30.0)}
 
 
 def run(ctx):
-    from pulsar_data_collection.models import CaptureOptions
-
-    os.environ["LAB_INFLUX_ENV"] = str(Path.home() / ".pulsar-lab" / "influx2.env")
+    os.environ["LAB_INFLUX_ENV"] = C.platform_env_file()
     env = C.influx_env()
     proc = psutil.Process()
     pool = C.frames_pool(BATCH, FEATURES, pool=64)
@@ -44,7 +42,8 @@ def run(ctx):
         bucket = C.ensure_bucket(f"lab_sc01_{datetime.now(timezone.utc):%m%d%H%M}_n{n}", env)
         before = C.proc_snapshot(proc)
         t0 = time.perf_counter()
-        pulses = [C.make_pulse(f"m{i:03d}", bucket, CaptureOptions(), env) for i in range(n)]
+        writer = C.shared_writer()
+        pulses = [C.make_pulse(f"m{i:03d}", bucket, C.capture_options(), env, writer=writer) for i in range(n)]
         startup_s = time.perf_counter() - t0
         created = C.proc_snapshot(proc)
         lat = []
@@ -97,6 +96,8 @@ def run(ctx):
         stats = [p.stats() for p in pulses]
         for p in pulses:
             p.close()
+        if writer is not None:
+            writer.close()
         del pulses
         gc.collect()
         time.sleep(2)
@@ -110,6 +111,7 @@ def run(ctx):
                "capture_max_ms": max(lat) * 1000, "captured": captured,
                "written": sum(s["written_rows"] for s in stats), "dropped": sum(s["dropped_rows"] for s in stats),
                "write_errors": sum(s["write_errors"] for s in stats), "stored": stored, "lost": captured - stored,
+               "uncertain": sum(s.get("uncertain_rows", 0) for s in stats),
                "rows_written_per_s": stored / (elapsed + flush_s), "flush_s": flush_s, "flushed": flushed,
                "peak_queued_rows": peak["queued"], "cpu_pct_of_one_core": 100 * cpu_s / elapsed,
                "rss_before_mb": before["rss_mb"], "rss_created_mb": created["rss_mb"], "rss_steady_mb": steady["rss_mb"],
