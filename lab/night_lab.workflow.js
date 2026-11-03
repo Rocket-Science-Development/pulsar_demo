@@ -13,6 +13,9 @@ export const meta = {
 }
 
 // args: { approved: [registry test objects], settings: {env, budget_usd, scope, stop, instructions}, stamp: "ISO time", report_file?: path }
+// The tag of the machines and volumes of this run (settings.project_tag, default pulsar-lab). Two runs at once use
+// different tags, so that the teardown of one never touches the machines of the other.
+const TAG = (args && args.settings && args.settings.project_tag) || 'pulsar-lab'
 const RULES = `
 Ground rules (non-negotiable):
 - Work in C:/dev/pulsar-ml/pulsar_demo/lab (the checked-out branch: do not switch, commit or stash). Tests go in lab/tests/<id>.py and run through
@@ -21,14 +24,16 @@ Ground rules (non-negotiable):
   Diabetes 130 contain real (anonymised) people: no re-identification, no joins with other sources.
 - No model of Chinese origin. No gated or non-commercial dataset. Never handle secrets: tokens come from existing env files.
 - AWS: region ca-central-1 only, auto-stop at the approved time, never exceed the approved budget.
-- Tags: every instance or volume CREATED for the lab gets Project=pulsar-lab. A PRE-EXISTING instance reused by the lab
-  is never re-tagged: its Project, Name and other tags stay as they are; add only LabRun=pulsar-lab (removed at
-  teardown) so the lab can find it. Teardown targets Project=pulsar-lab OR LabRun=pulsar-lab.
+- Tags: every instance or volume CREATED for the lab gets Project=${TAG}. A PRE-EXISTING instance reused by the lab
+  is never re-tagged: its Project, Name and other tags stay as they are; add only LabRun=${TAG} (removed at
+  teardown) so the lab can find it. Teardown targets Project=${TAG} OR LabRun=${TAG}.
 - Data: datasets, caches and models go on a separate EBS data volume per host, created for the lab (tag
-  Project=pulsar-lab, LabVolume=data, DeleteOnTermination=true) and mounted on /data/lab; never grow or reuse the root
+  Project=${TAG}, LabVolume=data, DeleteOnTermination=true) and mounted on /data/lab; never grow or reuse the root
   volume or a disk of a pre-existing instance. The data volume is detached and DELETED at teardown.
 - A limit is a fact about Pulsar.ml found by a test, with numbers. A test bug is NOT a limit: fix the test.
 - Do not push, merge or open pull requests. Do not modify pulsar_metrics or pulsar_data_collection; propose changes instead.
+- Another lab run may be in progress with machines tagged Project=pulsar-lab or another tag: never stop, terminate,
+  re-tag or use a machine or volume that does not carry Project=${TAG} or LabRun=${TAG}.
 `
 
 const FAMILIES = [
@@ -71,6 +76,8 @@ const settings = (args && args.settings) || {}
 // - teardown: "terminate" terminates the instances created for the lab (never a pre-existing one); default "stop".
 const SUFFIX = settings.run_name ? `.${settings.run_name}` : ''
 const PROFILES = settings.profiles || []
+// - family_hosts: {family: host} replaces the host of a family (e.g. "local" to run it on this PC)
+const FAMILY_HOSTS = settings.family_hosts || {}
 if (!approved.length || !settings.env) {
   log('Nothing approved or no run settings: the lab does not start.')
   return { started: false }
@@ -95,7 +102,7 @@ lab-soak c7i.2xlarge, lab-gpu-1/2 g6.xlarge if capacity else g4dn.xlarge (g6 had
 then fall back to g4dn). A pre-existing stopped instance may be restarted only if the operator instructions allow it, and
 then follows the pre-existing-instance tag rule (LabRun tag only, original tags untouched).
 Every instance: shutdown -h at the stop time, SSH only from the operator IP, Ollama bound to localhost.
-Every host: create and attach one data volume (gp3, sized for its family, tags Project=pulsar-lab and LabVolume=data),
+Every host: create and attach one data volume (gp3, sized for its family, tags Project=${TAG} and LabVolume=data),
 mount it on /data/lab, and put datasets, caches, venvs and models there. Return the volume ids.
 The GPU AMI ships Python 3.10: install Python 3.12 with uv. Use the Ollama release tarball, not the install script, if
 piping a remote script to a shell is not allowed.
@@ -104,7 +111,7 @@ hourly cost actually provisioned.`, { label: 'provision' })
 
 phase('Run')
 const results = await pipeline(
-  FAMILIES.map(f => ({ ...f, tests: approved.filter(t => f.prefixes.some(p => t.id.startsWith(p))) })).filter(f => f.tests.length),
+  FAMILIES.map(f => ({ ...f, host: FAMILY_HOSTS[f.key] || f.host, tests: approved.filter(t => f.prefixes.some(p => t.id.startsWith(p))) })).filter(f => f.tests.length),
   fam => agent(`${RULES}
 You run the "${fam.key}" family of the Pulsar.ml night lab on ${fam.host}. Provisioned environment:
 ${String(provision).slice(0, 1500)}
@@ -153,8 +160,8 @@ const teardown = await agent(`${RULES}
 Tear down the lab in ca-central-1. Approved budget: ${settings.budget_usd} USD; provisioned (from the provision step):
 ${String(provision).slice(0, 1500)}
 1. ${settings.teardown === 'terminate'
-    ? 'Terminate every instance tagged Project=pulsar-lab (created for the lab), after its results are copied back; stop (never terminate) an instance tagged LabRun=pulsar-lab.'
-    : 'Stop (do not terminate) every instance tagged Project=pulsar-lab or LabRun=pulsar-lab.'}
+    ? 'Terminate every instance tagged Project=' + TAG + ' (created for the lab), after its results are copied back; stop (never terminate) an instance tagged LabRun=' + TAG + '.'
+    : 'Stop (do not terminate) every instance tagged Project=' + TAG + ' or LabRun=' + TAG + '.'}
 2. On a pre-existing instance (LabRun tag): remove only the LabRun tag; check its original tags are unchanged.
 3. Detach and DELETE every data volume tagged LabVolume=data once its instance is stopped and the results it holds
    have been copied back to lab/results/; never delete a root volume or a volume without that tag.
