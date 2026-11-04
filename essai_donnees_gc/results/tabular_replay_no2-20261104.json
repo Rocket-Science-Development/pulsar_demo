@@ -1,0 +1,23 @@
+{
+ "campaign": "no2-20261104",
+ "model": "HistGradientBoostingRegressor(max_iter=300, learning_rate=0.05), scikit-learn 1.9.1",
+ "train_rows": 26303,
+ "train_period": [
+  "2016-01-01 00:00:00",
+  "2018-12-31 23:00:00"
+ ],
+ "replay_rows": 26304,
+ "replay_weeks": 157,
+ "replay_period": [
+  "2019-01-01 00:00:00",
+  "2021-12-31 23:00:00"
+ ],
+ "reference_mae_out_of_fold": 2.6452449296808958,
+ "pulse_stats": {
+  "captured_rows": 26304,
+  "written_rows": 26304,
+  "dropped_rows": 0,
+  "rejected_rows": 0
+ },
+ "seconds": 1.9
+}
