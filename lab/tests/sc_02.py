@@ -26,7 +26,7 @@ CRITERIA = {"loss_below_saturation": ("==", 0), "drops_counted_exactly": ("==", 
 
 
 def _step(env, n_models, rate):
-    bucket = C.ensure_bucket(f"lab_sc02_{datetime.now(timezone.utc):%m%d%H%M}_m{n_models}_r{rate}", env)
+    bucket = C.ensure_bucket(f"lab_sc02_{C.PROFILE}_{datetime.now(timezone.utc):%m%d%H%M%S}_m{n_models}_r{rate}", env)
     writer = C.shared_writer()
     pulses = [C.make_pulse(f"v{i:03d}", bucket, C.capture_options(), env, writer=writer) for i in range(n_models)]
     writes = []
