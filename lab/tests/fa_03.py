@@ -12,8 +12,9 @@ with out-of-fold predictions on the dataset's 10 folds. Parts:
 
 A. Community-level analysis: groups from race-share terciles (racepctblack, racePctWhite, racePctHisp), reference
    the lowest-share tercile; DIR, parity, equal opportunity, FPR difference. Null control with permuted terciles.
-B. Passing the share itself as the protected attribute (what a user does when the attribute is not categorical):
-   number of groups, suppression, coverage.
+B. Passing the share itself (the real float column) as the protected attribute, what a user does when the attribute
+   is not categorical: number of groups, suppression, coverage, or Pulsar's refusal (AllCellsSuppressed), which is
+   then the measured behaviour.
 C. What the decision means for people: exposure of Black / White / Asian residents to a "flagged" community,
    population-weighted from the aggregates (exact for a community-level decision), with a cluster bootstrap over
    communities - compared with the community-level tercile gap. Pulsar has no row weights: not computable natively.
@@ -205,22 +206,36 @@ def run(ctx):
     m["null_seconds"] = round(time.perf_counter() - t0, 1)
 
     # ------------------------------------------------ B. the share itself as attribute
+    # the float column as a user has it (not converted to strings on a grid: that made it categorical on purpose)
+    from pulsar_metrics.fairness import analyzer as fairness_analyzer
+
+    refusals = tuple(c for c in (getattr(fairness_analyzer, "AllCellsSuppressed", None),) if c is not None)
     raw = frame[["y_true", "y_pred", "y_pred_proba"]].copy()
-    raw["BLACK_SHARE"] = df["racepctblack"].map(lambda v: f"{v:.2f}")  # the 0.01 grid of UCI 183
+    raw["BLACK_SHARE"] = df["racepctblack"].to_numpy(dtype=float)
+    m["B_attribute_dtype"] = str(raw["BLACK_SHARE"].dtype)
+    m["B_groups"] = int(raw["BLACK_SHARE"].nunique())
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         an_b = FairnessAnalyzer(["BLACK_SHARE"], FairnessPolicy(criteria=["demographic_parity_difference"],
                                                                 n_bootstrap=p["n_bootstrap"]), seed=0)
-        rb = an_b.run(raw)
-    kept = [r for r in rb if not r.suppressed]
-    cov = an_b.coverage()
-    m["B_groups"] = int(raw["BLACK_SHARE"].nunique())
-    m["B_kept_groups"] = len(kept)
-    m["B_suppressed_groups"] = len(rb) - len(kept)
-    m["B_reference"] = rb[0].reference_group if rb else None
-    m["B_no_verdict_share"] = cov[0].metric_value if cov else None
-    m["B_established"] = sum(r.drift_status is True for r in kept)
+        try:
+            rb = an_b.run(raw)
+        except refusals as exc:  # every distinct share is a group below min_group_size: the refusal is the measure
+            rb = None
+            m["B_outcome"] = f"refused: {type(exc).__name__}: {str(exc)[:200]}"
     m["B_warnings"] = [str(w.message) for w in caught]
+    if rb is not None:
+        kept = [r for r in rb if not r.suppressed]
+        cov = an_b.coverage()
+        m["B_outcome"] = "accepted"
+        m["B_kept_groups"] = len(kept)
+        m["B_suppressed_groups"] = len(rb) - len(kept)
+        m["B_reference"] = rb[0].reference_group if rb else None
+        m["B_no_verdict_share"] = cov[0].metric_value if cov else None
+        m["B_established"] = sum(r.drift_status is True for r in kept)
+    # does Pulsar tell the user to bin the numeric attribute (in the error or a warning)?
+    m["B_binning_hint"] = any(w in text.lower() for text in [m["B_outcome"], *m["B_warnings"]]
+                              for w in ("bin", "numeric", "continuous", "quantile"))
 
     # ------------------------------------------------ C. population-weighted exposure by race
     pop = df["population"].to_numpy(dtype=float)
@@ -346,11 +361,20 @@ def run(ctx):
     elif m["E_composition_join"] == "accepted":
         ctx.note("composition join accepted (unexpected): check the semantics of the result")
 
-    if m["B_kept_groups"] > 3:
+    if m["B_outcome"].startswith("refused") and not m["B_binning_hint"]:
+        ctx.limit(
+            f"A continuous share passed as protected attribute is treated as {m['B_groups']} categories and refused, "
+            "without any hint that the attribute is numeric and must be binned",
+            f"racepctblack as {m['B_attribute_dtype']} ({m['B_groups']} distinct values over {len(df)} rows): "
+            f"{m['B_outcome']}",
+            "Detect numeric attributes with many distinct values and require explicit binning "
+            "(e.g. `bins={'share': 3}` by quantile), recording the cut points in the result; say so in the error.",
+            "minor")
+    elif m["B_outcome"] == "accepted" and m["B_kept_groups"] > 3:
         ctx.limit(
             "A continuous share passed as protected attribute is treated as categorical: every distinct value is a "
             "group, most are suppressed or inconclusive, without any warning that the attribute is numeric",
-            f"racepctblack on the 0.01 grid: {m['B_groups']} groups, {m['B_kept_groups']} kept, "
+            f"racepctblack as {m['B_attribute_dtype']}: {m['B_groups']} groups, {m['B_kept_groups']} kept, "
             f"{m['B_suppressed_groups']} suppressed, no-verdict share {m['B_no_verdict_share']:.1%}, "
             f"reference {m['B_reference']}, {m['B_established']} 'established'",
             "Detect numeric attributes with many distinct values and require explicit binning (e.g. `bins={'share': 3}` "
