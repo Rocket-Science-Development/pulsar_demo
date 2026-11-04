@@ -73,6 +73,12 @@ Each run writes `results/<ID>.json`, which overwrites the previous result of tha
 before a local dry run. Datasets are read from `C:/dev/pulsar-ml/data/lab/` (`/data/lab` on AWS), outside the
 repositories. Most ML tests need their dataset, and the LLM tests need Ollama or a GPU.
 
+Offline replays recompute a test's statistics from its recorded runs, without the agent or a GPU.
+`python -m lab.replay.declencheur_derive` replays LR-03 (`results/LR-03/runs.jsonl`) to measure the false-trigger rate
+and the detection delay of the "measured drift" trigger (signals, persistence k, alpha); it needs pulsar_metrics with
+`mmd_test(groups=)` and, once, the local Ollama for the passage embeddings. Its report is
+`results/rapport_fiabilite_declencheur.md`.
+
 The whole night lab: approve the tests and the run settings on the registry page, then start the `pulsar-night-lab`
 workflow (`night_lab.workflow.js`) with `{approved, settings, stamp}`. It runs these steps: preflight, provisioning, one
 agent per family (implementation, dry run, full run), adversarial verification of every limit, morning report and
