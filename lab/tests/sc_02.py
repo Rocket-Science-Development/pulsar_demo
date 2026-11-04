@@ -26,20 +26,13 @@ CRITERIA = {"loss_below_saturation": ("==", 0), "drops_counted_exactly": ("==", 
 
 
 def _step(env, n_models, rate):
-    bucket = C.ensure_bucket(f"lab_sc02_{datetime.now(timezone.utc):%m%d%H%M}_m{n_models}_r{rate}", env)
+    bucket = C.ensure_bucket(f"lab_sc02_{C.PROFILE}_{datetime.now(timezone.utc):%m%d%H%M%S}_m{n_models}_r{rate}", env)
     writer = C.shared_writer()
     pulses = [C.make_pulse(f"v{i:03d}", bucket, C.capture_options(), env, writer=writer) for i in range(n_models)]
     writes = []
-    # Rows per write call: wraps the instance's write_frame (private writers). A SharedWriter sends line protocol
-    # without write_frame; rows per write then come from the InfluxDB write requests.
-    for p in pulses if writer is None else []:
-        orig = p.storage_engine.write_frame
-
-        def wrapped(*a, _orig=orig, **kw):
-            writes.append(len(kw.get("frame", a[1] if len(a) > 1 else [])))
-            return _orig(*a, **kw)
-
-        p.storage_engine.write_frame = wrapped
+    # Rows per storage request, both profiles: pulsar_data_collection 0.10 sends line protocol through the Target of
+    # each Pulse's Channel (storage_engine.write_frame is no longer called, so wrapping it measured nothing)
+    C.count_sends(pulses, writes)
     pool = C.frames_pool(BATCH, 20, pool=64)
     lat, trace = [], []
     stop = threading.Event()
@@ -91,11 +84,8 @@ def _step(env, n_models, rate):
     captured = sum(s["captured_rows"] for s in stats)
     dropped = sum(s["dropped_rows"] for s in stats)
     requests = m1.get("write_requests", 0) - m0.get("write_requests", 0)
-    n_writes = len(writes) if writer is None else int(requests)
-    if writer is None:
-        rows_per_write = sum(writes) / len(writes) if writes else None
-    else:
-        rows_per_write = stored / requests if requests else None
+    n_writes = len(writes)
+    rows_per_write = sum(writes) / len(writes) if writes else None
     return {"models": n_models, "target_rows_per_min": rate, "achieved_rows_per_min": k * BATCH / elapsed * 60,
             "captured": captured, "dropped": dropped, "dropped_at_step_end": sum(s["dropped_rows"] for s in st_end),
             "rejected": sum(s["rejected_rows"] for s in stats), "write_errors": sum(s["write_errors"] for s in stats),

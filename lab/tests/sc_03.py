@@ -5,6 +5,10 @@
 stopped InfluxDB) for 60 s, 10 min and 30 min, with spool_dir and without; one extra case black-holes the network
 (connections accepted, never answered) for 60 s with spool. Measured: capture latency during the outage, spooled /
 dropped rows, spool disk usage, replay duration, losses and duplicates (points vs distinct seq queried back).
+
+Rows spooled or dropped "after the recovery" are counted by their capture timestamp (rows captured after the storage
+was back), not by the instant they reached the spool: after a black hole, the batches captured during the hang still
+wait behind the write timeout and reach the spool after the recovery.
 """
 
 import json
@@ -15,6 +19,7 @@ import time
 from datetime import datetime, timezone
 
 import numpy as np
+import pandas as pd
 
 from lab.tests import _platform as C
 
@@ -51,6 +56,38 @@ def _spool_bytes(root):
     return total
 
 
+class _FallbackByCapture:
+    """Rows sent to the spool or dropped (the writer's fallback: storage unavailable, failed or timed-out write, close),
+    split by the phase in which they were captured (their `_time`, the capture timestamp)"""
+
+    def __init__(self, writers):
+        self.rows = {"pre": 0, "outage": 0, "post": 0}
+        self.marks = {}  # phase -> start (UTC Timestamp)
+        self.hooked = False
+        self._lock = threading.Lock()
+        for w in writers:
+            if hasattr(w, "_fallback"):
+                w._fallback = self._wrap(w._fallback)
+                self.hooked = True
+
+    def mark(self, phase):
+        self.marks[phase] = pd.Timestamp.now(tz="UTC")
+
+    def _wrap(self, orig):
+        def fallback(unit, *a, **kw):
+            if not unit.replay and "_time" in unit.frame:  # a replayed batch stays in the spool: counted once
+                times = pd.to_datetime(unit.frame["_time"], utc=True)
+                post = int((times >= self.marks["post"]).sum()) if "post" in self.marks else 0
+                outage = int((times >= self.marks["outage"]).sum()) - post if "outage" in self.marks else 0
+                with self._lock:
+                    self.rows["post"] += post
+                    self.rows["outage"] += outage
+                    self.rows["pre"] += len(times) - post - outage
+            return orig(unit, *a, **kw)
+
+        return fallback
+
+
 def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     name = f"{mode}_{outage_s}s_{'spool' if spool else 'nospool'}"
     bucket = C.ensure_bucket(f"lab_sc03_{datetime.now(timezone.utc):%m%d%H%M}_{name}", env)
@@ -66,6 +103,7 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
                                              spool_dir=(spool_root / f"m{i}") if spool else None),
                            penv, writer=writer)
               for i in range(MODELS)]
+    fallbacks = _FallbackByCapture(C.writers_of(pulses))
     pool = C.frames_pool(BATCH, 20, pool=32)
     seq = [i * 100_000_000 for i in range(MODELS)]
     seq0 = list(seq)
@@ -107,6 +145,7 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     sm.start()
     time.sleep(PRE_S)
     phase["name"] = "outage"
+    fallbacks.mark("outage")
     if mode == "hang":
         proxy.down()
         proxy.hang = True
@@ -119,6 +158,7 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
     proxy.down()
     proxy.up()
     t_back = time.time()
+    fallbacks.mark("post")
     phase["name"] = "post"
     replay_s = None
     if spool:
@@ -159,7 +199,9 @@ def _case(ctx, env, proxy, outage_s, spool, mode="refuse"):
            "spool_files_max": max([t["spool_files"] for t in trace], default=0),
            "queued_max_outage": max([t["queued"] for t in trace if t["phase"] == "outage"], default=0),
            "rss_max_mb": max([t["rss_mb"] for t in trace], default=0), "replay_s": replay_s,
-           "spool_files_end": sum(s["spool_files"] for s in stats)}
+           "spool_files_end": sum(s["spool_files"] for s in stats),
+           "fallback_hooked": fallbacks.hooked,
+           **{f"fallback_rows_captured_{ph}": n for ph, n in fallbacks.rows.items()}}
     for ph in ("pre", "outage", "post"):
         row[f"p50_ms_{ph}"] = (C.pct(lat[ph], 50) or 0) * 1000
         row[f"p99_ms_{ph}"] = (C.pct(lat[ph], 99) or 0) * 1000
@@ -219,15 +261,23 @@ def run(ctx):
                       "20 float features + seq + time per row", "Spool in Parquet/Arrow (5-10x smaller) and add "
                       "max_spool_bytes with oldest-first eviction, counted as dropped", "minor")
     for r in ok:
-        lost_after = (r["dropped"] - r["dropped_during_outage"]) if not r["spool"] else (r["spooled"] - r["spooled_during_outage"])
+        # by counter: rows that reached the spool (or were dropped) after the recovery, whenever they were captured
+        by_counter = ((r["dropped"] - r["dropped_during_outage"]) if not r["spool"]
+                      else (r["spooled"] - r["spooled_during_outage"]))
+        r["fallback_rows_after_recovery_by_counter"] = by_counter
+        # by capture timestamp: rows captured after the recovery that still went to the spool or were dropped
+        lost_after = r["fallback_rows_captured_post"] if r["fallback_hooked"] else by_counter
         r["fallback_rows_after_recovery"] = lost_after
         rate = ROWS_PER_MIN / 60
         if lost_after > 2 * rate:
             ctx.limit(f"[{r['case']}] {lost_after} rows {'dropped' if not r['spool'] else 'spooled'} after the storage was "
                       f"back (about {lost_after / rate:.0f} s of traffic): the exponential retry delay keeps the storage "
                       "marked unavailable",
-                      f"during the outage {r['dropped_during_outage'] if not r['spool'] else r['spooled_during_outage']}, "
-                      f"total {r['dropped'] if not r['spool'] else r['spooled']}; max_retry_delay_s=60 (default)",
+                      f"rows captured after the recovery and {'dropped' if not r['spool'] else 'spooled'}: {lost_after}"
+                      f" (captured during the outage: {r['fallback_rows_captured_outage']}); reaching the "
+                      f"{'drop' if not r['spool'] else 'spool'} after the recovery, whatever their capture: "
+                      f"{by_counter}; "
+                      "max_retry_delay_s=60 (default)",
                       "Probe the storage (cheap /health or /ping) while in back-off instead of failing every batch until "
                       "the delay ends; cap the delay at a few seconds by default", "major" if not r["spool"] else "minor")
         if r["p99_ms_post"] >= 2 and r["p99_ms_post"] > 3 * r["p99_ms_pre"]:

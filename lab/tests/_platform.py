@@ -185,8 +185,78 @@ def proc_snapshot(proc=None) -> dict:
         conns = len(p.net_connections(kind="tcp"))
     except Exception:  # noqa: BLE001
         conns = -1
-    return {"rss_mb": p.memory_info().rss / 2**20, "threads": p.num_threads(), "fds": p.num_fds(), "tcp": conns,
+    fds = p.num_fds() if hasattr(p, "num_fds") else p.num_handles()  # Windows (local runs): handles
+    return {"rss_mb": p.memory_info().rss / 2**20, "threads": p.num_threads(), "fds": fds, "tcp": conns,
             "cpu_s": sum(p.cpu_times()[:2])}
+
+
+# ---------------------------------------------------------------- write path of pulsar_data_collection >= 0.10
+# Every Pulse writes through a Channel of a SharedWriter (its own private one by default): the storage engine's
+# write_frame is no longer called for InfluxDB (line protocol through Target.send). Instrumentation and fake storages
+# of the lab hook the Channel's Target.
+
+
+def channel_of(pulse):
+    """The 0.10 Channel of a background Pulse (shared writer: the Channel itself; private: BackgroundWriter._channel)"""
+    w = pulse._writer
+    return getattr(w, "_channel", w)
+
+
+def writers_of(pulses) -> list:
+    """The distinct SharedWriter instances behind the Pulse (one per Pulse with private writers)"""
+    out = {}
+    for p in pulses:
+        w = channel_of(p).writer
+        out[id(w)] = w
+    return list(out.values())
+
+
+def count_sends(pulses, sizes: list) -> None:
+    """Append the rows of every storage request of the Pulse to `sizes` (line protocol: one line per row)
+
+    Channels of the same client and bucket share requests: the request is sent by the first unit's Target, so every
+    request is counted once."""
+    lock = __import__("threading").Lock()
+    for p in pulses:
+        target = channel_of(p).target
+        if getattr(target, "_lab_counted", False):
+            continue
+        if target.lines:
+            def send(lines, _orig=target.send):
+                with lock:
+                    sizes.append(len(lines))
+                return _orig(lines)
+
+            target.send = send
+        else:
+            def write_frame(frame, meta, _orig=target.write_frame):
+                with lock:
+                    sizes.append(len(frame))
+                return _orig(frame, meta)
+
+            target.write_frame = write_frame
+        target._lab_counted = True
+
+
+def fake_storage(pulse, rows_per_s: float, received: list) -> None:
+    """Replace the storage request of a Pulse by a fake one absorbing `rows_per_s` rows/s (sleep), after the real
+    encoding; received = [rows, largest request, requests]. The probe answers up, so no back-off is entered."""
+    channel = channel_of(pulse)
+    target = channel.target
+    lock = __import__("threading").Lock()
+
+    def absorb(rows):
+        time.sleep(rows / rows_per_s)
+        with lock:
+            received[0] += rows
+            received[1] = max(received[1], rows)
+            received[2] += 1
+
+    if target.lines:
+        target.send = lambda lines: absorb(len(lines))
+    else:
+        target.write_frame = lambda frame, meta: absorb(len(frame))
+    target.ping = channel.endpoint.ping = lambda: True
 
 
 def pct(values, q):

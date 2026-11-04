@@ -1,7 +1,10 @@
 """SC-05 - Queue saturation and memory bound.
 
-For max_queue_rows in 1k..1M, a fresh process hosts one Pulse whose storage is replaced by a fake writer absorbing
-WRITE_RATE rows/s (so the queue is the only variable); a burst at 10x that rate is captured. Measured: RSS ceiling
+For max_queue_rows in 1k..1M, a fresh process hosts one Pulse whose storage request is replaced by a fake one absorbing
+WRITE_RATE rows/s (so the queue is the only variable); a burst at 10x that rate is captured. The fake request is
+injected at the Target of the Pulse's 0.10 Channel, after the real line-protocol encoding: replacing
+storage_engine.write_frame (as up to 0.9) is no longer called by the 0.10 write path, and every row was then dropped
+against the unreachable URL. Measured: RSS ceiling
 against the bound implied by max_queue_rows, peak queued rows, and exact drop accounting
 (captured = written + dropped + queued, written = rows the fake storage received). A last case submits one batch
 larger than max_queue_rows.
@@ -19,8 +22,13 @@ WRITE_RATE = 10_000  # rows/s absorbed by the fake storage
 BURST_FACTOR = 10
 BURST_BATCH = 500
 PARAMS = {"levels": LEVELS, "write_rate_rows_s": WRITE_RATE, "burst_factor": BURST_FACTOR, "burst_batch_rows": BURST_BATCH,
-          "features": 20, "storage": "fake writer in process (no network), InfluxDB connector code unchanged"}
-CRITERIA = {"accounting_exact_all": ("==", True), "rss_within_bound_all": ("==", True)}
+          "features": 20, "storage": "fake request in process (no network) at the Channel's Target, real encoding"}
+# writes_measured_all: the fake storage received rows at every level, otherwise the other criteria are empty (0.10
+# write path not hooked: every row dropped, as in the 2026-11-02 rerun); oversize_*: m20, a single batch above
+# max_queue_rows keeps its newest max_queue_rows rows and the rest is dropped and counted
+CRITERIA = {"accounting_exact_all": ("==", True), "rss_within_bound_all": ("==", True),
+            "writes_measured_all": ("==", True), "oversize_dropped_exact": ("==", True),
+            "oversize_write_within_bound": ("==", True)}
 
 
 def child(q: int, oversize: bool) -> dict:
@@ -30,17 +38,12 @@ def child(q: int, oversize: bool) -> dict:
     from lab.tests import _platform as C
 
     proc = psutil.Process()
-    received = [0, 0]  # rows received, largest single write
-
-    def fake_write_frame(client, frame, **kw):
-        time.sleep(len(frame) / WRITE_RATE)
-        received[0] += len(frame)
-        received[1] = max(received[1], len(frame))
+    received = [0, 0, 0]  # rows received, largest single write, requests
 
     opts = CaptureOptions(max_queue_rows=q, max_batch_rows=min(5_000, q), flush_interval_s=0.2)
     env = {"url": "http://127.0.0.1:9", "token": "none", "org": "lab"}  # unreachable on purpose: no real storage
     pulse = C.make_pulse("sc05", "lab_none", opts, env)
-    pulse.storage_engine.write_frame = fake_write_frame
+    C.fake_storage(pulse, WRITE_RATE, received)
     pool = C.frames_pool(BURST_BATCH, 20, pool=8)
     if oversize:
         pool = C.frames_pool(q * 5, 20, pool=1)
@@ -87,7 +90,8 @@ def child(q: int, oversize: bool) -> dict:
     return {"q": q, "oversize": oversize, "rows_sent": sent, "burst_s": burst_s, "burst_rows_per_s": sent / burst_s,
             "base_rss_mb": base / 2**20, "peak_rss_mb": peak[0] / 2**20, "delta_rss_mb": (peak[0] - base) / 2**20,
             "peak_queued_rows": peak[1], "captured": st["captured_rows"], "written": st["written_rows"],
-            "dropped": st["dropped_rows"], "queued_end": st["queued_rows"], "received_by_storage": received[0], "max_write_rows": received[1],
+            "dropped": st["dropped_rows"], "queued_end": st["queued_rows"], "received_by_storage": received[0],
+            "max_write_rows": received[1], "requests": received[2], "write_errors": st["write_errors"],
             "queued_mid": stats_mid["queued_rows"], "capture_p99_ms": sorted(lat)[int(0.99 * (len(lat) - 1))] * 1000,
             "bytes_per_row_estimate": 21 * 8 + 8}
 
@@ -139,12 +143,19 @@ def run(ctx):
                   "Reject or split a batch above max_queue_rows (count it as dropped) so the memory bound holds for any "
                   "batch size; document it in CaptureOptions", "minor")
     big = [r for r in rows if not r["oversize"]]
-    metrics = {"accounting_exact_all": exact_all, "rss_within_bound_all": within_all,
+    measured = all(r["received_by_storage"] > 0 for r in rows)
+    if not measured:
+        ctx.note("the fake storage received no row at some level: the write path was not hooked, the run is not a "
+                 "measurement (" + ", ".join(f"q={r['q']}: {r['received_by_storage']}" for r in rows) + ")")
+    metrics = {"accounting_exact_all": exact_all, "rss_within_bound_all": within_all, "writes_measured_all": measured,
+               "oversize_dropped_exact": over["dropped"] == over["rows_sent"] - over["q"],
+               "oversize_write_within_bound": 0 < over["max_write_rows"] <= over["q"],
                "levels": {str(r["q"]): {k: r[k] for k in ("peak_rss_mb", "delta_rss_mb", "rss_bound_mb",
                                                           "peak_queued_rows", "captured", "written", "dropped",
                                                           "bytes_per_queued_row", "burst_rows_per_s", "capture_p99_ms")}
                           for r in big},
-               "oversize_case": {k: over[k] for k in ("q", "rows_sent", "max_write_rows", "delta_rss_mb", "dropped")}}
+               "oversize_case": {k: over[k] for k in ("q", "rows_sent", "max_write_rows", "delta_rss_mb", "dropped",
+                                                      "received_by_storage")}}
     bpr = [r["bytes_per_queued_row"] for r in big if r["peak_queued_rows"] >= 10_000]
     if bpr:
         metrics["bytes_per_queued_row_median"] = sorted(bpr)[len(bpr) // 2]
