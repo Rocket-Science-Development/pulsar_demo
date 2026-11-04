@@ -37,7 +37,7 @@ automatic stop 4 h after the start. The machines are created for the rerun (tag 
 ## Before launching
 
 - Approval of the cost cap and of the stop time.
-- The 0.11.0 / 0.12.0 merge commits (`e67491a`, `cd18c94`) tagged `v0.11.0` / `v0.12.0`, and the hosts installed
+- The 0.11.0 / 0.12.0 merge commits (`e67491a`, `cd18c94`) tagged `0.11.0` / `0.12.0` (the repos tag without a `v`), and the hosts installed
   from those tags (the `environment` block records the commit and tag of each checkout).
 - An AWS Budgets alarm at the cap (recommended, not created by the lab).
 
