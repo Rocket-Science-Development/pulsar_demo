@@ -1,0 +1,14 @@
+{
+ "SC-01.v011-default": "limit-found",
+ "SC-01.v011-tuned": "limit-found",
+ "SC-02.v011-default": "limit-found",
+ "SC-02.v011-tuned": "limit-found",
+ "SC-03.v011-tuned": "passed",
+ "SC-03.v011-default": "skipped",
+ "SC-13.v011-tuned": "passed",
+ "SC-13.v011-default": "skipped",
+ "SC-05.v011-default": "passed",
+ "SC-05.v011-tuned": "skipped",
+ "SC-14.v011-default": "passed",
+ "SC-14.v011-tuned": "skipped"
+}
