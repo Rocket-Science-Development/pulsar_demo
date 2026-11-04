@@ -1,0 +1,715 @@
+{
+ "files": {
+  "NO2_2016.csv": {
+   "bytes": 8023817,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:13+00:00",
+   "sha256": "b8aebaa0f09252fa0b94cb4aec2ccaf23a0c4b985e45f29e5166845b4b33cb5a",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2016%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2016.csv"
+  },
+  "NO2_2017.csv": {
+   "bytes": 8023062,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:18+00:00",
+   "sha256": "ff57800fbd2255316bca138271f9109526241dc5e45bbb6e3479f8917e826265",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2017%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2017.csv"
+  },
+  "NO2_2018.csv": {
+   "bytes": 8069798,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:23+00:00",
+   "sha256": "2e501d9252233ce1a129d4318d8b0870c679c257ce95c9fd5b3505c36d7ed3e9",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2018%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2018.csv"
+  },
+  "NO2_2019.csv": {
+   "bytes": 8165625,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:27+00:00",
+   "sha256": "e3a3d7478563e77ec95c677405032e262d20c638eaffc8d49a5957f1922782bf",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2019%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2019.csv"
+  },
+  "NO2_2020.csv": {
+   "bytes": 8035286,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:32+00:00",
+   "sha256": "8681276a2da4cbc18ff4f9f0e7699be7239798f4f4539ca69fd9993699d68a6d",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2020%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2020.csv"
+  },
+  "NO2_2021.csv": {
+   "bytes": 8078395,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/1b36a356-defd-4813-acea-47bc3abd859b",
+   "retrieved": "2026-11-04T19:24:37+00:00",
+   "sha256": "7d68a826d727c35fd7cad9e850d9eda41ecbb4578886f19462461fa3faf030d8",
+   "source": "naps",
+   "url": "https://data-donnees.az.ec.gc.ca/api/file?path=%2Fair%2Fmonitor%2Fnational-air-pollution-surveillance-naps-program%2FData-Donnees%2F2021%2FContinuousData-DonneesContinu%2FHourlyData-DonneesHoraires%2FNO2_2021.csv"
+  },
+  "registre_ia.csv": {
+   "bytes": 687081,
+   "licence": "Open Government Licence - Canada",
+   "licence_url": "https://open.canada.ca/data/dataset/fcbc0200-79ba-4fa4-94a6-00e32facea6b",
+   "retrieved": "2026-11-04T19:25:10+00:00",
+   "sha256": "de0a5d2961fac0fb81c0c552104c21bea2c87a0b9c18ad58e2380199b4bfb313",
+   "source": "register",
+   "url": "https://open.canada.ca/data/dataset/fcbc0200-79ba-4fa4-94a6-00e32facea6b/resource/369f6f34-148a-42ed-b581-8c164e941a89/download/gc-ai-register-mvp-registre-de-lia-du-gc-pmv-04-26.csv"
+  },
+  "yul_2016_01.csv": {
+   "bytes": 139908,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:37+00:00",
+   "sha256": "7aacef0f9bcca962f0d66f5a7de81931b5c808e4e99e3673adca556789d388ff",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_02.csv": {
+   "bytes": 131386,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:38+00:00",
+   "sha256": "395fbca7fa7cd3fd291e9bc010cead8d074ecce15cebf26554b6b18d9fb12932",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_03.csv": {
+   "bytes": 138079,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:38+00:00",
+   "sha256": "9edc6576cd997fdfc3ce44927dc73438abfedc2a5d6a46805b4c6d4632d026ae",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_04.csv": {
+   "bytes": 133034,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:39+00:00",
+   "sha256": "7eba388c21560bac3c863cf0c0b0d9f356a893dbfa935db6bb222eb683416ceb",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_05.csv": {
+   "bytes": 137046,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:39+00:00",
+   "sha256": "a92d18c6f37d1a45e69ce513b878b8a322050e6e4600164850b8a0860dea7b0b",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_06.csv": {
+   "bytes": 133281,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:39+00:00",
+   "sha256": "cc94671565957a3afa7f387055fefabf6b0d5184c877881c53392f5e77363245",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_07.csv": {
+   "bytes": 139043,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:40+00:00",
+   "sha256": "8028aba9802458f1b09845fcdad23e4372377483da529bc482355c398c328d29",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_08.csv": {
+   "bytes": 138923,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:40+00:00",
+   "sha256": "944fa6f3ad014b4523915bbc9c63475c1266290c78c8890069728ee8c9743fc6",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_09.csv": {
+   "bytes": 133037,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:41+00:00",
+   "sha256": "eef817c6991f1233f2574899783cbad789fe6bf2e678d030ee668d1c295efe9b",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_10.csv": {
+   "bytes": 136711,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:41+00:00",
+   "sha256": "5b2ed4ab2d602ae23dfda2f42fb8e55eace2ea1e67a14f6b257374de7c337868",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_11.csv": {
+   "bytes": 132308,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:42+00:00",
+   "sha256": "535a106b3444ec44957464fce67a1a9438a4b4854808e46187d6d18f48a1f737",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2016_12.csv": {
+   "bytes": 139434,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:42+00:00",
+   "sha256": "3141b5a5b242fb504d42b7651bb188be9ca2eb4e736dd918ac1ccc7e1b26969d",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2016&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_01.csv": {
+   "bytes": 139673,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:42+00:00",
+   "sha256": "722b24ca592604e4ba96863fb2df97a486d7c515637304a888446cf3a81ab487",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_02.csv": {
+   "bytes": 125812,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:43+00:00",
+   "sha256": "2f592168d2115d25b46362887acb24689890105b71f47c760aceab035b1237e6",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_03.csv": {
+   "bytes": 139615,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:43+00:00",
+   "sha256": "ef624f64db77c5378bb5fa749e2f1046b95a443d9c56b92beb8e1cd4605e2427",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_04.csv": {
+   "bytes": 132207,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:43+00:00",
+   "sha256": "62dcc6c0baf0981594c34923d62aa960c3e3593530333b988ecfd868e2b2dda3",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_05.csv": {
+   "bytes": 136992,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:44+00:00",
+   "sha256": "da4637880d4a7ad1b08416eb6b43c0e273cbe279cf157ad055db5ce7fb04fe1a",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_06.csv": {
+   "bytes": 133560,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:44+00:00",
+   "sha256": "c4cd71e866d305de0d580c17c9319c299bbb7907f66c62d83ad0b96e0bb7d904",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_07.csv": {
+   "bytes": 138521,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:45+00:00",
+   "sha256": "661eac73ddfb6d9255d3a87c29edd0476e3b4a94f4420ef4f5c5d5d0cdf030e0",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_08.csv": {
+   "bytes": 138322,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:45+00:00",
+   "sha256": "692901df9862ea2963581d0d7a2ed84d9f870a7e69e632e2d0c8f3bc5f53f08f",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_09.csv": {
+   "bytes": 133113,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:45+00:00",
+   "sha256": "ae037a0c63a4cb0732d18542d2a53e37d01ea86f24127c38c8a237ce2c32c1d3",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_10.csv": {
+   "bytes": 136974,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:46+00:00",
+   "sha256": "e1e13e83c25a46d265fbcb2d910ad6e738cee7b4d4eed8597d877a2c3ef0b553",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_11.csv": {
+   "bytes": 133065,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:46+00:00",
+   "sha256": "680f40c513b47baa31c0fddf9bea586202e06c82e23a19afe9ae22cf9b89cab5",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2017_12.csv": {
+   "bytes": 140627,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:46+00:00",
+   "sha256": "6fa8f72b4487695c0c0e815754198e1c1fafde44a2a1e47ac49d220966affa2a",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2017&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_01.csv": {
+   "bytes": 141354,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:47+00:00",
+   "sha256": "0fdd7a4ad8dd134bd045342d5c382181d19dbc0b4c10e4e3c9d0a11e5706c42a",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_02.csv": {
+   "bytes": 125961,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:47+00:00",
+   "sha256": "0e62ee1500feffc42b8f58b0c00af8fb5fe6fb17b88f2c3ca0757eda5c32b5f1",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_03.csv": {
+   "bytes": 137986,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:48+00:00",
+   "sha256": "a76dece7655c353d469e2908d794e03a14598ff506a1afa2c619f8a4b19a2a9c",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_04.csv": {
+   "bytes": 133154,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:48+00:00",
+   "sha256": "0bc2cb4f3d5ecb143e7ff0bdb1bd7e0f3e16aa0a79436dbae7e22e6f2af288d2",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_05.csv": {
+   "bytes": 137128,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:48+00:00",
+   "sha256": "669c098c4083a1b75d7d382006a341771e823fad6a20c98210280720c39f7925",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_06.csv": {
+   "bytes": 133348,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:49+00:00",
+   "sha256": "6ee895a3de17330e7135b544c25ee75399d1d1ce52a79cf331249890724393f0",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_07.csv": {
+   "bytes": 138604,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:49+00:00",
+   "sha256": "b685beac4ec9658fb98915d077bf14a8faaf45846b1c7bfa9b196b0ba161f985",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_08.csv": {
+   "bytes": 138868,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:50+00:00",
+   "sha256": "5d9698e1dab3aad735f87f37d071c8335592bcbb7473606fb5ac033d0457002a",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_09.csv": {
+   "bytes": 133185,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:50+00:00",
+   "sha256": "3bcd21ce92a743436b75d247fefd9b93943c5528986fd5c733fe1777fe671a23",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_10.csv": {
+   "bytes": 136836,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:50+00:00",
+   "sha256": "7993af53c8d1f8a69604a84b5167f2ea6e757a610ba4dc1d6713eab19b4f32fc",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_11.csv": {
+   "bytes": 133587,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:51+00:00",
+   "sha256": "93eac44c7a23e00fccd4e05165912718866174262b39218eace64ace4e58d5b0",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2018_12.csv": {
+   "bytes": 138872,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:51+00:00",
+   "sha256": "417532676f045840d6f35a6c232524f6e3373db4d503e7bbe6d6c7de4acc0bc5",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2018&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_01.csv": {
+   "bytes": 143066,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:52+00:00",
+   "sha256": "10b0993e18fbb340cb9ce57d4903d533ae9d122f26842dfe577d022403465414",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_02.csv": {
+   "bytes": 128220,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:52+00:00",
+   "sha256": "b84cffa546c79742766e6abcf855aac6db6be30d56c43d66d87542fe97febe4b",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_03.csv": {
+   "bytes": 138825,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:52+00:00",
+   "sha256": "6106d6faacec526ca0a6ff10e021c54d7f3ec39a79111970dcd03b7080675797",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_04.csv": {
+   "bytes": 132526,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:53+00:00",
+   "sha256": "73979f51d3c82ae5bc63b4ad1d456200c66a5e3409b5595088873d47ca12d0dc",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_05.csv": {
+   "bytes": 136602,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:53+00:00",
+   "sha256": "924b95a6318a4c0a35868ba5b1b71e93b40272166cbbebca3c9cdae06ccacf3b",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_06.csv": {
+   "bytes": 133192,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:53+00:00",
+   "sha256": "a5583e69dd8ad42f0fd3c071ec018f9707425518386eb56670f1e1bbd387cdd0",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_07.csv": {
+   "bytes": 138703,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:54+00:00",
+   "sha256": "8653517ffa1e14126bfd8cde4c7a01966b89de83cfce1ed7a86ae1dc3cee18af",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_08.csv": {
+   "bytes": 138062,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:54+00:00",
+   "sha256": "f1785ce2f5cb48c33404c67b646548d21a43104a94528b89c3829f39760a6f7e",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_09.csv": {
+   "bytes": 132831,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:55+00:00",
+   "sha256": "52518adc68d8158883452577e1ae720b3c64f2cf6d8e0602e8699cfe96f07cb1",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_10.csv": {
+   "bytes": 136604,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:55+00:00",
+   "sha256": "37e3a9cbca1683705c5e05439f129368f15aec56f198135de6d6e28edad0504a",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_11.csv": {
+   "bytes": 134068,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:55+00:00",
+   "sha256": "60592ec29b75496356baae26467f1280428ef20931adde15bcb4a693a0706776",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2019_12.csv": {
+   "bytes": 139767,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:56+00:00",
+   "sha256": "d5e496bc35727657b67513a83cd255c99b5d0d79bca33042ed6a7bc9d7096697",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2019&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_01.csv": {
+   "bytes": 139435,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:56+00:00",
+   "sha256": "e2f6243acf4a383cdefb7bc0a43a5395e79f6bc585ca41f787e7dca61d737ba6",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_02.csv": {
+   "bytes": 132176,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:57+00:00",
+   "sha256": "a7139ca3b53124815b3f74ed863eac885c60470cca34c2f7be8b12d90550a618",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_03.csv": {
+   "bytes": 137841,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:57+00:00",
+   "sha256": "20e405d44c497ef2f3db595178c902298b56be35d6d624f8ff5b59dfd0f51be9",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_04.csv": {
+   "bytes": 132464,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:57+00:00",
+   "sha256": "51e696a09fa7b963a033f4a50dafaafccb1cf49dd8144ca3f010fef9ece94b1e",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_05.csv": {
+   "bytes": 137179,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:58+00:00",
+   "sha256": "b7b446db74d22a6920c578ad8a995efbece28e407a7579dfb19df7d2569f91f2",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_06.csv": {
+   "bytes": 133337,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:58+00:00",
+   "sha256": "5a11c5cb115d460e4bca0cc0c0d286c5c4b52edd83d878af3b7c965a9312e803",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_07.csv": {
+   "bytes": 139046,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:58+00:00",
+   "sha256": "8fc595f2c710c212ad1a621cb2336317e119591891386f6bfac134f7763ac172",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_08.csv": {
+   "bytes": 138399,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:59+00:00",
+   "sha256": "198fec4ba41e2d7c9f2af32bb8e1be00a38dafd94d60aa9497d97add0ec2be1c",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_09.csv": {
+   "bytes": 132807,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:24:59+00:00",
+   "sha256": "911906002ba34799f7590f0ea4cc56315f6afd1594df2378784f1b6d626c0421",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_10.csv": {
+   "bytes": 136779,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:00+00:00",
+   "sha256": "3d05d09fcd6b267876a59e50ee2e0bb0c6f049623e0b46f791074d1a1d9d383f",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_11.csv": {
+   "bytes": 132818,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:00+00:00",
+   "sha256": "eb306438eee982ce2579f31807d3ab6b694e4b4bee177bd389b47c00f1f4e897",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2020_12.csv": {
+   "bytes": 138285,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:00+00:00",
+   "sha256": "8445ffe3ed4669b0199bb25b687132aee34b73829f5e70a81b1a121532c58d62",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2020&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_01.csv": {
+   "bytes": 140139,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:01+00:00",
+   "sha256": "8219d3ba0e9a77508dc3522f61df3dbebc619e1dbf6d67b5343451ed72b5b57b",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=1&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_02.csv": {
+   "bytes": 127843,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:05+00:00",
+   "sha256": "c188e1b6050670a6036627e158e428c8571a00c5396895962b317b05c6938d11",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=2&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_03.csv": {
+   "bytes": 138375,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:05+00:00",
+   "sha256": "049dae7252a8c71651382bd8afb70ae8de7f049cc794d4b1ea69f4119005a714",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=3&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_04.csv": {
+   "bytes": 132225,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:05+00:00",
+   "sha256": "71559703f5f4753705a331269e50d80846cd639503e9b35ef35021238ec2835c",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=4&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_05.csv": {
+   "bytes": 137149,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:06+00:00",
+   "sha256": "56205bc47a496fe176bfb823316254d3e8ba21a6e34e68f004daef833d4b9091",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=5&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_06.csv": {
+   "bytes": 133874,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:06+00:00",
+   "sha256": "b5bf22c333883e4c9b205eb7c999cab66e12a5d618b71c8a09dbdd0a75ef42eb",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=6&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_07.csv": {
+   "bytes": 138167,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:06+00:00",
+   "sha256": "412524310e587c28e760cda3d70a5bf353e9b434f7a2232a83a505fde4564d87",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=7&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_08.csv": {
+   "bytes": 138626,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:07+00:00",
+   "sha256": "290d9b76cbcef785c14bb832f3a1e3319d6a415326dcd153e7ff797f1f138d14",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=8&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_09.csv": {
+   "bytes": 133434,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:07+00:00",
+   "sha256": "063a223ac34ad4596ea6a396c93e367d6a85534985c5736411452b3c38ea73f8",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=9&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_10.csv": {
+   "bytes": 136437,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:07+00:00",
+   "sha256": "8695d609250caf67ea30e8de801e4acdecc6855f3b3947ed3acf313d98177541",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=10&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_11.csv": {
+   "bytes": 132552,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:08+00:00",
+   "sha256": "886c76be05d13d9adb284736def5ed44cd9891b43f0b378633094de76291ecdf",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=11&Day=1&timeframe=1&submit=Download+Data"
+  },
+  "yul_2021_12.csv": {
+   "bytes": 139170,
+   "licence": "Environment and Climate Change Canada Data Servers End-use Licence",
+   "licence_url": "https://eccc-msc.github.io/open-data/licence/readme_en/",
+   "retrieved": "2026-11-04T19:25:08+00:00",
+   "sha256": "6fcd6856ea9a4774097908c969983076b2f3976642086dba6f49795daf7bb0f2",
+   "source": "climate",
+   "url": "https://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv&stationID=51157&Year=2021&Month=12&Day=1&timeframe=1&submit=Download+Data"
+  }
+ }
+}
