@@ -50,6 +50,31 @@ from(bucket: "monitoring")
   |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
 ```
 
+## Concurrency
+
+Ollama serves `OLLAMA_NUM_PARALLEL` requests at once (decoding slots). The compose file sets it explicitly to 4,
+with `OLLAMA_MAX_LOADED_MODELS=1` and a 4096 context. Left unset, Ollama picks 4 or 1 slots from the free memory. With
+1 slot, extra workers only queue: the agent stays near 50 runs/min and the latency grows. Keep the agent's worker pool
+(`--workers` of `campaign_s3s4.py`) equal to the number of slots: fewer workers leave slots idle, more workers only
+queue at the server.
+
+Measured on a T4 (15 GB), context 4096, temperature 0, workers = slots (lab SC-10, 2026-11-02). Runs/min, with the
+p95 run latency in brackets:
+
+| Model | 1 slot | 4 slots | 16 slots | 1 slot, 16 workers | Loaded size, 1 → 16 slots |
+|---|---|---|---|---|---|
+| `llama3.2:3b` | 42.4 (2.7 s) | **83.2** (6.2 s) | 146.4 (12.7 s) | 51.2 (21.8 s) | 2.4 → 9.2 GB |
+| `granite3.3:2b` | 48.8 (2.6 s) | **107.2** (4.8 s) | 207.2 (10.1 s) | 48.8 (32.7 s) | 1.9 → 6.9 GB |
+| `llama3.1:8b` | 16.0 (10.7 s) | 44.0 (15.3 s) | **75.2** (29.5 s) | 26.4 (48.9 s) | 5.0 → 12.7 GB |
+
+- Latency-bounded setting (the most slots whose p95 stays within 3 times the p95 of a single worker): 4 slots for
+  `llama3.2:3b` and `granite3.3:2b`, 16 for `llama3.1:8b`.
+- For throughput (batch campaigns), 16 slots or more: 146 / 207 / 75 runs/min, against 51 / 49 / 26 with 1 slot.
+- Every slot reserves its own KV cache (context 4096) in VRAM, on top of the weights: `llama3.1:8b` at 16 slots takes
+  12.7 GB of the T4's 15 GB. A longer context or more slots can push the model partly to the CPU, which is much slower;
+  check `ollama ps` (100 % GPU) after changing either.
+- These values hold for a T4 and a 4096 context; measure again on another GPU.
+
 ## Drift campaign
 
 `campaign.py` runs a calibrated drift study: 300 reference runs, a 60-run holdout (control), then three injected
