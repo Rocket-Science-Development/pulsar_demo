@@ -5,6 +5,7 @@ Signals, each phase cut into consecutive windows of `--window` runs and compared
 | Signal | Source | Test |
 |---|---|---|
 | trajectory and scores | `agent_run` records read back from InfluxDB: steps, tool calls, tokens, latency, best retrieval score, empty retrievals, faithfulness (NLI), first tool, termination, task success | the S2 analysis of `genai_agent/analyze_drift.py`: chi2 / ks_2samp calibrated by A/A draws on the reference, Benjamini-Hochberg, confirmation over 2 windows |
+| retrieval quality | the same records: faithfulness and best retrieval score | one-sided Mann-Whitney (lower in the window), as in the S3 analysis of `genai_agent/analyze_s3s4.py`, confirmation over 2 windows |
 | request embeddings | `embeddings.npy` (nomic-embed-text) | MMD permutation test (pulsar_metrics.genai.mmd_test), confirmation over 2 windows |
 | model identity | canary set (CanaryProbe) | model equality test (pulsar_metrics.genai.model_equality_test) |
 | accuracy | agreement with the register (known answers; an evaluation, not a production signal) | Clopper-Pearson 95 % intervals |
@@ -12,6 +13,7 @@ Signals, each phase cut into consecutive windows of `--window` runs and compared
 The `det_eval_correct` and `det_target_retrieved` fields need the known answers: they are reported, never monitored.
 
     python rag_analyze.py --env-file ../../validation_e2e/.env --campaign registre-gc-1 --window 8
+    python rag_analyze.py --env-file ../../validation_e2e/.env --campaign registre-gc-1 --window 20  # no S2 part
 """
 
 import argparse
@@ -22,13 +24,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.stats import beta
+from scipy.stats import beta, mannwhitneyu
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "genai_agent"))
 
 import analyze_drift  # noqa: E402
 from pulsar_data_collection.genai import CanaryProbe  # noqa: E402
+from pulsar_metrics.exceptions import CustomExceptionPulsarMetric  # noqa: E402
 from pulsar_metrics.genai import mmd_test, model_equality_test  # noqa: E402
 
 from influx_env import load_env, query  # noqa: E402
@@ -54,6 +57,8 @@ def load_records(login: dict, campaign: str) -> pd.DataFrame:
       |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
     """
     frame = query(login, flux).rename(columns={"_time": "pred_timestamp"})
+    # prepare() fills missing numbers with 0; the one-sided tests below keep runs without a faithfulness score aside
+    frame["faithfulness_scored"] = pd.to_numeric(frame.get("det_faithfulness"), errors="coerce")
     return analyze_drift.prepare(frame)
 
 
@@ -83,7 +88,32 @@ def main(argv=None):
     analyze_drift.MODEL_ID, analyze_drift.MODEL_VERSION = MODEL_ID, MODEL_VERSION
     analyze_drift.NUMERIC[:], analyze_drift.CATEGORICAL[:] = NUMERIC, CATEGORICAL
     records = load_records(login, args.campaign)
-    drift = analyze_drift.analyze(records, window=args.window, alpha=args.alpha, persistence=2)
+    try:
+        drift = analyze_drift.analyze(records, window=args.window, alpha=args.alpha, persistence=2)
+    except (ValueError, CustomExceptionPulsarMetric) as error:  # the A/A calibration needs 10 reference windows (80 runs: windows of 8 at most)
+        drift = {"error": str(error), "phases": {}, "window": args.window, "alpha": args.alpha, "persistence": 2,
+                 "reference_runs": int((records["scenario"] == "reference").sum())}
+
+    # 1b. retrieval quality: one-sided tests on the two scores meant for it (the S2 analysis tests 11 features
+    # two-sided, after Benjamini-Hochberg: little power for a drop of one score in windows of 8 runs)
+    targeted = {}
+    reference = records[records["scenario"] == "reference"]
+    for phase in [p for p in dict.fromkeys(records["scenario"]) if p != "reference"]:
+        frame = records[records["scenario"] == phase]
+        windows = list(analyze_drift.windows_of(frame, args.window))
+        targeted[phase] = {}
+        for score in ("det_faithfulness", "det_retrieval_top"):
+            column = "faithfulness_scored" if score == "det_faithfulness" else score
+            ref_values = reference[column].dropna()
+            p_values = [float(mannwhitneyu(w[column].dropna(), ref_values, alternative="less").pvalue)
+                        if w[column].notna().sum() >= 3 else 1.0 for w in windows]
+            flags = [p < args.alpha for p in p_values]
+            targeted[phase][score] = {
+                "p_values": [round(p, 4) for p in p_values], "windows_flagged": sum(flags),
+                "first_flag": next((k for k, f in enumerate(flags, 1) if f), None), "first_confirmed": first_streak(flags),
+                "mean_window": round(float(frame[column].mean()), 3), "mean_reference": round(float(ref_values.mean()), 3),
+                "scored_runs": int(frame[column].notna().sum()),
+            }
 
     # 2. request embeddings: MMD of every window against the reference
     runs = [json.loads(line) for line in open(results / "runs.jsonl", encoding="utf-8")]
@@ -127,10 +157,15 @@ def main(argv=None):
         accuracy[phase] = entry
 
     report = {"campaign": args.campaign, "window": args.window, "alpha": args.alpha, "records_read": len(records),
-              "runs_logged": len(runs), "drift": drift, "mmd": mmd, "canary": canary, "accuracy": accuracy}
-    (results / "analysis.json").write_text(json.dumps(report, indent=1, default=str), encoding="utf-8")
+              "runs_logged": len(runs), "drift": drift, "retrieval_quality": targeted, "mmd": mmd, "canary": canary, "accuracy": accuracy}
+    (results / f"analysis_w{args.window}.json").write_text(json.dumps(report, indent=1, default=str), encoding="utf-8")
 
-    lines = [analyze_drift.markdown(drift), "", "MMD of the request embeddings (windows flagged, first flag, first confirmed):", "",
+    lines = [drift.get("error") or analyze_drift.markdown(drift), "", "Retrieval quality, one-sided Mann-Whitney (windows flagged, first flag, "
+             "first confirmed):", "", "| Phase | Faithfulness | Best retrieval score |", "|---|---|---|"]
+    lines += [f"| {p} | " + " | ".join(f"{v[s]['windows_flagged']} / {len(v[s]['p_values'])}, {v[s]['first_flag'] or '-'}, "
+                                       f"{v[s]['first_confirmed'] or '-'}" for s in ("det_faithfulness", "det_retrieval_top"))
+              + " |" for p, v in targeted.items()]
+    lines += ["", "MMD of the request embeddings (windows flagged, first flag, first confirmed):", "",
              "| Phase | Windows flagged | First flag | First confirmed |", "|---|---|---|---|"]
     lines += [f"| {p} | {v['windows_flagged']} / {len(v['p_values'])} | {v['first_flag'] or '-'} | {v['first_confirmed'] or '-'} |"
               for p, v in mmd.items()]
@@ -139,7 +174,7 @@ def main(argv=None):
     lines += [f"| {p} | {v['runs']} | {v['accuracy']:.2f} [{v['ci95'][0]:.2f}, {v['ci95'][1]:.2f}] | "
               f"{v['target_retrieved']:.2f} | {v['mean_seconds']} |" for p, v in accuracy.items()]
     text = "\n".join(lines) + "\n"
-    (results / "analysis.md").write_text(text, encoding="utf-8")
+    (results / f"analysis_w{args.window}.md").write_text(text, encoding="utf-8")
     print(text)
     return 0
 
