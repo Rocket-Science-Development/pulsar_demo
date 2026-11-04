@@ -135,6 +135,16 @@ def check(metrics: dict, criteria: dict) -> dict:
     return {m: (m in metrics and metrics[m] is not None and ops[op](metrics[m], v)) for m, (op, v) in criteria.items()}
 
 
+def _environment() -> dict:
+    """Exact environment of the run (lab/environment.py); never fails a test"""
+    try:
+        from lab import environment
+
+        return environment.collect()
+    except Exception as exc:  # noqa: BLE001 - the result is still written without it
+        return {"error": f"{type(exc).__name__}: {exc}"}
+
+
 def run_test(test_id: str, fn: Callable[[Context], dict], criteria: Optional[dict] = None, env: str = "local",
              params: Optional[dict] = None) -> dict:
     RESULTS.mkdir(parents=True, exist_ok=True)
@@ -160,6 +170,7 @@ def run_test(test_id: str, fn: Callable[[Context], dict], criteria: Optional[dic
         "started": started.isoformat(timespec="seconds"), "seconds": round(seconds, 1), "params": ctx.params,
         "metrics": metrics, "criteria": {k: list(v) for k, v in (criteria or {}).items()}, "checks": checks,
         "limits": [asdict(x) for x in ctx.limits], "notes": ctx.notes, "health": health.summary(), "error": error,
+        "environment": _environment(),
     }
     (RESULTS / f"{name}.json").write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
     print(f"{name}: {status} in {seconds:.0f} s; {len(ctx.limits)} limit(s)", flush=True)
