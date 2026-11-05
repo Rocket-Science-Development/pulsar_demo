@@ -69,9 +69,15 @@ class Record:
         return self.values["_time"]
 
 
+class Column:
+    def __init__(self, label, data_type):
+        self.label, self.data_type = label, data_type
+
+
 class Table:
-    def __init__(self, records):
+    def __init__(self, records, value_type="long"):
         self.records = records
+        self.columns = [Column("_measurement", "string"), Column("_field", "string"), Column("_value", value_type)]
 
 
 class FakeClient:
@@ -139,14 +145,16 @@ class BackfillQuantiles(unittest.TestCase):
     def test_bounded_per_run_oldest_first(self):
         calls = []
         gaps = {("a", "1.0"): [at(h) for h in (1, 2, 3, 10, 11)], ("b", "1.0"): []}
-        original = job.find_quantile_gaps, job.aggregate_quantiles
+        original = job.find_quantile_gaps, job.aggregate_quantiles, job.numeric_features
+        job.numeric_features = lambda client, conn, models, features, *a: ({m: features for m in models},
+                                                                           {m: [] for m in models})
         job.find_quantile_gaps = lambda *args, **kw: gaps
         job.aggregate_quantiles = lambda client, conn, sink, m, v, a, b, features, chunk: (
             calls.append((m, a, b)) or {"rows": 1, "points": 2, "requests": 1, "read_s": 0, "compute_s": 0, "write_s": 0})
         try:
             out = job.backfill_quantiles(None, CONN, None, list(gaps), ["income"], at(0), at(24), max_hours=4)
         finally:
-            job.find_quantile_gaps, job.aggregate_quantiles = original
+            job.find_quantile_gaps, job.aggregate_quantiles, job.numeric_features = original
         self.assertEqual(calls, [("a", at(0), at(3)), ("a", at(9), at(10))])
         self.assertEqual((out["gap_hours"], out["hours"], out["remaining"], out["points"]), (5, 4, 1, 4))
 
@@ -154,6 +162,84 @@ class BackfillQuantiles(unittest.TestCase):
         client = FakeClient()
         out = job.backfill_quantiles(client, CONN, None, [("a", "1")], ["x"], at(5), at(5))
         self.assertEqual((client.queries, out["hours"]), ([], 0))
+
+
+def last_value(model, field, value, value_type):
+    return Table([Record("_result", at(0), value, _measurement=f"{model}_1.0_input_data", _field=field)], value_type)
+
+
+class NonNumericFeatures(unittest.TestCase):
+    """Features stored as text or boolean are left out once per run, with one warning, instead of being seen as a gap
+    (their raw values are counted, never aggregated) and re-aggregated at every run"""
+
+    TYPES = [last_value("a", "income", 1.5, "double"), last_value("a", "age", 30, "long"),
+             last_value("a", "region", "Québec", "string"), last_value("a", "flag", True, "boolean"),
+             last_value("b", "income", 2.5, "double"), last_value("b", "age", "trente", "string"),
+             last_value("b", "region", "Montréal", "string"), last_value("b", "flag", 1, "unsignedLong")]
+
+    def test_split_by_stored_type_in_one_query(self):
+        client = FakeClient(self.TYPES)
+        numeric, excluded = job.numeric_features(client, CONN, [("a", "1.0"), ("b", "1.0"), ("c", "1.0")],
+                                                 ["income", "age", "region", "flag"], at(0), at(24))
+        self.assertEqual(len(client.queries), 1)
+        self.assertIn("|> last()", client.queries[0])
+        self.assertEqual(numeric, {("a", "1.0"): ["income", "age"], ("b", "1.0"): ["income", "flag"],
+                                   ("c", "1.0"): ["income", "age", "region", "flag"]})  # c: no value, no gap
+        self.assertEqual(excluded, {("a", "1.0"): ["region", "flag"], ("b", "1.0"): ["age", "region"],
+                                    ("c", "1.0"): []})
+
+    def test_a_field_numeric_in_one_shard_and_text_in_another_is_left_out(self):
+        tables = [last_value("a", "age", 30, "long"), last_value("a", "age", "30", "string")]
+        numeric, excluded = job.numeric_features(FakeClient(tables), CONN, [("a", "1.0")], ["age"], at(0), at(1))
+        self.assertEqual((numeric, excluded), ({("a", "1.0"): []}, {("a", "1.0"): ["age"]}))
+
+    def test_one_warning_naming_the_features_and_models(self):
+        line = job.excluded_warning({("a", "1.0"): ["region", "flag"], ("b", "1.0"): ["region"]})
+        self.assertEqual(len(line.splitlines()), 1)
+        self.assertIn("region (a:1.0, b:1.0)", line)
+        self.assertIn("flag (a:1.0)", line)
+        many = job.excluded_warning({(f"m{i}", "1"): ["region"] for i in range(300)})
+        self.assertIn("region (m0:1, m1:1, m2:1 and 297 more)", many)
+        self.assertEqual(job.excluded_warning({("a", "1.0"): []}), "")
+
+    def test_backfill_leaves_them_out_of_detection_and_aggregation(self):
+        import contextlib
+        import io
+
+        detected, aggregated = [], []
+        original = job.find_quantile_gaps, job.aggregate_quantiles
+        job.find_quantile_gaps = lambda client, conn, models, features, start, stop: (
+            detected.append((models, features)) or {m: [at(1)] for m in models})
+        job.aggregate_quantiles = lambda client, conn, sink, m, v, a, b, features, chunk: (
+            aggregated.append((m, features)) or {"rows": 1, "points": 1, "requests": 1, "read_s": 0, "compute_s": 0,
+                                                 "write_s": 0})
+        printed = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(printed):
+                out = job.backfill_quantiles(FakeClient(self.TYPES), CONN, None, [("a", "1.0"), ("b", "1.0")],
+                                             ["income", "age", "region", "flag"], at(0), at(24))
+        finally:
+            job.find_quantile_gaps, job.aggregate_quantiles = original
+        self.assertEqual(detected, [([("a", "1.0")], ["income", "age"]), ([("b", "1.0")], ["income", "flag"])])
+        self.assertEqual(aggregated, [("a", ["income", "age"]), ("b", ["income", "flag"])])
+        self.assertEqual(out["excluded"], {("a", "1.0"): ["region", "flag"], ("b", "1.0"): ["age", "region"]})
+        lines = printed.getvalue().splitlines()
+        self.assertEqual(len(lines), 1)
+        self.assertTrue(lines[0].startswith("warning: not stored as numbers"))
+
+    def test_models_with_the_same_numeric_features_share_one_gap_query(self):
+        tables = [last_value(f"m{i}", "region", "x", "string") for i in range(300)]
+        detected = []
+        original = job.find_quantile_gaps
+        job.find_quantile_gaps = lambda client, conn, models, features, start, stop: (
+            detected.append((len(models), features)) or {m: [] for m in models})
+        try:
+            with __import__("contextlib").redirect_stdout(__import__("io").StringIO()):
+                job.backfill_quantiles(FakeClient(tables), CONN, None, [(f"m{i}", "1.0") for i in range(300)],
+                                       ["income", "region"], at(0), at(24))
+        finally:
+            job.find_quantile_gaps = original
+        self.assertEqual(detected, [(300, ["income"])])
 
 
 class ParseModels(unittest.TestCase):
@@ -168,7 +254,8 @@ class ParseModels(unittest.TestCase):
 class BackfillAgainstInfluxDB(unittest.TestCase):
     """Captures of 6 closed hours and of the current hour, 2 hours aggregated beforehand: the backfill aggregates the
     4 others (2 per run with max_hours=2), never the current hour, writes nothing on a rerun, and re-aggregates an
-    hour that receives a late row."""
+    hour that receives a late row. The captures also hold a text field and a boolean field: asked as features, they
+    are left out (they would otherwise be a gap at every run)."""
 
     FEATURES = ["income", "age"]
 
@@ -194,7 +281,7 @@ class BackfillAgainstInfluxDB(unittest.TestCase):
             for i in range(12):
                 rows.append({"pred_timestamp": cls.start + h * H + timedelta(seconds=1 + i * (299 if h < 6 else 1)),
                              "income": float(rng.lognormal(10, 0.4)), "age": float(rng.integers(18, 80)),
-                             "region": str(rng.choice(["Montréal", "Québec"]))})
+                             "region": str(rng.choice(["Montréal", "Québec"])), "flag": bool(rng.random() < 0.5)})
         cls.rows = pd.DataFrame(rows)
         cls.write_rows(cls.rows)
 
@@ -202,7 +289,7 @@ class BackfillAgainstInfluxDB(unittest.TestCase):
     def write_rows(cls, frame):
         points = [cls.Point(job.captures(cls.model, cls.version)).tag("model_id", cls.model).time(r["pred_timestamp"])
                   .field("income", r["income"]).field("age", r["age"]).field("region", r["region"])
-                  for r in frame.to_dict("records")]
+                  .field("flag", r["flag"]) for r in frame.to_dict("records")]
         cls.writer.write(bucket=cls.conn["bucket"], record=points)
 
     @classmethod
@@ -242,6 +329,15 @@ class BackfillAgainstInfluxDB(unittest.TestCase):
         again = self.backfill()
         self.assertEqual((again["gap_hours"], again["points"], again["rows"]), (0, 0, 0))
 
+        asked = self.FEATURES + ["region", "flag"]
+        unguarded = job.find_quantile_gaps(self.client, self.conn, models, asked, self.stop - 24 * H, self.stop)
+        self.assertEqual(unguarded[models[0]], ends)  # their values are counted, never aggregated
+        numeric, excluded = job.numeric_features(self.client, self.conn, models, asked, self.stop - 24 * H, self.stop)
+        self.assertEqual((numeric[models[0]], excluded[models[0]]), (self.FEATURES, ["region", "flag"]))
+        guarded = job.backfill_quantiles(self.client, self.conn, self.sink, models, asked, self.stop - 24 * H, self.stop)
+        self.assertEqual((guarded["gap_hours"], guarded["points"], guarded["excluded"]),
+                         (0, 0, {models[0]: ["region", "flag"]}))
+
         stored = self.stored()
         self.assertEqual(sorted(set(stored["_time"])), [pd.Timestamp(e) for e in ends])  # not the current hour
         closed = self.rows[self.rows["pred_timestamp"] < self.stop]
@@ -253,7 +349,8 @@ class BackfillAgainstInfluxDB(unittest.TestCase):
             for name, value in fields.items():
                 self.assertAlmostEqual(got[name], value, places=9)
 
-        late = pd.DataFrame([{"pred_timestamp": self.start + 1.5 * H, "income": 1e9, "age": 30.0, "region": "Québec"}])
+        late = pd.DataFrame([{"pred_timestamp": self.start + 1.5 * H, "income": 1e9, "age": 30.0, "region": "Québec",
+                              "flag": True}])
         self.write_rows(late)
         relate = self.backfill()
         self.assertEqual((relate["gap_hours"], relate["hours"]), (1, 1))

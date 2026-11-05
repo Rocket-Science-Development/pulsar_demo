@@ -10,9 +10,10 @@ are recomputed at every run, so rows that arrive late are counted; rewriting an 
 
 Backfill: each run then looks, over the last `--backfill-days` (default 30), for the older closed hours that have raw
 captures but no aggregate, or fewer aggregated values than captured ones (rows that arrived after the hour was
-aggregated). One grouped Flux query finds them for every feature (and every model of `--models`); the oldest
-`--backfill-max-hours` (default 168) of each model are aggregated, in reads of at most 24 hours, so that a run stays
-bounded and the history fills up over the next runs. An hour aggregated from all its rows is not a gap: rerunning
+aggregated). One grouped Flux query finds them for every feature (and every model of `--models`); features stored
+as text or boolean are found first (one query on the stored field types) and left out, with a single warning. The
+oldest `--backfill-max-hours` (default 168) of each model are aggregated, in reads of at most 24 hours, so that a run
+stays bounded and the history fills up over the next runs. An hour aggregated from all its rows is not a gap: rerunning
 writes nothing. `--backfill-only` fills the whole look-back at once, without the analyses (no reference needed), and
 exits. The hour being captured is never aggregated (only closed hours are).
 
@@ -168,6 +169,56 @@ def find_quantile_gaps(client, conn, models: list, features: list, start: dateti
     return {m: quantile_gaps(raw[m], agg[m]) for m in models}
 
 
+NUMERIC_TYPES = {"double", "long", "unsignedLong"}  # Flux types of the fields the quantiles can be computed on
+
+
+def field_types_flux(bucket: str, models: list, features: list, start: datetime, stop: datetime) -> str:
+    """Last value of each feature of each model's captures over [start, stop): one small table per series, whose
+    `_value` column carries the stored type of the field (`last` is pushed down to storage)."""
+    return f"""
+from(bucket: {_flux_string(bucket)})
+  |> range(start: {_flux_time(start)}, stop: {_flux_time(stop)})
+  |> filter(fn: (r) => {_any("_measurement", [captures(m, v) for m, v in models])} and {_any("_field", features)})
+  |> last()
+  |> keep(columns: ["_measurement", "_field", "_value"])
+"""
+
+
+def numeric_features(client, conn, models: list, features: list, start: datetime, stop: datetime) -> tuple:
+    """Split the features of each model by the type InfluxDB stores them with, in one query for all the models.
+
+    Returns ({(model, version): [numeric features]}, {(model, version): [features stored as text or boolean]}). A
+    feature stored with a non-numeric type in any shard of the window is left out: its raw values would be counted
+    but never aggregated (the quantiles skip non-numeric columns), so it would look like a gap at every run. A feature
+    without any value in the window stays (it gives no gap)."""
+    models = [tuple(m) for m in models]
+    model_of = {captures(m, v): (m, v) for m, v in models}
+    bad = {m: set() for m in models}
+    for table in client.query_api().query(field_types_flux(conn["bucket"], models, features, start, stop)):
+        kind = next((c.data_type for c in table.columns if c.label == "_value"), None)
+        if kind in NUMERIC_TYPES or not table.records:
+            continue
+        values = table.records[0].values
+        key = model_of.get(values.get("_measurement"))
+        if key is not None:
+            bad[key].add(values.get("_field"))
+    return ({m: [f for f in features if f not in bad[m]] for m in models},
+            {m: [f for f in features if f in bad[m]] for m in models})
+
+
+def excluded_warning(excluded: dict) -> str:
+    """One line naming the features left out and the models concerned ("" if none)"""
+    by_feature = {}
+    for (model, version), names in excluded.items():
+        for name in names:
+            by_feature.setdefault(name, []).append(f"{model}:{version}")
+    if not by_feature:
+        return ""
+    parts = [f"{name} ({', '.join(m[:3])}{f' and {len(m) - 3} more' if len(m) > 3 else ''})"
+             for name, m in by_feature.items()]
+    return ("warning: not stored as numbers, left out of the hourly quantiles and their backfill: " + "; ".join(parts))
+
+
 def backfill_quantiles(client, conn, sink, models: list, features: list, start: datetime, stop: datetime,
                        max_hours: int = None, chunk_hours: int = 24) -> dict:
     """Aggregate the hours of [start, stop) that have captures but no complete aggregate: the `max_hours` oldest of
@@ -175,14 +226,28 @@ def backfill_quantiles(client, conn, sink, models: list, features: list, start: 
     current hour (the hour being captured is never aggregated). Idempotent: an hour aggregated from all its rows is not
     a gap, so a second run finds nothing and writes nothing.
 
+    Features stored as text or boolean are found first (`numeric_features`, one query) and left out, with a single
+    warning naming them; the gaps are then found in one query per distinct set of numeric features (one in general).
+
     Returns {"models", "gap_hours", "hours", "remaining", "rows", "points", "requests", "detect_s", "read_s",
-    "compute_s", "write_s"}."""
+    "compute_s", "write_s", "excluded"} ("excluded": {(model, version): [features left out]}, models with some)."""
     out = {"models": len(models), "gap_hours": 0, "hours": 0, "remaining": 0, "rows": 0, "points": 0, "requests": 0,
-           "detect_s": 0.0, "read_s": 0.0, "compute_s": 0.0, "write_s": 0.0}
+           "detect_s": 0.0, "read_s": 0.0, "compute_s": 0.0, "write_s": 0.0, "excluded": {}}
     if start >= stop or not models:
         return out
     t0 = time.perf_counter()
-    gaps = find_quantile_gaps(client, conn, models, features, start, stop)
+    numeric, excluded = numeric_features(client, conn, models, features, start, stop)
+    out["excluded"] = {m: names for m, names in excluded.items() if names}
+    warning = excluded_warning(out["excluded"])
+    if warning:
+        print(warning, flush=True)
+    by_set = {}
+    for m in models:
+        if numeric[tuple(m)]:
+            by_set.setdefault(tuple(numeric[tuple(m)]), []).append(tuple(m))
+    gaps = {}
+    for names, group in by_set.items():
+        gaps.update(find_quantile_gaps(client, conn, group, list(names), start, stop))
     out["detect_s"] = time.perf_counter() - t0
     for (model, version), hours in gaps.items():
         ranges = backfill_ranges(hours, max_hours, chunk_hours)
@@ -191,7 +256,7 @@ def backfill_quantiles(client, conn, sink, models: list, features: list, start: 
         out["hours"] += done
         out["remaining"] += len(hours) - done
         for a, b in ranges:
-            q = aggregate_quantiles(client, conn, sink, model, version, a, b, features, chunk_hours)
+            q = aggregate_quantiles(client, conn, sink, model, version, a, b, numeric[(model, version)], chunk_hours)
             for key in ("rows", "points", "requests", "read_s", "compute_s", "write_s"):
                 out[key] += q[key]
     return out

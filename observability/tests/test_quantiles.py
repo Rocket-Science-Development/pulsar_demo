@@ -72,9 +72,9 @@ class HourlyQuantiles(unittest.TestCase):
         data = frame(hours=4).sample(frac=1, random_state=3)
         data.iloc[::5, data.columns.get_loc("income")] = np.inf
         data.iloc[::7, data.columns.get_loc("age")] = np.nan
-        hours = data["pred_timestamp"].dt.floor("h")
+        hours = np.array([t.replace(minute=0, second=0, microsecond=0) for t in data["pred_timestamp"]])
         for end, feature, fields in hourly_quantiles(data, ["income", "age"]):
-            values = data.loc[hours == pd.Timestamp(end) - pd.Timedelta(hours=1), feature].to_numpy(dtype=float)
+            values = data.loc[hours == end - timedelta(hours=1), feature].to_numpy(dtype=float)
             values = values[np.isfinite(values)]
             self.assertEqual([fields["p10"], fields["median"], fields["p90"], fields["n"]],
                              [*np.quantile(values, [0.1, 0.5, 0.9]).tolist(), float(len(values))])

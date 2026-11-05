@@ -50,8 +50,11 @@ to change before any shared use).
   hours that have captures but no aggregate, or fewer aggregated values than captured ones (rows that arrived after the
   hour was aggregated), and aggregates the oldest `--backfill-max-hours` of them (default 168 per model and run), in
   reads of at most 24 hours. The history thus fills up over a few runs, and a rerun on complete hours writes nothing.
-  The hour being captured is never aggregated. For a model already captured before the job, fill the history at once
-  with `--backfill-only` (no analyses, no reference needed; `--backfill-days 365` for a longer history, `--models
+  The hour being captured is never aggregated. A feature of `--quantile-features` stored as text or boolean (in any
+  shard of the look-back) has no quantile and would look like a gap at every run: each run first reads the stored
+  type of the fields (one query, `last()` per series) and leaves such features out of the detection and the backfill,
+  with a single warning naming them. For a model already captured before the job, fill the history at once with
+  `--backfill-only` (no analyses, no reference needed; `--backfill-days 365` for a longer history, `--models
   a:1.0,b:2.1` for several models found in the same query).
 - `build_dashboards.py` regenerates the dashboards (`grafana/dashboards/*.json`) from their Python description; edit
   it rather than the JSON, then restart Grafana or wait for the provisioning to reload.
@@ -77,7 +80,8 @@ to change before any shared use).
   2.6.1 with 300 models x 20 numeric features x 30 days, 12 rows per hour (52 million raw values), the first 10 days
   never aggregated and 2 % of the other hours missing (74,700 model-hours): finding the gaps takes 7.8 s for the 300
   models in one query (13 s with one query per model, 43 ms each), 1.3 s for 50 models, 4.3 s for 300 models over 7
-  days. Filling them costs about 20 ms per model-hour (read 5, quantiles 5, write 9 to 28: one write request per
+  days; reading the stored types first adds about 3.4 s for 300 models (22 fields each, 6,600 series). Filling them
+  costs about 20 ms per model-hour (read 5, quantiles 5, write 9 to 28: one write request per
   hour), so 6.6 s per model for a run capped at 168 hours, and about 40 min for the whole history of the 300 models
   at once. A rerun finds no gap and writes nothing; the backfilled values equal numpy's on the raw rows, and the band
   then shows the 720 hours of the month.
