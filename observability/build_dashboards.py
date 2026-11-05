@@ -2,7 +2,8 @@
 
 Dashboards are code: one Python description, consistent names, colors, variables and links, reviewed like any change.
 Queries are Flux (InfluxDB 2). Results come from the `pulsar_results` measurement (ResultsSink), captures from the
-`<model>_<version>_input_data` measurements (Pulse), capture counters from `pulsar_capture_stats` (StatsReporter).
+`<model>_<version>_input_data` measurements (Pulse), capture counters from `pulsar_capture_stats` (StatsReporter), hourly
+quantiles of the numeric features from `pulsar_feature_quantiles` (analysis_job.py / seed_demo.py).
 
     python build_dashboards.py --out grafana/dashboards --bucket monitoring
 """
@@ -46,6 +47,30 @@ RESULTS = f'from(bucket: "${{bucket}}") {RANGE} |> filter(fn: (r) => r._measurem
 CAPTURES = f'from(bucket: "${{bucket}}") {RANGE} |> filter(fn: (r) => r._measurement == "${{model}}_${{version}}_input_data")'
 AGENT = (f'from(bucket: "${{bucket}}") {RANGE} |> filter(fn: (r) => r._measurement == "permit_assistant_1.0_input_data")')
 STATS = f'from(bucket: "${{bucket}}") {RANGE} |> filter(fn: (r) => r._measurement == "pulsar_capture_stats")'
+QUANTILE_TAIL_HOURS = 24  # hours after the last pre-aggregated one computed from the raw captures, at most
+
+
+def hourly_quantile(field: str, q: float) -> str:
+    """One quantile of the drift band: the hours pre-aggregated by the analysis job (`pulsar_feature_quantiles`), then,
+    after the last of them, the raw captures of at most QUANTILE_TAIL_HOURS hours (the hours not analysed yet).
+
+    InfluxDB 2.6 does not push quantile / median down to storage: on the raw captures this panel read every row of the
+    range (lab SC-07: 8.9 s at 30 days with 20 viewers). Pre-aggregated, it reads one point per hour."""
+    fn = "median" if q == 0.5 else f"(column, tables=<-) => tables |> quantile(q: {q}, column: column)"
+    return (
+        'import "date"\n'
+        f'agg = from(bucket: "${{bucket}}") {RANGE} |> filter(fn: (r) => r._measurement == "pulsar_feature_quantiles" and '
+        'r.model_id == "${model}" and r.model_version == "${version}" and r.feature_name == "${feature}")\n'
+        'done = agg |> filter(fn: (r) => r._field == "n") |> group() |> last() |> findColumn(fn: (key) => true, column: "_time")\n'
+        f'floor = date.sub(d: {QUANTILE_TAIL_HOURS}h, from: v.timeRangeStop)\n'
+        'since = if length(arr: done) == 0 then floor else if done[0] > floor then done[0] else floor\n'
+        'tail_start = if since > v.timeRangeStart then since else v.timeRangeStart\n'
+        'tail = from(bucket: "${bucket}") |> range(start: tail_start, stop: v.timeRangeStop)'
+        ' |> filter(fn: (r) => r._measurement == "${model}_${version}_input_data") |> filter(fn: (r) => r._field == "${feature}")'
+        f' |> group() |> aggregateWindow(every: 1h, fn: {fn}, createEmpty: false) |> keep(columns: ["_time", "_value"])\n'
+        f'union(tables: [agg |> filter(fn: (r) => r._field == "{field}") |> group() |> keep(columns: ["_time", "_value"]), tail])'
+        f' |> sort(columns: ["_time"]) |> set(key: "q", value: "{field}")'
+    )
 
 
 def fields(*names) -> str:
@@ -134,11 +159,12 @@ def stat(title, query, unit="none", decimals=None, thresholds=None, mappings=Non
 
 
 def timeseries(title, queries, unit="none", description="", thresholds=None, display=None, overrides=None,
-               stack=False, bars=False, min_=None, max_=None, log=False, show_thresholds=None, fill=10, legend="list"):
+               stack=False, bars=False, min_=None, max_=None, log=False, show_thresholds=None, fill=10, legend="list",
+               span_nulls=True):
     defaults = {
         "unit": unit, "min": min_, "max": max_, "color": {"mode": "palette-classic"},
         "custom": {"lineWidth": 2, "fillOpacity": 70 if bars else fill, "pointSize": 6, "showPoints": "auto",
-                   "drawStyle": "bars" if bars else "line", "spanNulls": True,
+                   "drawStyle": "bars" if bars else "line", "spanNulls": span_nulls,
                    "stacking": {"mode": "normal" if stack else "none", "group": "A"},
                    "axisSoftMin": None, "barAlignment": 0,
                    "thresholdsStyle": {"mode": show_thresholds or "off"},
@@ -214,9 +240,13 @@ def var_bucket(default: str) -> dict:
             "current": {"text": default, "value": default}, "hide": 0}
 
 
-def var_tag(name, label, tag, measurement_filter, default=None, include_all=False, hide=0):
+def var_tag(name, label, tag, measurement_filter, default=None, include_all=False, hide=0, exclude=()):
+    """`exclude`: values left out after the index lookup. A negation in the predicate (tag != value) makes InfluxDB
+    test every series of the measurement (lab SC-07: 2.3 s at 10,000 models, 0.14 s when filtered afterwards)"""
     query = ('import "influxdata/influxdb/schema"\n'
              f'schema.tagValues(bucket: "${{bucket}}", tag: "{tag}", predicate: (r) => {measurement_filter}, start: -30d)')
+    if exclude:
+        query += " |> filter(fn: (r) => " + " and ".join(f'r._value != "{v}"' for v in exclude) + ")"
     variable = {"name": name, "label": label, "type": "query", "datasource": DS, "query": query, "refresh": 2,
                 "sort": 1, "includeAll": include_all, "multi": False, "hide": hide}
     if default:
@@ -228,8 +258,8 @@ def var_tag(name, label, tag, measurement_filter, default=None, include_all=Fals
 
 def model_vars(default_model="admissibilite"):
     return [
-        var_tag("model", "Model", "model_id",
-                'r._measurement == "pulsar_results" and r.model_id != "permit_assistant"', default_model),
+        var_tag("model", "Model", "model_id", 'r._measurement == "pulsar_results"', default_model,
+                exclude=("permit_assistant",)),
         var_tag("version", "Version", "model_version",
                 'r._measurement == "pulsar_results" and r.model_id == "${model}"', "1.0"),
     ]
@@ -314,8 +344,11 @@ def drift(bucket):
     d = Dashboard("pulsar-drift", "Pulsar.ml — Data drift",
                   "Calibrated drift tests per feature and window: raw alerts, confirmation, adjusted p-values, distributions",
                   [var_bucket(bucket)] + model_vars() + [
-                      var_tag("feature", "Feature", "feature_name",
-                              'r._measurement == "pulsar_results" and r.model_id == "${model}" and r.metric_type == "drift"', "income")])
+                      # numeric features only: the hourly quantiles below fail on a categorical (string) field
+                      # (lab SC-07: "quantile: unsupported aggregate column type string"); chi2 is the categorical test
+                      var_tag("feature", "Feature (numeric)", "feature_name",
+                              'r._measurement == "pulsar_results" and r.model_id == "${model}" and r.metric_type == "drift"'
+                              ' and r.metric_name != "chi2"', "income")])
     d.text("**How to read**: each window is tested against the reference with thresholds calibrated by A/A resampling of the "
            "reference; p-values are adjusted for the number of features (Benjamini-Hochberg, 5 %). A raw alert becomes "
            "**confirmed** only when it persists over two consecutive windows.", h=3)
@@ -341,16 +374,18 @@ def drift(bucket):
                    ' |> group() |> keep(columns: ["feature_name", "_value"]) |> rename(columns: {_value: "windows"})'
                    ' |> sort(columns: ["windows"], desc: true)', color=SERIES[0]), 10, 9)
     d.row("Distribution of the selected feature: ${feature}")
-    q = f'{CAPTURES} |> filter(fn: (r) => r._field == "${{feature}}") |> group()'
-    d.add(timeseries("Hourly quantiles of ${feature}", [
-        f'{q} |> aggregateWindow(every: 1h, fn: (column, tables=<-) => tables |> quantile(q: 0.9, column: column), createEmpty: false) |> set(key: "q", value: "p90")',
-        f'{q} |> aggregateWindow(every: 1h, fn: median, createEmpty: false) |> set(key: "q", value: "median")',
-        f'{q} |> aggregateWindow(every: 1h, fn: (column, tables=<-) => tables |> quantile(q: 0.1, column: column), createEmpty: false) |> set(key: "q", value: "p10")',
-    ], display="${__field.labels.q}",
-        overrides=[color("p90", SERIES[0], custom__fillBelowTo="p10", custom__lineWidth=1),
-                   color("median", SERIES[1]), color("p10", SERIES[0], custom__lineWidth=1)],
-        description="Numeric features: the band spans the 10th to 90th percentiles of each hour; a shift of the band is "
-                    "the drift that the tests measure", fill=0), 16, 9)
+    d.add(timeseries("Hourly quantiles of ${feature}", [hourly_quantile("p90", 0.9), hourly_quantile("median", 0.5),
+                                                        hourly_quantile("p10", 0.1)],
+                     display="${__field.labels.q}",
+                     overrides=[color("p90", SERIES[0], custom__fillBelowTo="p10", custom__lineWidth=1),
+                                color("median", SERIES[1]), color("p10", SERIES[0], custom__lineWidth=1)],
+                     description="Numeric features: the band spans the 10th to 90th percentiles of each hour; a shift of "
+                                 "the band is the drift that the tests measure. Each hour is pre-aggregated by the analysis "
+                                 "job (pulsar_feature_quantiles): exact quantiles of the rows captured in that hour "
+                                 "(linear interpolation), recomputed for the last 24 hours at every run so that late rows "
+                                 "count. After the last pre-aggregated hour, up to 24 hours are computed live from the raw "
+                                 "captures (t-digest estimate); older hours never aggregated are left as a gap.",
+                     fill=0, span_nulls=2 * 3600 * 1000), 16, 9)
     d.add(table("Latest window: tests by feature",
                 f'{base} |> filter(fn: (r) => r._field == "metric_value" or r._field == "p_adjusted" or r._field == "status" or r._field == "confirmed")'
                 ' |> last() |> toFloat() |> group() |> pivot(rowKey: ["feature_name", "metric_name"], columnKey: ["_field"], valueColumn: "_value")'

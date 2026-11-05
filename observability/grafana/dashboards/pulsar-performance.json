@@ -36,7 +36,7 @@
           "type": "influxdb",
           "uid": "pulsar-influx"
         },
-        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\" and r.model_id != \"permit_assistant\", start: -30d)",
+        "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"${bucket}\", tag: \"model_id\", predicate: (r) => r._measurement == \"pulsar_results\", start: -30d) |> filter(fn: (r) => r._value != \"permit_assistant\")",
         "refresh": 2,
         "sort": 1,
         "includeAll": false,

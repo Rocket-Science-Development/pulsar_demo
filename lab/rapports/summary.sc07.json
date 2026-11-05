@@ -1,0 +1,1782 @@
+{
+ "test": "SC-07",
+ "env": "local workstation (registry: aws-db); host shared with SC-04 (network toxics) running at the same time",
+ "params": {
+  "env": "local (registry: aws-db)",
+  "models": 300,
+  "days": 30,
+  "window_hours": 6,
+  "features": 20,
+  "captured_models": 10,
+  "capture_rows_per_hour": 150,
+  "viewers": 20,
+  "viewer_rounds": 3,
+  "direct_repeats": 5,
+  "budget_s": 3.0,
+  "influxdb": "2.6.1 (sc07-influxdb, :8107)",
+  "grafana": "11.3.0 (sc07-grafana, :3107)",
+  "bucket": "monitoring"
+ },
+ "load": {
+  "end": "2026-11-05T12:00:00+00:00",
+  "results_points": 5066400,
+  "results_requests": 36000,
+  "results_write_errors": 0,
+  "results_seconds": 160.2,
+  "results_points_per_s": 31628,
+  "results_points_per_request": 140.7,
+  "results_request_ms_mean": 33.34,
+  "capture_rows": 1080000,
+  "capture_dropped": 0,
+  "captures_seconds": 122.7,
+  "stats_points": 216000,
+  "stats_seconds": 23.7
+ },
+ "cardinality": {
+  "bucket_series": 42610,
+  "pulsar_results_series": 42300,
+  "pulsar_capture_stats_series": 300,
+  "pulsar_results_series_per_model": 141,
+  "pulsar_results_field_series": 279000,
+  "pulsar_results_distinct_tag_values": {
+   "model_id": 300,
+   "model_version": 1,
+   "metric_type": 4,
+   "metric_name": 15,
+   "feature_name": 21,
+   "group": 16,
+   "reference_group": 3,
+   "test_type": 2
+  },
+  "pulsar_results_fields": [
+   "ci_high",
+   "ci_low",
+   "confirmed",
+   "e_value",
+   "method",
+   "metric_value",
+   "n",
+   "p_adjusted",
+   "status",
+   "suppressed",
+   "threshold",
+   "threshold_high",
+   "threshold_low"
+  ],
+  "measurements": 12
+ },
+ "disk_before_run": {
+  "bucket_tsm_bytes": 769167651,
+  "bucket_wal_bytes": 61115905,
+  "engine_bytes": 863956182,
+  "tsm_files": 20,
+  "shards": "5"
+ },
+ "disk_after_run": {
+  "bucket_tsm_bytes": 788773549,
+  "bucket_wal_bytes": 28672,
+  "engine_bytes": 822474847,
+  "tsm_files": 25,
+  "shards": "5"
+ },
+ "run_before_fix": {
+  "status": "failed",
+  "started": "2026-11-05T13:59:43+00:00",
+  "seconds": 463.3,
+  "checks": {
+   "worst_key_panel_p95_7d_direct_s": true,
+   "worst_key_panel_p95_7d_20_viewers_s": true,
+   "model_variable_values": true,
+   "flux_timeouts": true,
+   "query_errors": false
+  },
+  "criteria": {
+   "worst_key_panel_p95_7d_direct_s": [
+    "<",
+    3.0
+   ],
+   "worst_key_panel_p95_7d_20_viewers_s": [
+    "<",
+    3.0
+   ],
+   "model_variable_values": [
+    "==",
+    300
+   ],
+   "flux_timeouts": [
+    "==",
+    0
+   ],
+   "query_errors": [
+    "==",
+    0
+   ]
+  },
+  "limits": 0,
+  "direct_by_dashboard": {
+   "pulsar-agents": {
+    "7d": {
+     "panels": 22,
+     "over_budget": 0,
+     "worst_p95_s": 0.045,
+     "worst_max_s": 0.049,
+     "worst_panel": "11A Terminations",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 22,
+     "over_budget": 0,
+     "worst_p95_s": 0.034,
+     "worst_max_s": 0.034,
+     "worst_panel": "7A Latency per run, by phase",
+     "errors": 0
+    }
+   },
+   "pulsar-capture": {
+    "7d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.036,
+     "worst_max_s": 0.037,
+     "worst_panel": "9A Rows not yet written: queued, spooled, dropped",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.053,
+     "worst_max_s": 0.056,
+     "worst_panel": "10A Storage available",
+     "errors": 0
+    }
+   },
+   "pulsar-drift": {
+    "7d": {
+     "panels": 8,
+     "over_budget": 0,
+     "worst_p95_s": 0.17,
+     "worst_max_s": 0.179,
+     "worst_panel": "7C Hourly quantiles of ${feature}",
+     "errors": 3
+    },
+    "30d": {
+     "panels": 8,
+     "over_budget": 0,
+     "worst_p95_s": 0.473,
+     "worst_max_s": 0.485,
+     "worst_panel": "7C Hourly quantiles of ${feature}",
+     "errors": 3
+    }
+   },
+   "pulsar-explain": {
+    "7d": {
+     "panels": 6,
+     "over_budget": 0,
+     "worst_p95_s": 0.099,
+     "worst_max_s": 0.1,
+     "worst_panel": "5A Importance by group (vs fr), latest window",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 6,
+     "over_budget": 0,
+     "worst_p95_s": 0.125,
+     "worst_max_s": 0.127,
+     "worst_panel": "5A Importance by group (vs fr), latest window",
+     "errors": 0
+    }
+   },
+   "pulsar-fairness": {
+    "7d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.052,
+     "worst_max_s": 0.053,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.057,
+     "worst_max_s": 0.058,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "errors": 0
+    }
+   },
+   "pulsar-overview": {
+    "7d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.059,
+     "worst_max_s": 0.064,
+     "worst_panel": "4A Disparities established (latest)",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.057,
+     "worst_max_s": 0.059,
+     "worst_panel": "8A Alerts over time, by kind",
+     "errors": 0
+    }
+   },
+   "pulsar-performance": {
+    "7d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.033,
+     "worst_max_s": 0.034,
+     "worst_panel": "2A Accuracy (latest labelled window)",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.069,
+     "worst_max_s": 0.076,
+     "worst_panel": "8B Hourly approval rate and mean score",
+     "errors": 0
+    }
+   },
+   "pulsar-privacy": {
+    "7d": {
+     "panels": 11,
+     "over_budget": 0,
+     "worst_p95_s": 0.037,
+     "worst_max_s": 0.038,
+     "worst_panel": "3A Rows with personal information",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 11,
+     "over_budget": 0,
+     "worst_p95_s": 0.047,
+     "worst_max_s": 0.049,
+     "worst_panel": "3A Rows with personal information",
+     "errors": 0
+    }
+   }
+  },
+  "viewers_by_dashboard": {
+   "pulsar-overview": {
+    "7d": {
+     "worst_p95_s": 1.234,
+     "worst_max_s": 1.426,
+     "worst_panel": "6A Personal information masked (period)",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.719,
+     "whole_dashboard_p95_s": 1.95,
+     "errors": 0
+    },
+    "30d": {
+     "worst_p95_s": 1.05,
+     "worst_max_s": 1.321,
+     "worst_panel": "8A Alerts over time, by kind",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.701,
+     "whole_dashboard_p95_s": 1.305,
+     "errors": 0
+    }
+   },
+   "pulsar-drift": {
+    "7d": {
+     "worst_p95_s": 2.85,
+     "worst_max_s": 3.025,
+     "worst_panel": "7C Hourly quantiles of ${feature}",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 2.184,
+     "whole_dashboard_p95_s": 3.091,
+     "errors": 30
+    },
+    "30d": {
+     "worst_p95_s": 9.261,
+     "worst_max_s": 9.987,
+     "worst_panel": "7B Hourly quantiles of ${feature}",
+     "over_budget": 4,
+     "whole_dashboard_p50_s": 8.088,
+     "whole_dashboard_p95_s": 9.605,
+     "errors": 39
+    }
+   },
+   "pulsar-fairness": {
+    "7d": {
+     "worst_p95_s": 0.89,
+     "worst_max_s": 1.365,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.673,
+     "whole_dashboard_p95_s": 1.345,
+     "errors": 0
+    },
+    "30d": {
+     "worst_p95_s": 0.726,
+     "worst_max_s": 0.897,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.507,
+     "whole_dashboard_p95_s": 0.955,
+     "errors": 0
+    }
+   }
+  },
+  "variables_direct": {
+   "campaign": {
+    "values_min": 0,
+    "values_max": 0,
+    "p50_s": 0.03,
+    "max_s": 0.05,
+    "errors": 0
+   },
+   "model": {
+    "values_min": 300,
+    "values_max": 300,
+    "p50_s": 0.071,
+    "max_s": 0.126,
+    "errors": 0
+   },
+   "version": {
+    "values_min": 1,
+    "values_max": 1,
+    "p50_s": 0.019,
+    "max_s": 0.034,
+    "errors": 0
+   },
+   "feature": {
+    "values_min": 20,
+    "values_max": 20,
+    "p50_s": 0.017,
+    "max_s": 0.033,
+    "errors": 0
+   },
+   "attribute": {
+    "values_min": 3,
+    "values_max": 3,
+    "p50_s": 0.025,
+    "max_s": 0.033,
+    "errors": 0
+   },
+   "group": {
+    "values_min": 2,
+    "values_max": 2,
+    "p50_s": 0.01,
+    "max_s": 0.017,
+    "errors": 0
+   }
+  },
+  "model_variable_values": 300,
+  "worst": {
+   "worst_key_panel_7d_direct": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "C",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 0.123,
+    "p95_s": 0.17,
+    "max_s": 0.179,
+    "errors": 1
+   },
+   "worst_key_panel_30d_direct": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "C",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 0.421,
+    "p95_s": 0.473,
+    "max_s": 0.485,
+    "errors": 1
+   },
+   "worst_key_panel_7d_20_viewers": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "C",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 1.644,
+    "p95_s": 2.85,
+    "max_s": 3.025,
+    "errors": 10
+   },
+   "worst_key_panel_30d_20_viewers": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "B",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 7.216,
+    "p95_s": 9.261,
+    "max_s": 9.987,
+    "errors": 13
+   }
+  },
+  "flux_timeouts": 0,
+  "query_errors": 78,
+  "viewers_phase_seconds": 62.4,
+  "viewer_panel_requests": 3840,
+  "docker_cpu_peak_pct": {
+   "sc07-influxdb": 1365.12,
+   "sc07-grafana": 739.58
+  },
+  "host_health": {
+   "cpu_max": 99.9,
+   "mem_max": 91.6,
+   "rss_mb_max": 121.84765625,
+   "threads_max": 165,
+   "fds_max": 1592,
+   "disk_max": 49.2,
+   "rss_growth_mb_per_h": 228.3789713046498,
+   "samples": 92
+  }
+ },
+ "run_after_fix": {
+  "status": "passed",
+  "started": "2026-11-05T14:30:30+00:00",
+  "seconds": 1498.9,
+  "checks": {
+   "worst_key_panel_p95_7d_direct_s": true,
+   "worst_key_panel_p95_7d_20_viewers_s": true,
+   "model_variable_values": true,
+   "flux_timeouts": true,
+   "query_errors": true
+  },
+  "criteria": {
+   "worst_key_panel_p95_7d_direct_s": [
+    "<",
+    3.0
+   ],
+   "worst_key_panel_p95_7d_20_viewers_s": [
+    "<",
+    3.0
+   ],
+   "model_variable_values": [
+    "==",
+    300
+   ],
+   "flux_timeouts": [
+    "==",
+    0
+   ],
+   "query_errors": [
+    "==",
+    0
+   ]
+  },
+  "limits": 0,
+  "direct_by_dashboard": {
+   "pulsar-agents": {
+    "7d": {
+     "panels": 22,
+     "over_budget": 0,
+     "worst_p95_s": 0.04,
+     "worst_max_s": 0.042,
+     "worst_panel": "10A Errors by tool",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 22,
+     "over_budget": 0,
+     "worst_p95_s": 0.033,
+     "worst_max_s": 0.033,
+     "worst_panel": "8B Tool error rate and task success (10-minute windows)",
+     "errors": 0
+    }
+   },
+   "pulsar-capture": {
+    "7d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.035,
+     "worst_max_s": 0.035,
+     "worst_panel": "9A Rows not yet written: queued, spooled, dropped",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.044,
+     "worst_max_s": 0.044,
+     "worst_panel": "10A Storage available",
+     "errors": 0
+    }
+   },
+   "pulsar-drift": {
+    "7d": {
+     "panels": 8,
+     "over_budget": 0,
+     "worst_p95_s": 0.132,
+     "worst_max_s": 0.134,
+     "worst_panel": "7B Hourly quantiles of ${feature}",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 8,
+     "over_budget": 0,
+     "worst_p95_s": 0.464,
+     "worst_max_s": 0.464,
+     "worst_panel": "7A Hourly quantiles of ${feature}",
+     "errors": 0
+    }
+   },
+   "pulsar-explain": {
+    "7d": {
+     "panels": 6,
+     "over_budget": 0,
+     "worst_p95_s": 0.114,
+     "worst_max_s": 0.12,
+     "worst_panel": "5A Importance by group (vs fr), latest window",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 6,
+     "over_budget": 0,
+     "worst_p95_s": 0.099,
+     "worst_max_s": 0.1,
+     "worst_panel": "5A Importance by group (vs fr), latest window",
+     "errors": 0
+    }
+   },
+   "pulsar-fairness": {
+    "7d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.048,
+     "worst_max_s": 0.049,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.051,
+     "worst_max_s": 0.052,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "errors": 0
+    }
+   },
+   "pulsar-overview": {
+    "7d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.088,
+     "worst_max_s": 0.097,
+     "worst_panel": "9A Latest verdict by kind",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 12,
+     "over_budget": 0,
+     "worst_p95_s": 0.062,
+     "worst_max_s": 0.063,
+     "worst_panel": "9A Latest verdict by kind",
+     "errors": 0
+    }
+   },
+   "pulsar-performance": {
+    "7d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.034,
+     "worst_max_s": 0.034,
+     "worst_panel": "2A Accuracy (latest labelled window)",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 9,
+     "over_budget": 0,
+     "worst_p95_s": 0.05,
+     "worst_max_s": 0.052,
+     "worst_panel": "8B Hourly approval rate and mean score",
+     "errors": 0
+    }
+   },
+   "pulsar-privacy": {
+    "7d": {
+     "panels": 11,
+     "over_budget": 0,
+     "worst_p95_s": 0.042,
+     "worst_max_s": 0.045,
+     "worst_panel": "2A Findings masked (period)",
+     "errors": 0
+    },
+    "30d": {
+     "panels": 11,
+     "over_budget": 0,
+     "worst_p95_s": 0.042,
+     "worst_max_s": 0.043,
+     "worst_panel": "6A Findings masked in tabular captures, per hour",
+     "errors": 0
+    }
+   }
+  },
+  "viewers_by_dashboard": {
+   "pulsar-overview": {
+    "7d": {
+     "worst_p95_s": 1.143,
+     "worst_max_s": 1.272,
+     "worst_panel": "5A Explanation changes (latest)",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.886,
+     "whole_dashboard_p95_s": 1.506,
+     "errors": 0
+    },
+    "30d": {
+     "worst_p95_s": 1.008,
+     "worst_max_s": 1.405,
+     "worst_panel": "8A Alerts over time, by kind",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.877,
+     "whole_dashboard_p95_s": 1.263,
+     "errors": 0
+    }
+   },
+   "pulsar-drift": {
+    "7d": {
+     "worst_p95_s": 2.441,
+     "worst_max_s": 2.928,
+     "worst_panel": "7B Hourly quantiles of ${feature}",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 2.086,
+     "whole_dashboard_p95_s": 2.567,
+     "errors": 0
+    },
+    "30d": {
+     "worst_p95_s": 8.9,
+     "worst_max_s": 9.558,
+     "worst_panel": "7C Hourly quantiles of ${feature}",
+     "over_budget": 5,
+     "whole_dashboard_p50_s": 7.625,
+     "whole_dashboard_p95_s": 9.274,
+     "errors": 0
+    }
+   },
+   "pulsar-fairness": {
+    "7d": {
+     "worst_p95_s": 0.721,
+     "worst_max_s": 0.841,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.657,
+     "whole_dashboard_p95_s": 1.073,
+     "errors": 0
+    },
+    "30d": {
+     "worst_p95_s": 0.645,
+     "worst_max_s": 0.781,
+     "worst_panel": "9A Disparate impact ratio of intersectional groups",
+     "over_budget": 0,
+     "whole_dashboard_p50_s": 0.546,
+     "whole_dashboard_p95_s": 0.917,
+     "errors": 0
+    }
+   }
+  },
+  "variables_direct": {
+   "campaign": {
+    "values_min": 0,
+    "values_max": 0,
+    "p50_s": 0.015,
+    "max_s": 0.066,
+    "errors": 0
+   },
+   "model": {
+    "values_min": 300,
+    "values_max": 300,
+    "p50_s": 0.033,
+    "max_s": 0.051,
+    "errors": 0
+   },
+   "version": {
+    "values_min": 1,
+    "values_max": 1,
+    "p50_s": 0.024,
+    "max_s": 0.03,
+    "errors": 0
+   },
+   "feature": {
+    "values_min": 16,
+    "values_max": 16,
+    "p50_s": 0.032,
+    "max_s": 0.033,
+    "errors": 0
+   },
+   "attribute": {
+    "values_min": 3,
+    "values_max": 3,
+    "p50_s": 0.032,
+    "max_s": 0.032,
+    "errors": 0
+   },
+   "group": {
+    "values_min": 2,
+    "values_max": 2,
+    "p50_s": 0.029,
+    "max_s": 0.031,
+    "errors": 0
+   }
+  },
+  "model_variable_values": 300,
+  "worst": {
+   "worst_key_panel_7d_direct": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "B",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 0.119,
+    "p95_s": 0.132,
+    "max_s": 0.134,
+    "errors": 0
+   },
+   "worst_key_panel_30d_direct": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "A",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 0.42,
+    "p95_s": 0.464,
+    "max_s": 0.464,
+    "errors": 0
+   },
+   "worst_key_panel_7d_20_viewers": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "B",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 1.798,
+    "p95_s": 2.441,
+    "max_s": 2.928,
+    "errors": 0
+   },
+   "worst_key_panel_30d_20_viewers": {
+    "dashboard": "pulsar-drift",
+    "panel_id": 7,
+    "ref": "C",
+    "title": "Hourly quantiles of ${feature}",
+    "p50_s": 7.182,
+    "p95_s": 8.9,
+    "max_s": 9.558,
+    "errors": 0
+   }
+  },
+  "flux_timeouts": 0,
+  "query_errors": 0,
+  "viewers_phase_seconds": 52.2,
+  "viewer_panel_requests": 3840,
+  "docker_cpu_peak_pct": {
+   "sc07-influxdb": 1415.92,
+   "sc07-grafana": 607.09
+  },
+  "host_health": {
+   "cpu_max": 99.0,
+   "mem_max": 99.6,
+   "rss_mb_max": 113.75390625,
+   "threads_max": 167,
+   "fds_max": 1666,
+   "disk_max": 50.0,
+   "rss_growth_mb_per_h": 64.0626366608052,
+   "samples": 297
+  }
+ },
+ "cardinality_ladder": [
+  {
+   "models": 1000,
+   "points_written": 141000,
+   "write_s": 38.1,
+   "write_points_per_s": 3701,
+   "cardinality_query_s": 9.08,
+   "cardinality_query_error": null,
+   "index_series": 141000,
+   "model_variable": {
+    "p50_s": 0.031,
+    "max_s": 0.031,
+    "values": 1000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "model_variable_before_fix": {
+    "p50_s": 0.213,
+    "max_s": 0.256,
+    "values": 1000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "panels_7d": {
+    "2A Raw alerts (BH-adjusted), by feature": {
+     "p50_s": 0.031,
+     "max_s": 0.032,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "8A Latest window: tests by feature": {
+     "p50_s": 0.062,
+     "max_s": 0.064,
+     "values": 20,
+     "errors": 0,
+     "error_sample": null
+    },
+    "3A Confirmed drift (latest window)": {
+     "p50_s": 0.031,
+     "max_s": 0.033,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "9A Latest verdict by kind": {
+     "p50_s": 0.047,
+     "max_s": 0.047,
+     "values": 4,
+     "errors": 0,
+     "error_sample": null
+    }
+   },
+   "influx_mem": "909.3MiB / 18.95GiB"
+  },
+  {
+   "models": 3000,
+   "points_written": 282000,
+   "write_s": 89.4,
+   "write_points_per_s": 3154,
+   "cardinality_query_s": 26.39,
+   "cardinality_query_error": null,
+   "index_series": 423000,
+   "model_variable": {
+    "p50_s": 0.032,
+    "max_s": 0.045,
+    "values": 3000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "model_variable_before_fix": {
+    "p50_s": 0.59,
+    "max_s": 0.772,
+    "values": 3000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "panels_7d": {
+    "2A Raw alerts (BH-adjusted), by feature": {
+     "p50_s": 0.014,
+     "max_s": 0.031,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "8A Latest window: tests by feature": {
+     "p50_s": 0.06,
+     "max_s": 0.071,
+     "values": 20,
+     "errors": 0,
+     "error_sample": null
+    },
+    "3A Confirmed drift (latest window)": {
+     "p50_s": 0.017,
+     "max_s": 0.031,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "9A Latest verdict by kind": {
+     "p50_s": 0.031,
+     "max_s": 0.047,
+     "values": 4,
+     "errors": 0,
+     "error_sample": null
+    }
+   },
+   "influx_mem": "1.146GiB / 18.95GiB"
+  },
+  {
+   "models": 10000,
+   "points_written": 987000,
+   "write_s": 298.2,
+   "write_points_per_s": 3310,
+   "cardinality_query_s": 111.95,
+   "cardinality_query_error": null,
+   "index_series": 1410000,
+   "model_variable": {
+    "p50_s": 0.102,
+    "max_s": 0.138,
+    "values": 10000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "model_variable_before_fix": {
+    "p50_s": 2.504,
+    "max_s": 3.373,
+    "values": 10000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "panels_7d": {
+    "2A Raw alerts (BH-adjusted), by feature": {
+     "p50_s": 0.029,
+     "max_s": 0.032,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "8A Latest window: tests by feature": {
+     "p50_s": 0.065,
+     "max_s": 0.075,
+     "values": 20,
+     "errors": 0,
+     "error_sample": null
+    },
+    "3A Confirmed drift (latest window)": {
+     "p50_s": 0.04,
+     "max_s": 0.048,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "9A Latest verdict by kind": {
+     "p50_s": 0.038,
+     "max_s": 0.053,
+     "values": 4,
+     "errors": 0,
+     "error_sample": null
+    }
+   },
+   "influx_mem": "1.281GiB / 18.95GiB"
+  },
+  {
+   "models": 20000,
+   "points_written": 1410000,
+   "write_s": 417.1,
+   "write_points_per_s": 3380,
+   "cardinality_query_s": 199.53,
+   "cardinality_query_error": null,
+   "index_series": 2820000,
+   "model_variable": {
+    "p50_s": 0.1,
+    "max_s": 0.145,
+    "values": 20000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "model_variable_before_fix": {
+    "p50_s": 3.831,
+    "max_s": 4.099,
+    "values": 20000,
+    "errors": 0,
+    "error_sample": null
+   },
+   "panels_7d": {
+    "2A Raw alerts (BH-adjusted), by feature": {
+     "p50_s": 0.035,
+     "max_s": 0.041,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "8A Latest window: tests by feature": {
+     "p50_s": 0.062,
+     "max_s": 0.078,
+     "values": 20,
+     "errors": 0,
+     "error_sample": null
+    },
+    "3A Confirmed drift (latest window)": {
+     "p50_s": 0.03,
+     "max_s": 0.032,
+     "values": 1,
+     "errors": 0,
+     "error_sample": null
+    },
+    "9A Latest verdict by kind": {
+     "p50_s": 0.06,
+     "max_s": 0.063,
+     "values": 4,
+     "errors": 0,
+     "error_sample": null
+    }
+   },
+   "influx_mem": "1.684GiB / 18.95GiB"
+  }
+ ],
+ "probe_quantiles": {
+  "current (3 queries, tdigest) @7d": {
+   "single_p50_s": 0.237,
+   "single_max_s": 0.316,
+   "rows": 495,
+   "errors": 0,
+   "20_concurrent_p50_s": 2.019,
+   "20_concurrent_max_s": 2.161,
+   "20_wall_s": 2.18
+  },
+  "current (3 queries, tdigest) @30d": {
+   "single_p50_s": 0.805,
+   "single_max_s": 1.125,
+   "rows": 2151,
+   "errors": 0,
+   "20_concurrent_p50_s": 7.683,
+   "20_concurrent_max_s": 7.867,
+   "20_wall_s": 7.87
+  },
+  "3 queries, exact_mean @7d": {
+   "single_p50_s": 0.235,
+   "single_max_s": 0.244,
+   "rows": 495,
+   "errors": 0,
+   "20_concurrent_p50_s": 1.917,
+   "20_concurrent_max_s": 2.094,
+   "20_wall_s": 2.17
+  },
+  "3 queries, exact_mean @30d": {
+   "single_p50_s": 0.814,
+   "single_max_s": 1.685,
+   "rows": 2151,
+   "errors": 0,
+   "20_concurrent_p50_s": 7.666,
+   "20_concurrent_max_s": 7.838,
+   "20_wall_s": 7.86
+  },
+  "1 query (union), tdigest @7d": {
+   "single_p50_s": 0.41,
+   "single_max_s": 0.607,
+   "rows": 495,
+   "errors": 0,
+   "20_concurrent_p50_s": 1.811,
+   "20_concurrent_max_s": 1.859,
+   "20_wall_s": 1.89
+  },
+  "1 query (union), tdigest @30d": {
+   "single_p50_s": 1.25,
+   "single_max_s": 1.591,
+   "rows": 2151,
+   "errors": 0,
+   "20_concurrent_p50_s": 7.833,
+   "20_concurrent_max_s": 8.155,
+   "20_wall_s": 8.16
+  },
+  "1 query (union), exact_mean @7d": {
+   "single_p50_s": 0.346,
+   "single_max_s": 0.436,
+   "rows": 495,
+   "errors": 0,
+   "20_concurrent_p50_s": 1.828,
+   "20_concurrent_max_s": 1.93,
+   "20_wall_s": 1.95
+  },
+  "1 query (union), exact_mean @30d": {
+   "single_p50_s": 1.567,
+   "single_max_s": 1.726,
+   "rows": 2151,
+   "errors": 0,
+   "20_concurrent_p50_s": 7.893,
+   "20_concurrent_max_s": 8.164,
+   "20_wall_s": 8.2
+  }
+ },
+ "probe_modelvar_300": {
+  "before SC-07: tagValues, _measurement and model_id != permit_assistant": {
+   "values": 300,
+   "p50_s": 0.064,
+   "max_s": 0.514,
+   "errors": 0
+  },
+  "after SC-07: tagValues on _measurement, then filter on the values": {
+   "values": 300,
+   "p50_s": 0.034,
+   "max_s": 0.043,
+   "errors": 0
+  },
+  "measurementTagValues": {
+   "values": 300,
+   "p50_s": 0.032,
+   "max_s": 0.032,
+   "errors": 0
+  },
+  "tagValues on one series per model (performance / label_coverage)": {
+   "values": 300,
+   "p50_s": 0.029,
+   "max_s": 0.031,
+   "errors": 0
+  },
+  "tagValues on pulsar_capture_stats": {
+   "values": 300,
+   "p50_s": 0.027,
+   "max_s": 0.033,
+   "errors": 0
+  }
+ },
+ "probe_modelvar_20000": {
+  "before SC-07: tagValues, _measurement and model_id != permit_assistant": {
+   "values": 20000,
+   "p50_s": 3.667,
+   "max_s": 5.109,
+   "errors": 0
+  },
+  "after SC-07: tagValues on _measurement, then filter on the values": {
+   "values": 20000,
+   "p50_s": 0.106,
+   "max_s": 0.136,
+   "errors": 0
+  },
+  "measurementTagValues": {
+   "values": 20000,
+   "p50_s": 0.078,
+   "max_s": 0.092,
+   "errors": 0
+  },
+  "tagValues on one series per model (performance / label_coverage)": {
+   "values": 20000,
+   "p50_s": 0.075,
+   "max_s": 0.079,
+   "errors": 0
+  },
+  "tagValues on pulsar_capture_stats": {
+   "values": 0,
+   "p50_s": 0.017,
+   "max_s": 0.019,
+   "errors": 0
+  }
+ },
+ "environment": {
+  "collected_at": "2026-11-05T14:55:29+00:00",
+  "host": "rocketscience",
+  "hardware": {
+   "cpu_model": "AMD Ryzen 7 7730U with Radeon Graphics",
+   "logical_cpus": 16,
+   "physical_cpus": 8,
+   "ram_gib": 38.8,
+   "gpus": [],
+   "cloud": null
+  },
+  "software": {
+   "os": "Windows-11-10.0.26300-SP0",
+   "python": "3.12.10",
+   "python_executable": "C:\\dev\\pulsar-ml\\validation_e2e\\.venv\\Scripts\\python.exe",
+   "packages": {
+    "pulsar_data_collection": "0.13.0 (dist-info says 0.8.0)",
+    "pulsar_metrics": "0.14.0 (dist-info says 0.9.1)",
+    "influxdb-client": "1.50.0",
+    "pandas": "2.3.3",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "pydantic": "2.14.2",
+    "opentelemetry-sdk": "1.45.2",
+    "torch": "2.15.0+cpu",
+    "transformers": "4.57.6",
+    "gliner": "0.2.30",
+    "sentence-transformers": null,
+    "psutil": "7.2.2"
+   },
+   "docker": "28.0.4",
+   "containers": [
+    {
+     "name": "sc07-grafana",
+     "image": "grafana/grafana-oss:11.3.0"
+    },
+    {
+     "name": "sc07-influxdb",
+     "image": "influxdb:2.6.1"
+    },
+    {
+     "name": "pulsar-grafana",
+     "image": "grafana/grafana-oss:11.3.0"
+    },
+    {
+     "name": "pulsar-validation-influxdb",
+     "image": "influxdb:2.6.1"
+    },
+    {
+     "name": "pulsar-ollama",
+     "image": "ollama/ollama:0.6.8"
+    }
+   ]
+  },
+  "services": {
+   "influxdb": {
+    "url": "http://127.0.0.1:8107/health",
+    "reachable": true,
+    "version": "v2.6.1"
+   },
+   "grafana": {
+    "url": "http://127.0.0.1:3107/api/health",
+    "reachable": true,
+    "version": "11.3.0"
+   },
+   "ollama": {
+    "url": "http://localhost:11434/api/tags",
+    "reachable": true,
+    "models": [
+     {
+      "name": "granite-embedding:278m",
+      "digest": "1a37926bf842899cbf90583e3932f3820548716d9d07661ba622199ffe95c552",
+      "size_gb": 0.56,
+      "quantization": "F16"
+     },
+     {
+      "name": "nomic-embed-text:latest",
+      "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+      "size_gb": 0.27,
+      "quantization": "F16"
+     },
+     {
+      "name": "granite3.3:2b",
+      "digest": "07bd1f170855240f9e162bf54ea494a8bc1c73d8cbd1365d7fccbeb7d2504947",
+      "size_gb": 1.55,
+      "quantization": "Q4_K_M"
+     },
+     {
+      "name": "llama3.2:3b",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size_gb": 2.02,
+      "quantization": "Q4_K_M"
+     }
+    ]
+   }
+  },
+  "sources": {
+   "pulsar_data_collection": {
+    "path": "C:/dev/pulsar-ml/pulsar_data_collection",
+    "commit": "39f83c238e93444a42efe93f326eb551077887cd",
+    "branch": "main",
+    "tag": "0.13.0",
+    "dirty": false
+   },
+   "pulsar_metrics": {
+    "path": "C:/dev/pulsar-ml/pulsar_metrics",
+    "commit": "48657e80ecc855948af79e46fe39ea223b63e05d",
+    "branch": "main",
+    "tag": "0.14.0",
+    "dirty": false
+   },
+   "pulsar_demo": {
+    "path": "C:/dev/pulsar-ml/wt/sc07",
+    "commit": "6dec929c10af638004e33e61fd7b074ba99fc30b",
+    "branch": "fonction/sc07-tableaux-echelle",
+    "tag": null,
+    "dirty": true
+   }
+  }
+ },
+ "correctif_l1": {
+  "change": "hourly p10/median/p90 and n of each numeric feature written by the analysis job to pulsar_feature_quantiles (analysis.write_hourly_quantiles via ResultsSink.write_stats_many); drift panel reads it, raw captures only for at most 24 h after the last aggregated hour",
+  "sources": [
+   "lab/results/SC-07.before-l1.json",
+   "lab/results/SC-07.after-l1.json",
+   "lab/results/SC-07/bench_quantiles_l1.json"
+  ],
+  "same_bucket": "both runs on the same fresh load (end 2026-11-05T12:00Z); before-l1 with the dashboards of commit 506d545, after-l1 with the regenerated ones",
+  "host_load": "SC-04 containers (sc04-influxdb, sc04-toxiproxy) running during before-l1, stopped before after-l1; the probe ran after, both variants in the same minutes",
+  "load": {
+   "end": "2026-11-05T12:00:00+00:00",
+   "results_points": 5066400,
+   "results_requests": 36000,
+   "results_write_errors": 0,
+   "results_seconds": 146.4,
+   "results_points_per_s": 34597,
+   "results_points_per_request": 140.7,
+   "results_request_ms_mean": 30.68,
+   "capture_rows": 1080000,
+   "capture_dropped": 0,
+   "captures_seconds": 93.2,
+   "stats_points": 216000,
+   "stats_seconds": 19.5,
+   "quantile_models": 10,
+   "quantile_hours": 7200,
+   "quantile_points": 115200,
+   "quantile_requests": 7200,
+   "quantile_rows_read": 1080000,
+   "quantile_points_per_model_hour": 16.0,
+   "quantile_seconds": 130.1,
+   "quantile_ms_per_model_hour": 18.06,
+   "quantile_read_ms_per_model_hour": 9.71,
+   "quantile_compute_ms_per_model_hour": 2.904,
+   "quantile_write_ms_per_model_hour": 5.38,
+   "quantile_24h_call_p50_s": 0.427,
+   "quantile_24h_call_p95_s": 0.492,
+   "quantile_24h_call_max_s": 0.565
+  },
+  "aggregation_cost": {
+   "quantile_models": 10,
+   "quantile_hours": 7200,
+   "quantile_points": 115200,
+   "quantile_requests": 7200,
+   "quantile_rows_read": 1080000,
+   "quantile_points_per_model_hour": 16.0,
+   "quantile_seconds": 130.1,
+   "quantile_ms_per_model_hour": 18.06,
+   "quantile_read_ms_per_model_hour": 9.71,
+   "quantile_compute_ms_per_model_hour": 2.904,
+   "quantile_write_ms_per_model_hour": 5.38,
+   "quantile_24h_call_p50_s": 0.427,
+   "quantile_24h_call_p95_s": 0.492,
+   "quantile_24h_call_max_s": 0.565
+  },
+  "cardinality_added": {
+   "pulsar_feature_quantiles_index_series": 160,
+   "per_captured_model_index_series": 16,
+   "field_series": 640,
+   "per_captured_model_field_series": 64,
+   "fields": [
+    "median",
+    "n",
+    "p10",
+    "p90"
+   ],
+   "categorical_features_skipped": [
+    "region",
+    "language",
+    "channel",
+    "segment"
+   ],
+   "bucket_series_before_l1_in_previous_run": 42610,
+   "bucket_series_now": 42770
+  },
+  "idempotency_check": "24 h of model002 rewritten (384 points): p90 point count 11520 before and after",
+  "accuracy_check": "over 48 h of model003/f00: median identical between pre-aggregated (exact) and raw tail (t-digest); p10/p90 differ by at most 0.073 and 0.050 (standard normal feature)",
+  "run_before_l1": {
+   "status": "passed",
+   "started": "2026-11-05T15:19:27+00:00",
+   "seconds": 546.0,
+   "checks": {
+    "worst_key_panel_p95_7d_direct_s": true,
+    "worst_key_panel_p95_7d_20_viewers_s": true,
+    "model_variable_values": true,
+    "flux_timeouts": true,
+    "query_errors": true
+   },
+   "notes": [
+    "Run locally on the workstation (registry env: aws-db): own containers sc07-influxdb 2.6.1 and sc07-grafana 11.3.0; other containers running on the host at start: sc04-toxiproxy, sc04-influxdb, pulsar-grafana, pulsar-validation-influxdb, pulsar-ollama."
+   ],
+   "quantile_panel": {
+    "7d": {
+     "direct_p95_s": 0.115,
+     "direct_max_s": 0.119,
+     "1_viewer_p50_s": 0.19,
+     "1_viewer_p95_s": 0.191,
+     "1_viewer_max_s": 0.191,
+     "20_viewers_p50_s": 1.543,
+     "20_viewers_p95_s": 2.3,
+     "20_viewers_max_s": 2.602
+    },
+    "30d": {
+     "direct_p95_s": 0.404,
+     "direct_max_s": 0.406,
+     "1_viewer_p50_s": 0.532,
+     "1_viewer_p95_s": 0.553,
+     "1_viewer_max_s": 0.556,
+     "20_viewers_p50_s": 6.78,
+     "20_viewers_p95_s": 8.508,
+     "20_viewers_max_s": 9.102
+    }
+   },
+   "drift_dashboard": {
+    "7d": {
+     "1_viewer": {
+      "whole_p50_s": 0.21,
+      "whole_p95_s": 0.23,
+      "whole_max_s": 0.232
+     },
+     "20_viewers": {
+      "whole_p50_s": 1.948,
+      "whole_p95_s": 2.449,
+      "whole_max_s": 2.613
+     },
+     "direct_worst_p95_s": 0.115,
+     "direct_worst_panel": "7A Hourly quantiles of ${feature}"
+    },
+    "30d": {
+     "1_viewer": {
+      "whole_p50_s": 0.557,
+      "whole_p95_s": 0.59,
+      "whole_max_s": 0.594
+     },
+     "20_viewers": {
+      "whole_p50_s": 7.214,
+      "whole_p95_s": 8.787,
+      "whole_max_s": 9.109
+     },
+     "direct_worst_p95_s": 0.404,
+     "direct_worst_panel": "7B Hourly quantiles of ${feature}"
+    }
+   },
+   "viewers_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "worst_p95_s": 0.98,
+      "worst_max_s": 1.256,
+      "worst_panel": "5A Explanation changes (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.725,
+      "whole_dashboard_p95_s": 1.242,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.729,
+      "worst_max_s": 1.327,
+      "worst_panel": "8A Alerts over time, by kind",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.651,
+      "whole_dashboard_p95_s": 1.141,
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "worst_p95_s": 2.3,
+      "worst_max_s": 2.602,
+      "worst_panel": "7A Hourly quantiles of ${feature}",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 1.948,
+      "whole_dashboard_p95_s": 2.449,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 8.508,
+      "worst_max_s": 9.102,
+      "worst_panel": "7B Hourly quantiles of ${feature}",
+      "over_budget": 3,
+      "whole_dashboard_p50_s": 7.214,
+      "whole_dashboard_p95_s": 8.787,
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "worst_p95_s": 0.821,
+      "worst_max_s": 1.144,
+      "worst_panel": "2A Latest window, by group",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.658,
+      "whole_dashboard_p95_s": 1.075,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.576,
+      "worst_max_s": 0.637,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.509,
+      "whole_dashboard_p95_s": 0.811,
+      "errors": 0
+     }
+    }
+   },
+   "direct_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.043,
+      "worst_max_s": 0.043,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.052,
+      "worst_max_s": 0.055,
+      "worst_panel": "4A Disparities established (latest)",
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.115,
+      "worst_max_s": 0.119,
+      "worst_panel": "7A Hourly quantiles of ${feature}",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.404,
+      "worst_max_s": 0.406,
+      "worst_panel": "7B Hourly quantiles of ${feature}",
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.048,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.052,
+      "worst_max_s": 0.054,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     }
+    }
+   },
+   "panel_queries_p95_over_3s_20_viewers": {
+    "7d": 0,
+    "30d": 3
+   },
+   "docker_cpu_peak_pct": {
+    "sc07-influxdb": 1395.64,
+    "sc07-grafana": 840.6
+   },
+   "viewers_phase_seconds": 48.0,
+   "query_errors": 0,
+   "flux_timeouts": 0,
+   "host_health": {
+    "cpu_max": 99.4,
+    "mem_max": 79.7,
+    "rss_mb_max": 204.578125,
+    "threads_max": 182,
+    "fds_max": 1671,
+    "disk_max": 50.0,
+    "rss_growth_mb_per_h": 813.7750150837074,
+    "samples": 108
+   }
+  },
+  "run_after_l1": {
+   "status": "passed",
+   "started": "2026-11-05T15:29:45+00:00",
+   "seconds": 128.5,
+   "checks": {
+    "worst_key_panel_p95_7d_direct_s": true,
+    "worst_key_panel_p95_7d_20_viewers_s": true,
+    "model_variable_values": true,
+    "flux_timeouts": true,
+    "query_errors": true
+   },
+   "notes": [
+    "Run locally on the workstation (registry env: aws-db): own containers sc07-influxdb 2.6.1 and sc07-grafana 11.3.0; other containers running on the host at start: pulsar-grafana, pulsar-validation-influxdb, pulsar-ollama."
+   ],
+   "quantile_panel": {
+    "7d": {
+     "direct_p95_s": 0.034,
+     "direct_max_s": 0.035,
+     "1_viewer_p50_s": 0.042,
+     "1_viewer_p95_s": 0.048,
+     "1_viewer_max_s": 0.049,
+     "20_viewers_p50_s": 0.291,
+     "20_viewers_p95_s": 0.787,
+     "20_viewers_max_s": 1.016
+    },
+    "30d": {
+     "direct_p95_s": 0.033,
+     "direct_max_s": 0.033,
+     "1_viewer_p50_s": 0.053,
+     "1_viewer_p95_s": 0.058,
+     "1_viewer_max_s": 0.059,
+     "20_viewers_p50_s": 0.408,
+     "20_viewers_p95_s": 0.915,
+     "20_viewers_max_s": 1.259
+    }
+   },
+   "drift_dashboard": {
+    "7d": {
+     "1_viewer": {
+      "whole_p50_s": 0.105,
+      "whole_p95_s": 0.116,
+      "whole_max_s": 0.117
+     },
+     "20_viewers": {
+      "whole_p50_s": 0.784,
+      "whole_p95_s": 1.23,
+      "whole_max_s": 1.292
+     },
+     "direct_worst_p95_s": 0.057,
+     "direct_worst_panel": "8A Latest window: tests by feature"
+    },
+    "30d": {
+     "1_viewer": {
+      "whole_p50_s": 0.127,
+      "whole_p95_s": 0.163,
+      "whole_max_s": 0.167
+     },
+     "20_viewers": {
+      "whole_p50_s": 1.287,
+      "whole_p95_s": 1.917,
+      "whole_max_s": 2.201
+     },
+     "direct_worst_p95_s": 0.092,
+     "direct_worst_panel": "3A Confirmed drift (2 windows), by feature"
+    }
+   },
+   "viewers_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "worst_p95_s": 1.154,
+      "worst_max_s": 1.222,
+      "worst_panel": "4A Disparities established (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.845,
+      "whole_dashboard_p95_s": 1.497,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 1.11,
+      "worst_max_s": 1.214,
+      "worst_panel": "5A Explanation changes (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.85,
+      "whole_dashboard_p95_s": 1.337,
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "worst_p95_s": 1.046,
+      "worst_max_s": 1.191,
+      "worst_panel": "3A Confirmed drift (2 windows), by feature",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.784,
+      "whole_dashboard_p95_s": 1.23,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 1.882,
+      "worst_max_s": 1.988,
+      "worst_panel": "5A Windows with a confirmed drift, by feature (period)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 1.287,
+      "whole_dashboard_p95_s": 1.917,
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "worst_p95_s": 0.837,
+      "worst_max_s": 0.903,
+      "worst_panel": "4B Parity difference of ${group}, with its confidence interval",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.667,
+      "whole_dashboard_p95_s": 1.111,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.779,
+      "worst_max_s": 0.879,
+      "worst_panel": "4C Parity difference of ${group}, with its confidence interval",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.635,
+      "whole_dashboard_p95_s": 1.034,
+      "errors": 0
+     }
+    }
+   },
+   "direct_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.045,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.046,
+      "worst_max_s": 0.049,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.057,
+      "worst_max_s": 0.058,
+      "worst_panel": "8A Latest window: tests by feature",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.092,
+      "worst_max_s": 0.092,
+      "worst_panel": "3A Confirmed drift (2 windows), by feature",
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     }
+    }
+   },
+   "panel_queries_p95_over_3s_20_viewers": {
+    "7d": 0,
+    "30d": 0
+   },
+   "docker_cpu_peak_pct": {
+    "sc07-influxdb": 711.17,
+    "sc07-grafana": 874.06
+   },
+   "viewers_phase_seconds": 29.4,
+   "query_errors": 0,
+   "flux_timeouts": 0,
+   "host_health": {
+    "cpu_max": 98.4,
+    "mem_max": 74.9,
+    "rss_mb_max": 110.38671875,
+    "threads_max": 155,
+    "fds_max": 1650,
+    "disk_max": 50.1,
+    "rss_growth_mb_per_h": 808.8431861227928,
+    "samples": 26
+   }
+  },
+  "probe_quantiles_l1": {
+   "current (3 queries, tdigest) @7d": {
+    "single_p50_s": 0.128,
+    "single_max_s": 0.209,
+    "rows": 492,
+    "errors": 0,
+    "20_concurrent_p50_s": 1.378,
+    "20_concurrent_max_s": 1.446,
+    "20_wall_s": 1.47
+   },
+   "current (3 queries, tdigest) @30d": {
+    "single_p50_s": 0.482,
+    "single_max_s": 0.509,
+    "rows": 2148,
+    "errors": 0,
+    "20_concurrent_p50_s": 6.851,
+    "20_concurrent_max_s": 7.01,
+    "20_wall_s": 7.03
+   },
+   "pre-aggregated (3 queries, pulsar_feature_quantiles) @7d": {
+    "single_p50_s": 0.033,
+    "single_max_s": 0.039,
+    "rows": 495,
+    "errors": 0,
+    "20_concurrent_p50_s": 0.396,
+    "20_concurrent_max_s": 0.442,
+    "20_wall_s": 0.47
+   },
+   "pre-aggregated (3 queries, pulsar_feature_quantiles) @30d": {
+    "single_p50_s": 0.036,
+    "single_max_s": 0.052,
+    "rows": 2151,
+    "errors": 0,
+    "20_concurrent_p50_s": 0.481,
+    "20_concurrent_max_s": 0.514,
+    "20_wall_s": 0.55
+   }
+  }
+ }
+}

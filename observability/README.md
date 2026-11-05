@@ -26,6 +26,7 @@ never a status color.
 | `<model>_<version>_input_data` | `Pulse` (pulsar-data-collection) | captures: features, predictions, labels when known, `pii_count`; agent records (`record_type` agent_run / tool_call / llm_call) |
 | `pulsar_results` | `ResultsSink` (pulsar-data-collection) | one point per `MetricResults`: tags `metric_type`, `metric_name`, `feature_name`, `group`, `reference_group`, `test_type`, plus caller tags (`campaign`, `phase`, `scenario`); fields `metric_value`, `ci_low`, `ci_high`, `threshold*`, `n`, `e_value`, `status` (1 established, 0 within, -1 inconclusive), `p_adjusted`, `confirmed` |
 | `pulsar_capture_stats` | `StatsReporter` (pulsar-data-collection) | counters of each Pulse |
+| `pulsar_feature_quantiles` | `analysis_job.py`, `seed_demo.py` (`analysis.write_hourly_quantiles`, through `ResultsSink.write_stats_many`) | per model and numeric feature, one point per hour stamped at the end of the hour: tags `model_id`, `model_version`, `feature_name`; fields `p10`, `median`, `p90` (exact quantiles of the rows of that hour), `n` |
 
 ## Run it
 
@@ -43,7 +44,9 @@ to change before any shared use).
   analyses every 6 hours. `--agent-campaign` analyses the agent runs of a campaign already in the bucket (see
   `genai_agent/campaign.py`); `--probe-rows` adds the counterfactual probe results of `genai_agent/probe_agent.py`.
 - `analysis_job.py` is the periodic analysis of a live model: every `--every` minutes it reads the window that just
-  closed and writes its results (`--once` for a single run).
+  closed and writes its results (`--once` for a single run). It also recomputes the hourly quantiles of the last
+  `--quantile-hours` closed hours (default 24, so that late rows count; rewriting an hour overwrites it). For a model
+  already captured before the job, backfill once with `--once --quantile-hours 720`.
 - `build_dashboards.py` regenerates the dashboards (`grafana/dashboards/*.json`) from their Python description; edit
   it rather than the JSON, then restart Grafana or wait for the provisioning to reload.
 
@@ -57,3 +60,11 @@ to change before any shared use).
   every group into a false disparity), fixed in pulsar-metrics 0.9.1, and a calibration artifact of the demo itself
   (a reference of 8 contiguous windows is too short for a contiguous A/A calibration; the demo now draws random rows,
   which suits its independent rows).
+- At scale (lab SC-07: 300 models, 30 days of results, 20 concurrent viewers) every panel stays under 3 s at 7 days.
+  The model selector no longer puts a negation in its predicate: that made it linear in the number of series (3.8 s
+  at 20,000 models, 0.1 s now). The drift feature selector lists numeric features only. The hourly quantile band
+  read the raw captures (quantiles are not pushed down to storage in InfluxDB 2.6): about 9 s at 30 days with 20
+  viewers. It now reads the hours pre-aggregated by the analysis job (`pulsar_feature_quantiles`); only the hours after
+  the last aggregated one (24 at most) are computed from the raw captures, and older hours never aggregated show as a
+  gap (`lab/rapports/rapport_sc07_tableaux_echelle.md`, section "Correctif L1").
+- Tests of the aggregation: `python -m unittest discover -s tests -v` (from this folder).
