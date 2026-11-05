@@ -1,0 +1,250 @@
+{
+ "created": "2026-11-04T23:27:48+00:00",
+ "metadata": {
+  "model": "llama3.2:3b",
+  "temperature": 0.7,
+  "failures": 0
+ },
+ "answers": {
+  "Explain in two sentences what a rent assistance program is.": [
+   "A rent assistance program is a government-funded or non-profit organization that provides financial support to individuals and families who are struggling to pay their rent, often due to poverty, unemployment, or other forms of hardship. These programs typically offer temporary emergency funding, subsidies, or vouchers to help eligible participants cover part or",
+   "A rent assistance program provides financial support to individuals or families who are struggling to pay their rent, often due to job loss, medical expenses, or other unexpected events. These programs may offer temporary or permanent financial aid, such as subsidies, vouchers, or emergency grants, to help eligible tenants cover their rent",
+   "A rent assistance program is a government-funded or non-profit organization that provides temporary financial support to low-income individuals and families to help them pay their rent, mortgages, or other housing costs. These programs often have eligibility requirements and may offer varying levels of assistance, such as subsidies, vouchers, or lump-sum"
+  ],
+  "Expliquez en deux phrases ce qu'est une subvention à la rénovation.": [
+   "Une subvention à la rénovation est un avantage financier accordé par le gouvernement ou une entité publique pour aider les propriétaires à réaliser des travaux de rénovation sur leur immeuble ou maison, en visant à améliorer ses conditions d'habitation",
+   "Une subvention à la rénovation est un avantage financier offert par l'État, les collectivités ou les institutions publiques pour contribuer à financer les travaux de rénovation et de modernisation des bâtiments existants. Cette aide peut prendre différentes formes,",
+   "Une subvention à la rénovation est un avantage financier accordé par l'État ou une entité publique pour aider les particuliers à financer leurs projets de rénovation de leur domicile, en échange d'une certaine condition. Cette aide peut prendre variouses formes"
+  ],
+  "List three documents usually needed to apply for child care benefits.": [
+   "Here are three documents that are typically required when applying for child care benefits:\n\n1. **Identification and Income Documents**: This may include:\n\t* Your driver's license or state ID\n\t* Pay stubs (up to 30 days)\n\t* W-2 forms (previous year's income",
+   "Here are three documents that are often required when applying for child care benefits:\n\n1. **Identification and Proof of Income Documents**:\n\t* Government-issued ID (driver's license, passport)\n\t* Proof of income (pay stubs, W-2 forms, or tax returns)\n\n2.",
+   "Here are three common documents that may be required when applying for child care benefits:\n\n1. **Proof of Income**: This can include pay stubs, W-2 forms, or other documentation showing your current income and employment status.\n\n2. **Identification Documents**: You'll typically need to provide a valid"
+  ],
+  "Quelles sont trois raisons courantes de refus d'une demande d'aide ?": [
+   "Bien sûr, voici trois raisons courantes de refus d'une demande d'aide :\n\n1. **Manque de ressources financières** : De nombreux organismes qui offrent une aide peuvent ne pas disposer des moyens nécessaires pour soutenir une demande spécifique.",
+   "Bien sûr, voici trois raisons courantes de refus d’une demande d’aide :\n\n1. **Manque de préétablissement (ou absence d'avis)** : Si vous n’avez pas obtenu un avis favorable ou préalablement à votre demande d’aide",
+   "Voici trois raisons couramment mentionnées pour les refus de demande d'aide :\n\n1. **Manque de ressources** : Les prestataires d'assistance peuvent ne pas avoir les moyens nécessaires, tels que des fonds ou du personnel, pour fournir"
+  ],
+  "Write a short polite reply to someone asking about their application status.": [
+   "Here is a sample polite reply:\n\n\"Dear [Name],\n\nThank you for your email regarding the status of your application. I'm happy to let you know that we are currently reviewing all applications and will be in touch with the next steps soon.\n\nPlease note that our hiring process can take some time,",
+   "Here is a sample response:\n\n\"Dear [Name],\n\nThank you for your interest in the [Position/Program] at [Company/Organization]. I wanted to personally update you on the status of your application.\n\nUnfortunately, our hiring process can take some time, and we are currently [insert timeline,",
+   "Here is a sample polite reply:\n\n\"Dear [Name],\n\nThank you for your interest in [Position/Opportunity]. I appreciate the time you took to apply and share your qualifications with us.\n\nI will be able to provide an update on the current status of your application at [Timeframe, e"
+  ],
+  "Rédigez une courte réponse polie à une personne qui demande l'état de son dossier.": [
+   "Bonjour,\n\nJe vous remercie d'avoir contacté mon bureau pour connaître l'état de votre dossier. Malheureusement, je n'ai pas accès aux informations concernant vos dossiers.\n\nSi vous le souhaitez, nous pouvons discuter des étapes suivantes",
+   "Voici une réponse polie :\n\n\"Bonjour, merci pour votre question. Je vais vous fournir les informations nécessaires quant à l'état de mon dossier. Puis-je savoir si c'est lié à un sujet spécifique ou s'il s'agit d'un requête géné",
+   "Bonjour, je vous remercie de votre question. Cependant, je suis actuellement indisponible pour discuter de mes dossiers personnels. Si vous avez besoin d'informations ou de renseignements supplémentaires, je serais ravi de vous aider à retr"
+  ],
+  "What is the difference between a grant and a loan? Answer briefly.": [
+   "The main differences between a grant and a loan are:\n\n1. Ownership: A grant gives you ownership of the asset or property, while a loan requires repayment with interest.\n2. Repayment: A grant has no repayment requirement, while a loan must be repaid with interest, usually within a set",
+   "The key differences between a grant and a loan are:\n\n- A grant: Free money provided by a government or organization, typically for a specific purpose, with no repayment required.\n- A loan: Borrowed money that must be repaid with interest, usually requiring repayment over time.\n\nIn essence, grants",
+   "The main difference between a grant and a loan is:\n\n* A grant is a gift of money that doesn't need to be repaid.\n* A loan requires repayment, usually with interest.\n\nThink of it like borrowing money: grants are free money, while loans are borrowed money that must be paid back"
+  ],
+  "Donnez un exemple de calcul d'un montant d'aide selon le revenu.": [
+   "Voici un exemple de calcul d'un montant d'aide selon le revenu :\n\n**Exemple :**\n\nUn individuel nommé Pierre a une situation suivante :\n\n* Son revenu mensuel est égal à 2 000 €.\n* Il a des dettes pour lesqu",
+   "Voici un exemple de calcul d'un montant d'aide en fonction du revenu :\n\n**Revenu mensuel** | **Montant d'aide**\n\n* 0-2 500 € | -50% sur les impôts\n* 2 501-4 ",
+   "Exemple de calcul d’un montant d’aide selon le revenu :\n\nSupposons que nous avons un système de aide sociale qui attribue un certain montant d’argent à une personne en fonction de son revenu.\n\nLes critères utilisés pour déterminer le montant de"
+  ],
+  "Summarize in one sentence why income limits exist in public programs.": [
+   "Income limits exist in public programs, such as Medicaid and food assistance programs like SNAP (Supplemental Nutrition Assistance Program), to prevent unnecessary duplication of benefits, ensure that resources are not wasted on those who do not genuinely need them, and promote efficient use of limited government funds.",
+   "Income limits exist in public programs to ensure that only those who are most vulnerable or in greatest need can access these essential resources, preventing them from being drained of their limited financial reserves and preventing abuse or exploitation of the system.",
+   "Income limits exist in public programs to prevent wealthier individuals from receiving benefits that are intended for low-income families and to ensure that resources are allocated fairly and sustainably."
+  ],
+  "Expliquez en une phrase pourquoi une authentification est demandée avant d'ouvrir un dossier.": [
+   "Une authentification est demandée avant d'ouvrir un dossier pour garantir que les personnes concernées par les informations contenues dans le dossier ont les droits et les autorisations nécessaires pour accéder à cette information confidentielle.",
+   "Une authentification est demandée avant d'ouvrir un dossier pour garantir que la personne concernée a le droit d'accéder aux informations contenues dans celui-ci et pour prévenir toute violation de la vie privée ou des confidentialités.",
+   "Une authentification est demandée avant d'ouvrir un dossier pour s'assurer que l'utilisateur a les autorisations nécessaires et la confidentialité requise pour accéder aux informations contenues dans le dossier, en garantissant ainsi la sécurité et la protection des données sensibles."
+  ],
+  "Name two ways a citizen can contact a public service office.": [
+   "Two ways a citizen can contact a public service office are:\n\n1. Phone: Citizens can call the office directly to speak with an employee or leave a voicemail.\n2. Email: Many public service offices have an email address that citizens can use to send inquiries, requests, or feedback.",
+   "Here are two ways a citizen can contact a public service office:\n\n1. Phone: Many public service offices have phone numbers that citizens can call to ask questions, make appointments, or report issues.\n2. Email: Some public service offices also have email addresses where citizens can send messages, request information,",
+   "Two ways a citizen can contact a public service office include:\n\n1. Phone: Most public service offices have a phone number that citizens can call to inquire about services, report issues, or request assistance.\n2. In-person visit: Citizens can also visit the public service office in person to speak with representatives"
+  ],
+  "Décrivez en deux phrases la formation professionnelle subventionnée.": [
+   "La formation professionnelle subventionnée est un programme gouvernemental qui permet aux travailleurs de bénéficier d'un soutien financier pour suivre des cours ou des formations professionnelles, afin d'améliorer leurs compétences et leur employabilité sur le marché du travail. Ces programmes sont",
+   "La formation professionnelle subventionnée est un programme qui permet aux salariés de poursuivre leurs études et acquérir des compétences pour améliorer leur employabilité et leur carrière, avec une aide financière de la part de l'État ou d'autres organism",
+   "La formation professionnelle subventionnée est un programme de soutien financier et de guidance qui permet aux candidats de poursuivre des formations dédiées à leur carrière. Cette subvention peut être accordée par l'État ou les entreprises pour aider les individus à acquér"
+  ],
+  "Explain in three sentences how a property tax credit works.": [
+   "A property tax credit is an incentive offered by the government to lower-income homeowners that allows them to offset part or all of their local property taxes on their federal income tax return. In exchange for receiving this credit, eligible homeowners must meet certain income limits and occupy the home as their primary residence. By claiming",
+   "A property tax credit is an annual payment that homeowners receive from their local government to offset the amount of property taxes they pay on their home or other real estate. The credit amount varies depending on the location, with some areas offering more generous credits than others. Homeowners can use these credits to reduce their",
+   "A property tax credit is a refundable tax credit that allows eligible homeowners to reduce their annual property taxes based on the assessed value of their primary residence. The credit amount varies by state and locality, but it typically represents a percentage of the total property taxes owed, allowing homeowners to keep more of their hard"
+  ],
+  "Expliquez en trois phrases le fonctionnement d'un crédit d'impôt foncier.": [
+   "Un crédit d'impôt foncier est un avantage fiscal qui permet aux propriétaires de biens immobiliers de réduire leur charge fiscale. Il s'agit d'une somme d'argent que l'État doit à chaque propriétaire immobilier",
+   "Un crédit d’impôt foncier est un avantage fiscal accordé aux propriétaires de biens immobiliers en France, permettant de réduire l'impôt sur le revenu. Le crédit est calculé en fonction des impôts fonciers",
+   "Un crédit d’impôt foncier est un avantage fiscal qui permet aux propriétaires de biens immobiliers de bénéficier d’une réduction fiscale sur leurs impôts fonciers. Ce crédit est calculé en fonction du montant des impô"
+  ],
+  "Give two examples of proof of residence accepted by a public office.": [
+   "Here are two common examples of proof of residence that may be accepted by a public office:\n\n1. Utility Bill: A utility bill from a electricity, gas, water, or internet service provider can serve as proof of residence. This type of bill typically includes the resident's name and address, and is",
+   "Here are two examples of proof of residence that may be accepted by a public office:\n\n1. Utility Bill: A utility bill (such as an electricity, gas, or water bill) with your name and address on it can serve as proof of residence. The bill should be recent (usually within the",
+   "Here are two common examples of proof of residence that may be accepted by a public office:\n\n1. **Utility Bill**: A utility bill from a local service provider, such as electricity, gas, water, or internet, can serve as proof of residence. The bill should include the applicant's name and"
+  ],
+  "Donnez deux exemples de preuves de résidence acceptées par un bureau public.": [
+   "Cela dépend du pays ou de la région dans laquelle vous vous trouvez, mais je peux fournir quelques exemples généraux d'identifiants de résidence qui pourraient être acceptés par un bureau public dans certaines régions.\n\n1.  **Lett",
+   "Voici deux exemples de preuves de résidence acceptées par un bureau public :\n\n1. **Facture d'électricité ou de gaz** : La facture d'électricité ou de gaz est une preuve courante de résidence acceptée par les bureaux publics",
+   "Bien sûr, voici deux exemples de pièces de preuve de résidence acceptées par un bureau public :\n\n1. **Facture d'électricité ou de gaz** : La facture du fournisseur d'énergie est une pièce de preuve de résidence classique."
+  ],
+  "Write a short message telling a citizen that a document is missing from their file.": [
+   "\"Dear [Citizen's Name],\n\nWe have reviewed your file and noticed that one of the supporting documents required for processing was not received. Please contact our office at [phone number] or [email address] to confirm receipt of this document, or to request a replacement if it is missing.\n\nS",
+   "\"Dear [Citizen's Name],\n\nWe have located your recent documents, however, it appears that one of the files was misplaced. Unfortunately, this means that [document name] is currently unaccounted for in your file.\n\nWe are working to locate and retrieve any lost documents immediately. In the",
+   "\"Hello [Citizen's Name],\n\nWe have reviewed your file and noticed that the document 'License to Operate' is currently missing. We are working to locate an alternative copy for you. In the meantime, please contact our office at [phone number] or [email address] if you need"
+  ],
+  "Rédigez un court message informant une citoyenne qu'il manque un document à son dossier.": [
+   "Objet : Notification de non-présence d'un document dans votre dossier\n\nChère [Nom de la citoyenne],\n\nNous vous écrivons pour informer que, suite à notre vérification des dossiers, il semble qu'il manque un document important à votre dossier act",
+   "Objet : Notification de manque de document dans votre dossier\n\nChère Madame/Monsieur [Nom],\n\nNous vous informons que, suite à notre vérification récente sur vos dossiers, nous avons identifié un document manquant pour le complet de votre dossier.\n\nLe document concerné",
+   "Bonjour madame,\n\nJe vous écris pour vous informer que nous avons détecté un problème avec votre dossier, notamment l'absence de certain documents importants.\n\nNous avons vérifié les informations fournies par vous et constaté que le document manquant est un acte de"
+  ],
+  "What is a waiting list for social housing? Answer in two sentences.": [
+   "A waiting list for social housing refers to the list of individuals or families who are eligible for government-subsidized rental accommodation but do not currently have a suitable place to live, with the understanding that they will be offered a home as soon as one becomes available. The length and priority of access to",
+   "A waiting list for social housing refers to a list of individuals or families who are in need of affordable housing but do not currently have a place to live, and are being waited upon by the housing authority for available units to become available. The length of time an individual remains on the waiting list can vary",
+   "A waiting list for social housing refers to the list of individuals or families who are waiting to be allocated a home through a government-funded program, such as Housing Benefit or Section 8 vouchers, due to high demand for available housing and limited availability. Typically, applicants on these lists must meet specific income and"
+  ],
+  "Qu'est-ce qu'une liste d'attente pour un logement social ? Répondez en deux phrases.": [
+   "Une liste d'attente pour un logement social est une liste de personnes qui attendent l'accès à un logement social, généralement en raison d'un besoin urgent ou de circonstances exceptionnelles telles que la situation d'urgence ou le refus de logement",
+   "Une liste d'attente pour un logement social est une énumération des personnes ou des familles qui ont demandé à être accueillies dans le système de logements sociaux, en fonction de leur priorité et de leurs besoins. Les détails de la liste peuvent",
+   "Une liste d'attente pour un logement social est une file d'attendu des personnes qui ont besoin d'un logement mais ne peuvent pas s'y rendre immédiatement en raison de la demande excessive. Les gens sur cette liste sont généralement sélectionnés par ordre"
+  ],
+  "List four steps to renew a driving permit.": [
+   "Here are the four steps to renew a driving permit:\n\n1. **Check if you need to renew your permit**: Check with your state's Department of Motor Vehicles (DMV) or equivalent agency to see if your permit is set to expire soon, and if so, determine what requirements apply to renewal",
+   "Here are the four steps to renew a driving permit:\n\n1. **Check your eligibility**: Make sure you meet the requirements for renewing your permit, which typically includes being at least 15 years and 6 months old (for a learner's permit) or having completed the required amount of supervised driving",
+   "Here are the four steps to renew a driver's permit:\n\n1. **Check Eligibility**: Make sure you meet the eligibility criteria for permit renewal, which typically includes being at least 15 years and 6 months old (for a full permit), or having held a learner permit for a certain period"
+  ],
+  "Énumérez quatre étapes pour renouveler un permis de conduire.": [
+   "Renouveler un permis de conduire peut être une tâche fastidieuse, mais il est important de procéder correctement pour garantir que vous disposez du document nécessaire pour conduire dans votre paysage. Voici quatre étapes à suivre :\n\n1.",
+   "Renouveler un permis de conduire est une procédure essentielle pour maintenir votre autorisation de conduire en vigueur. Voici les quatre étapes à suivre :\n\n1. **Vérifiez vos documents** : Avant de commencement le processus",
+   "Renouveler un permis de conduire peut être une tâche fastidieuse, mais voici les étapes de base à suivre :\n\n1.  **Vérifiez la durée de validité du permis** : Consultez le site web de l'"
+  ],
+  "Explain the difference between a refundable and a non-refundable tax credit.": [
+   "A refundable tax credit and a non-refundable tax credit are two types of tax credits that the Internal Revenue Service (IRS) offers to eligible taxpayers.\n\n**Refundable Tax Credit:**\n\nA refundable tax credit is an amount of money that the government owes you if you have overpaid",
+   "A refundable tax credit is a type of tax credit that can result in a refund if the amount of the credit exceeds the amount of taxes owed.\n\nHere's how it works:\n\n1. The credit is calculated based on your income, family size, or other factors.\n2. If you owe no",
+   "In the United States, tax credits are a type of tax benefit that reduces an individual's or business's tax liability dollar-for-dollar. The main difference between a refundable tax credit and a non-refundable tax credit lies in how much of the credit can be claimed as a refund.\n\n**Non"
+  ],
+  "Expliquez la différence entre un crédit d'impôt remboursable et non remboursable.": [
+   "Bien sûr, je serais ravi de vous aider !\n\nUn crédit fiscal est une aide financière offerte par l’État pour aider les contribuables à réduire leur fardeur fiscale. Il existe deux types de crédits fiscaux : le crédit d",
+   "Une excellente question !\n\nDans le contexte des impôts, il existe deux types de crédits fiscaux : les crédits d'impôt remboursables et les crédits d'impôt non remboursables.\n\n**Crédit d'impôt remb",
+   "Un crédit d'impôt remboursable et un crédit d'impôt non remboursable sont deux types de crédits fiscaux qui peuvent aider les individus à réduire leur charge fiscale.\n\n**Crédit d'impôt remboursable"
+  ],
+  "Describe in one paragraph how to appeal an administrative decision.": [
+   "To appeal an administrative decision, first review the original decision and any supporting documentation to understand the reasoning behind it. Next, gather evidence and arguments that support your case, such as witness statements, medical records, or other relevant documents. Prepare a clear and concise written statement outlining the reasons why you disagree with",
+   "To appeal an administrative decision, you typically need to follow a specific process outlined by the relevant administrative agency or tribunal. First, review your original decision and any supporting documentation to understand the reasoning behind it. Next, gather evidence and arguments that support your case, which may include submitting written statements, witness testimony",
+   "To appeal an administrative decision, start by reviewing the original decision and any supporting documents provided. Next, gather relevant evidence or witnesses that can support your case, if applicable. Then, prepare a clear and concise written statement outlining your grounds for appeal and any new information or arguments you want to present. Include"
+  ],
+  "Décrivez en un paragraphe comment contester une décision administrative.": [
+   "Contester une décision administrative est un processus qui consiste à faire appel contre une décision prise par un organisme administratif, tel que le gouvernement ou une entreprise publique. Pour contester une telle décision, il faut d'abord vérifier si la décision",
+   "Contester une décision administrative consiste à présenter des arguments et des preuves pour soutenir votre revendication ou vos griefs. Tout d'abord, il est essentiel de vérifier si la contestation peut être effectuée auprès du même administr",
+   "Pour contester une décision administrative, il est essential de suivre les procédures et les étapes appropriées. Tout d'abord, il est recommandé de consulter le guide ou le règlement en vigueur dans votre région ou pays pour comprendre les exigences"
+  ],
+  "What should a person do if they lose their health insurance card?": [
+   "If you lose your health insurance card, there are several steps you can take to resolve the issue:\n\n1. Replace the card: Contact your health insurance provider's customer service department to request a replacement card. You may need to provide proof of identity and residency to verify your information.\n2. Access alternative",
+   "If a person loses their health insurance card, there are several steps they can take to resolve the issue and obtain a replacement card:\n\n1. **Contact their health insurance provider**: Reach out to the phone number on the back of the lost or stolen card or check the website for customer service contact information.",
+   "If you lose your health insurance card, it's essential to act quickly to minimize any potential disruption to your coverage. Here are the steps you can take:\n\n1. **Contact your insurer**: Reach out to your health insurance company as soon as possible to report the loss or theft of your ID card."
+  ],
+  "Que doit faire une personne qui perd sa carte d'assurance maladie ?": [
+   "Si vous avez perdu votre carte d'assurance maladie, voici les étapes à suivre pour résoudre le problème :\n\n1. **Contactez vos assureurs** : Comme d'habitude, contactez vos assureurs en personne ou par téléphone pour leur dé",
+   "Si vous avez perdu votre carte d'assurance maladie, il est important de prendre les mesures suivantes pour minimiser la perturbation de vos soins médicaux :\n\n1.  **Contactez votre assureur** : Appelez immédiatement votre assureur pour",
+   "Si vous perdez votre carte d'assurance maladie, voici les étapes que vous devriez suivre pour résoudre le problème :\n\n1. **Contactez votre assureur** : Appelez votre compagnie d'assurance et expliquez la situation. Ils"
+  ],
+  "Summarize in two sentences the purpose of a parental leave benefit.": [
+   "A parental leave benefit is designed to provide financial support and assistance to parents who are taking time off from work to care for their newborn or adopted child, allowing them to balance family responsibilities with career obligations. The primary purpose of these benefits is to enable parents to take extended leaves without facing significant financial hardship,",
+   "The primary purpose of a parental leave benefit is to provide financial support and stability for families during a critical period, allowing parents to take time off from work or self-care to care for their newborns or newly adopted children. By providing this financial safety net, governments aim to promote bonding between caregivers and children",
+   "The primary purpose of a parental leave benefit is to support working parents by providing financial assistance while they care for their newborn or newly adopted child, allowing them to balance work and family responsibilities. By offering this benefit, governments aim to promote equal opportunities for fathers and mothers to participate in childcare, reduce the gender"
+  ],
+  "Résumez en deux phrases l'objectif d'une prestation de congé parental.": [
+   "Bien sûr, voici un résumé de l'objectif d'une prestation de congé parental :\n\nL'objectif d'une prestation de congé parental est de permettre aux parents de prendre du temps pour se soigner ou s'accorder la possibilité de passer du temps",
+   "Bien sûr, voici une résumé des objectifs d'une prestation de congé parental :\n\nL'objectif d'une prestation de congé parental est de permettre aux parents de prendre du temps pour s'occuper de leur enfant lorsqu'ils sont nés ou après",
+   "Bien sûr, voici une brève explication :\n\nLa prestation de congé parental permet aux parents ou aux tuteurs de prendre du recul et de se concentrer sur leur santé mentale, leur bien-être et leurs besoins personnels pendant la période immédiatement après"
+  ],
+  "Give an example of a monthly budget for a family of four with a modest income.": [
+   "Here's an example of a monthly budget for a family of four with a modest income:\n\n**Assumptions:**\n\n* Household income: $4,500 per month\n* Family size: 2 adults, 2 children (ages 6 and 10)\n* Monthly expenses:\n\t+",
+   "Here's an example of a monthly budget for a family of four with a modest income:\n\nAssumptions:\n\n* Gross income: $4,000 per month\n* Net income (after taxes): $3,200 per month\n* Family size: 4 members (2 adults and 2",
+   "Here's an example of a monthly budget for a family of four with a modest income:\n\nAssumptions:\n\n* Gross household income: $4,500 per month\n* Family size: 2 adults and 2 children (ages 6 and 8)\n* Moderate lifestyle expectations\n* No"
+  ],
+  "Donnez un exemple de budget mensuel pour une famille de quatre au revenu modeste.": [
+   "Bien sûr, voici un exemple de budget mensuel pour une famille de quatre personnes avec un revenu modeste :\n\n**Informations générales**\n\n* Revenu brut mensuel : 2 500 €\n* Nombre d'adultes : 3 (père, mère",
+   "Bien sûr, je vais vous donner un exemple de budget mensuel pour une famille de quatre personnes à revenu modeste. Il est important de noter que ce budget est juste un exemple et qu'il peut varier en fonction de vos besoins et de vos préférences personnelles.\n\n",
+   "Bien sûr, je vais vous donner un exemple de budget mensuel pour une famille de quatre personnes avec un revenu modeste.\n\n**Revenu mensuel :** 2 000 €\n\n**Budget mensuel :**\n\n1. **Logement :**\n * Lozère (électric"
+  ],
+  "Write a polite email asking for an appointment at a service centre.": [
+   "Here is a sample email:\n\nSubject: Request for Appointment at [Service Centre Name]\n\nDear Service Centre Team,\n\nI am writing to request an appointment at your service centre to have my vehicle serviced. I would greatly appreciate it if you could let me know when and where I can bring my vehicle in.\n\n",
+   "Here is a sample email:\n\nSubject: Request for Appointment at [Service Centre Name]\n\nDear Service Centre Team,\n\nI am writing to request an appointment at your service centre for [briefly mention the reason for the visit, e.g., \"my vehicle needs routine maintenance\" or \"I have a concern",
+   "Here is a sample email you could send:\n\nSubject: Request for Appointment at [Service Centre Name]\n\nDear [Service Centre Name] Team,\n\nI am writing to request an appointment at your service centre for [optional: specify the reason for the visit, e.g. \"maintenance\" or \"repair\"]"
+  ],
+  "Rédigez un courriel poli pour demander un rendez-vous dans un centre de services.": [
+   "Voici un exemple de courriel poli pour demander un rendez-vous dans un centre de services :\n\nObjet : Demande de rendez-vous pour [type de consultation/séance]\n\nChère/Mesdame [Nom du responsable],\n\nJe vous écris pour demander un rendez-vous",
+   "Objet : Demande de rendez-vous au centre de services\n\nCher(e) [Nom du responsable ou du service],\n\nJe vous écris pour demander un rendez-vous à votre centre de services, situé à [adresse du centre]. J'ai besoin d'accès à vos services pour",
+   "Voici un exemple de courriel poli pour demander un rendez-vous dans un centre de services :\n\nObjet : Demande de rendez-vous pour [type de service ou consultation]\n\nMadame/Monsieur [Nom du responsable ou du personnel],\n\nJe vous écris pour demander un rendez"
+  ],
+  "Explain why some programs ask for the previous year's tax return.": [
+   "There are several reasons why some programs may ask for the previous year's tax return:\n\n1. Funding Verification: Many government programs, including education assistance, housing subsidies, and unemployment benefits, require documentation of income to ensure that the recipient is not receiving duplicate benefits. By requesting the previous year's tax return",
+   "There are several reasons why some programs or organizations may request a previous year's tax return:\n\n1. **Verification of income**: By reviewing past tax returns, it can be verified that an individual's income has remained stable or consistent over time. This helps to ensure that the individual is eligible for certain benefits",
+   "There are several reasons why some programs, such as mortgage lenders or employers, may ask for the previous year's tax return:\n\n1. **Verification of income**: Tax returns can be used to verify an individual's income level and ensure it is consistent with their current financial situation. This helps lenders or employers"
+  ],
+  "Expliquez pourquoi certains programmes demandent la déclaration de revenus de l'année précédente.": [
+   "La nécessité de déclarer des revenus de l'année précédente pour certaines situations est souvent liée à plusieurs facteurs, notamment :\n\n1.  **Règlement des impôts** : La déclaration de revenus permet aux organismes fiscaux d",
+   "La demande de déclaration de revenus de l'année précédente est une exigence réglementaire pour les programmes gouvernementaux et fiscalistes qui visent à évaluer la richesse des individus et des entreprises, ainsi que de leurs revenus et de leurs biens.\n\n",
+   "Les programmes qui demandent la déclaration de revenus de l'année précédente sont souvent des régimes fiscaux ou d'autres programs gouvernementaux, tels que les avantages pour retraités, les allocations chômage et les programmes de sécurité sociale. Voici quelques"
+  ],
+  "List three common mistakes when filling in an application form.": [
+   "Here are three common mistakes to watch out for when filling in an application form:\n\n1. **Typos and grammatical errors**: A single mistake, such as a typo or grammatical error, can make a negative impression on the reviewer. Make sure to proofread your responses carefully before submitting them.\n\n",
+   "Here are three common mistakes to watch out for when filling in an application form:\n\n1. **Typos and grammatical errors**: A single mistake can raise red flags about your attention to detail or literacy skills. Make sure to proofread your application carefully before submitting it.\n\n2. **Inaccurate",
+   "Here are three common mistakes people make when filling out an application form:\n\n1. **Typos and grammatical errors**: Carelessly typing or writing \"teh\" instead of \"the\", or using incorrect verb tenses, can raise red flags with the applicant. Double-check your responses for spelling,"
+  ],
+  "Énumérez trois erreurs courantes en remplissant un formulaire de demande.": [
+   "Voici trois erreurs courantes à éviter lors du remplissage d'un formulaire de demande :\n\n1. **Oubli de fournir une adresse complète** : Il est important de s'assurer que l'adresse complète, y compris le numéro, la rue,",
+   "Voici trois erreurs courantes en remplissant un formulaire de demande :\n\n1. **L'omission des informations obligatoires** : Il est important de vérifier soigneusement les exigences du formulaire et de répondre à toutes les questions demandées. L'omission d'",
+   "Bien sûr, voici trois erreurs courantes qui peuvent se produire lors du remplissage d'un formulaire de demande :\n\n1. **Manque ou erreur de données personnelles** : Il est essentiel de fournir les informations personnelles correctes et complètes, notamment le"
+  ],
+  "What is a means test? Answer in two sentences.": [
+   "A means test is an evaluation of a person's financial situation to determine their eligibility for a particular benefit, program, or service, often based on income, assets, and expenses. The purpose of a means test is to ensure that only those who need the assistance the most can access it, by setting",
+   "A means test is an assessment used to determine whether an individual or family has sufficient financial resources to support themselves, typically through government programs such as Medicaid or food stamps. The test evaluates the applicant's income, assets, and expenses to set a threshold for eligibility, with those who fall below this level being",
+   "A means test is an evaluation process used to determine an individual's or family's financial eligibility for government benefits, such as Medicaid, food stamps, or housing assistance, by assessing their income and assets. The test typically takes into account various factors, including income level, expenses, savings, debts, and"
+  ],
+  "Qu'est-ce qu'un critère de ressources ? Répondez en deux phrases.": [
+   "Un critère de ressource est un ensemble de caractéristiques, telles que la disponibilité, l'accessibilité et la durabilité, qui permettent d'évaluer la qualité et la quantité des ressources d'une région ou d'un pays. Ces critères",
+   "Un critère de ressources est une méthode utilisée pour évaluer la qualité et la quantité des informations ou données disponibles sur un sujet ou un projet. Les critères de ressources permettent aux décideurs de prendre des décisions éclairées en considérant les facteurs",
+   "Un critère de ressources est un ensemble d'indicateurs et de mesures qui permettent d'évaluer la qualité, la quantité et la disponibilité des ressources dont dispose une organisation ou une communauté pour atteindre ses objectifs. Les critères de ressources"
+  ],
+  "Describe how a citizen can follow the progress of an online application.": [
+   "As a citizen, following the progress of an online application can be done in several ways:\n\n1. **Tracking the Application Status**: Most government agencies and organizations provide a \"Track Your Application\" feature on their website. This feature allows you to enter your application reference number or other identifying information to view the",
+   "A citizen can follow the progress of an online application in several ways:\n\n1. **Tracking Status**: Most government agencies and service providers offer tracking features that allow citizens to monitor the status of their applications in real-time. This feature provides updates on the processing time, stage reached, and any required documents or",
+   "As a citizen, following the progress of an online application is crucial to ensure that your application is processed efficiently and effectively. Here's a step-by-step guide on how you can track the progress of an online application:\n\n1. **Register for an Account**: If you haven't already, create an account"
+  ],
+  "Décrivez comment une personne peut suivre l'avancement d'une demande en ligne.": [
+   "Une fois que vous avez déposé votre demande en ligne, il est possible de suivre son avancement à travers plusieurs étapes. Voici les étapes générales que vous pouvez suivre :\n\n1. **Accès à votre compte :** Commencez par se connecter à",
+   "Pour suivre l'avancement d'une demande en ligne, voici les étapes que vous pouvez suivre :\n\n1. **Rendez-vous sur le site web de la plateforme ou du service**: Recherchez le site web où vous avez soumis votre demande et rendez-vous sur la page",
+   "Bonjour ! Suivre l'avancement d'une demande en ligne peut être un processus relativement simple, mais il est important de comprendre les étapes nécessaires pour obtenir des informations à jour sur la situation de votre demande.\n\nVoici les étapes générales pour suivre l'av"
+  ],
+  "Compute the yearly total of a benefit of 245 dollars paid every two weeks, and show the steps.": [
+   "To compute the yearly total of a benefit, we need to calculate the total amount paid in a year and then multiply it by the number of pay periods in a year.\n\nStep 1: Calculate the weekly amount\nDivide the bi-weekly amount ($245) by 2 to get the weekly",
+   "To compute the yearly total of a benefit of $245 paid every two weeks, we need to follow these steps:\n\n1. Determine the number of pay periods in a year: Since the benefit is paid every two weeks, there are 26 pay periods in a year (52 weeks / 2 weeks",
+   "To compute the yearly total of a benefit of $245 paid every two weeks, we need to follow these steps:\n\n1. Convert the frequency from \"every two weeks\" to \"per week\": Since there are two pay periods in a week, the benefit is already expressed per week.\n2. Calculate"
+  ],
+  "Calculez le total annuel d'une prestation de 245 dollars versée toutes les deux semaines, en montrant les étapes.": [
+   "Pour calculer le total annuel de la prestation, nous devons trouver le montant mensuel et ensuite le double pour obtenir le montant annuel.\n\nÉtape 1 : Déterminer le nombre de jours dans un mois :\n\n*   Janvier, mars, mai, ju",
+   "Pour calculer le total annuel de la prestation, nous devons d'abord connaître le nombre de semaines dans une année.\n\nIl y a 52 semaines dans une année.\n\nPuisque la prestation est versée toutes les deux semaines, on peut calculer",
+   "Pour calculer le total annuel de la prestation, nous devons d’abord trouver le montant mensuel et ensuite l’annuel.\n\nÉtape 1 : Déterminer le montant mensuel :\n\nPrestation mensuelle = Montant semainesly / 2"
+  ],
+  "Explain in simple words what personal information protection means for a public service.": [
+   "Personal Information Protection (PIP) is like having a secret keeper for your customers' or users' sensitive details.\n\nImagine you're working at a library, and people come to borrow books. You need to know their names, addresses, and phone numbers so you can return the books to them. But what",
+   "Personal Information Protection (PIP) is about keeping sensitive information about individuals safe and secure when handling it, especially in a public service.\n\nThink of your personal info like your home address or phone number. You wouldn't want just anyone to know that, right?\n\nWhen you interact with a public service (like",
+   "Personal Information Protection (PIP) is a set of rules that helps keep sensitive info about individuals private and safe when using public services.\n\nThink of it like this:\n\n* When you're at the local library, they need your name, address, and phone number to check out books.\n* But if someone"
+  ],
+  "Expliquez simplement ce que signifie la protection des renseignements personnels pour un service public.": [
+   "La protection des renseignements personnels pour un service public est une mesure de sécurité qui vise à protéger les informations personnelles des citoyens collectées ou utilisées par les services publics pour exercer leurs responsabilités.\n\nObjectif :\n\n*   Prévenir l",
+   "La protection des renseignements personnels est une mesure de sécurité qui vise à protéger les informations personnelles et sensibles contenues dans les dossiers ou les fiches de chaque citoyen, pour éviter qu'elles ne soient utilisées par erreur ou par",
+   "La protection des renseignements personnels pour un service public est essentielle pour assurer la confidentialité et la sécurité des informations sensibles qui concernent les individus. Voici une explication simple :\n\n**Qu'est-ce que les renseignements personnels ?**\n\nLes ren"
+  ],
+  "Write three short tips for preparing a meeting with a social worker.": [
+   "Here are three short tips for preparing a meeting with a social worker:\n\n1. **Gather Relevant Information**: Collect any relevant documents, such as medical records, school reports, or family history, to share with the social worker during the meeting. This will help them understand your situation and make informed decisions",
+   "Here are three short tips for preparing a meeting with a social worker:\n\n1. **Gather Relevant Documents**: Before the meeting, organize and gather any relevant documents that may be helpful to share with the social worker, such as medical records, identification documents, financial information, or family history.\n\n2.",
+   "Here are three short tips for preparing a meeting with a social worker:\n\n1. **Gather necessary documents and information**: Before the meeting, make sure to gather any relevant documents or information that you think the social worker may need to know, such as medical records, school reports, or proof of income"
+  ],
+  "Rédigez trois conseils courts pour préparer une rencontre avec une travailleuse sociale.": [
+   "Voici trois conseils courts pour préparer une rencontre avec une travailleuse sociale :\n\n1. **Soyez prêt à partager vos informations personnelles** : Les travailleuses sociales ont besoin de connaître un peu sur votre vie personnelle, vos antécédents et vos objectifs",
+   "**Conseils pour préparer une rencontre avec une travailleuse sociale**\n\nVoici trois conseils courts pour vous aider à préparer une rencontre réussie avec une travailleuse sociale :\n\n**1. Préparez-vous sur l'objectif de la consultation**\n\n* Déterminez cl",
+   "Détails détaillés sur la façon de rédiger des textes en plusieurs langues peuvent varier considérablement suivant l'objectif, le public cible et les contraintes linguistiques. \n\nVoici quelques conseils pour rédiger un texte en"
+  ]
+ }
+}

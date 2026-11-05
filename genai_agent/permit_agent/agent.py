@@ -40,19 +40,30 @@ class RunResult:
 
 
 class PermitAgent:
-    def __init__(self, base_url: str, model: str, temperature: float = 0.0, prompt_version: str = "v1", max_steps: int = 6):
+    def __init__(self, base_url: str, model: str, temperature: float = 0.0, prompt_version: str = "v1", max_steps: int = 6,
+                 system_prompt: str | None = None, tool_schemas: list | None = None, functions: dict | None = None,
+                 context_tools: tuple = ("search_documents",), max_tokens: int | None = None):
+        """`system_prompt`, `tool_schemas` and `functions` replace the permit assistant's prompt and tools (another
+        assistant on the same loop); the passages returned by the tools of `context_tools` are kept as context;
+        `max_tokens` caps every completion (a model that never stops would otherwise hold a slot until the timeout)"""
         self.client = OpenAI(base_url=base_url, api_key="not-needed-for-local-models")
         self.model = model
         self.temperature = temperature
         self.prompt_version = prompt_version
         self.max_steps = max_steps
+        self.system_prompt = system_prompt
+        self.tool_schemas = TOOL_SCHEMAS if tool_schemas is None else tool_schemas
+        self.functions = FUNCTIONS if functions is None else functions
+        self.context_tools = context_tools
+        self.max_tokens = max_tokens
         self.tracer = trace.get_tracer("permit-agent")
 
     def run(self, request: str, expected_tool: str | None = None, span_attributes: dict | None = None,
             on_finish=None) -> RunResult:
         """Answer one request; `span_attributes` are added to the agent span (e.g. the pulsar.cf.* probe attributes);
         `on_finish(span, request, result)` runs before the span closes (detectors that score the run)"""
-        messages = [{"role": "system", "content": SYSTEM_PROMPT[self.prompt_version]}, {"role": "user", "content": request}]
+        system = self.system_prompt or SYSTEM_PROMPT[self.prompt_version]
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": request}]
         result = RunResult(answer="")
         with agent_span(
             self.tracer, "permit_assistant", prompt_version=self.prompt_version, **(span_attributes or {})
@@ -61,7 +72,8 @@ class PermitAgent:
                 result.steps += 1
                 with llm_span(self.tracer, model=self.model, provider="ollama", temperature=self.temperature) as call:
                     response = self.client.chat.completions.create(
-                        model=self.model, messages=messages, tools=TOOL_SCHEMAS, temperature=self.temperature
+                        model=self.model, messages=messages, tools=self.tool_schemas, temperature=self.temperature,
+                        **({"max_tokens": self.max_tokens} if self.max_tokens else {}),
                     )
                     choice = response.choices[0]
                     record_llm_response(
@@ -80,7 +92,7 @@ class PermitAgent:
                     output = self._call_tool(tool_call)
                     messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(output, default=str)})
                     result.tools.append(tool_call.function.name)
-                    if tool_call.function.name == "search_documents" and isinstance(output, list):
+                    if tool_call.function.name in self.context_tools and isinstance(output, list):
                         result.context += [d["text"] for d in output]
             else:
                 result.termination = "max_steps"
@@ -99,8 +111,8 @@ class PermitAgent:
             arguments = {}
         try:
             with tool_span(self.tracer, name, arguments=arguments, call_id=tool_call.id):
-                if name not in FUNCTIONS:
+                if name not in self.functions:
                     raise LookupError(f"unknown tool {name}")
-                return FUNCTIONS[name](**arguments)
+                return self.functions[name](**arguments)
         except Exception as error:  # noqa: BLE001 - reported to the model, recorded on the span
             return {"error": f"{type(error).__name__}: {error}"}

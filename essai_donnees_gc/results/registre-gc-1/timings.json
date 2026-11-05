@@ -1,0 +1,10 @@
+{
+ "reference": 1835.0,
+ "holdout": 865.6,
+ "corpus_loss": 951.2,
+ "language_en": 773.5,
+ "model_granite": 175.7,
+ "canary_reference": 1184.2,
+ "canary_same": 1285.4,
+ "canary_granite": 926.4
+}
