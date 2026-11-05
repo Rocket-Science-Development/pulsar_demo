@@ -57,3 +57,8 @@ to change before any shared use).
   every group into a false disparity), fixed in pulsar-metrics 0.9.1, and a calibration artifact of the demo itself
   (a reference of 8 contiguous windows is too short for a contiguous A/A calibration; the demo now draws random rows,
   which suits its independent rows).
+- At scale (lab SC-07: 300 models, 30 days of results, 20 concurrent viewers) every panel stays under 3 s at 7 days.
+  The model selector no longer puts a negation in its predicate: that made it linear in the number of series (3.8 s
+  at 20,000 models, 0.1 s now). The drift feature selector lists numeric features only. The hourly quantile band
+  reads raw captures (quantiles are not pushed down to storage in InfluxDB 2.6): at 30 days with 20 viewers it takes
+  about 9 s, and pre-aggregated hourly quantiles are the planned fix (`lab/rapports/rapport_sc07_tableaux_echelle.md`).

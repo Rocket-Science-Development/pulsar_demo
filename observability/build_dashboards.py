@@ -214,9 +214,13 @@ def var_bucket(default: str) -> dict:
             "current": {"text": default, "value": default}, "hide": 0}
 
 
-def var_tag(name, label, tag, measurement_filter, default=None, include_all=False, hide=0):
+def var_tag(name, label, tag, measurement_filter, default=None, include_all=False, hide=0, exclude=()):
+    """`exclude`: values left out after the index lookup. A negation in the predicate (tag != value) makes InfluxDB
+    test every series of the measurement (lab SC-07: 2.3 s at 10,000 models, 0.14 s when filtered afterwards)"""
     query = ('import "influxdata/influxdb/schema"\n'
              f'schema.tagValues(bucket: "${{bucket}}", tag: "{tag}", predicate: (r) => {measurement_filter}, start: -30d)')
+    if exclude:
+        query += " |> filter(fn: (r) => " + " and ".join(f'r._value != "{v}"' for v in exclude) + ")"
     variable = {"name": name, "label": label, "type": "query", "datasource": DS, "query": query, "refresh": 2,
                 "sort": 1, "includeAll": include_all, "multi": False, "hide": hide}
     if default:
@@ -228,8 +232,8 @@ def var_tag(name, label, tag, measurement_filter, default=None, include_all=Fals
 
 def model_vars(default_model="admissibilite"):
     return [
-        var_tag("model", "Model", "model_id",
-                'r._measurement == "pulsar_results" and r.model_id != "permit_assistant"', default_model),
+        var_tag("model", "Model", "model_id", 'r._measurement == "pulsar_results"', default_model,
+                exclude=("permit_assistant",)),
         var_tag("version", "Version", "model_version",
                 'r._measurement == "pulsar_results" and r.model_id == "${model}"', "1.0"),
     ]
@@ -314,8 +318,11 @@ def drift(bucket):
     d = Dashboard("pulsar-drift", "Pulsar.ml — Data drift",
                   "Calibrated drift tests per feature and window: raw alerts, confirmation, adjusted p-values, distributions",
                   [var_bucket(bucket)] + model_vars() + [
-                      var_tag("feature", "Feature", "feature_name",
-                              'r._measurement == "pulsar_results" and r.model_id == "${model}" and r.metric_type == "drift"', "income")])
+                      # numeric features only: the hourly quantiles below fail on a categorical (string) field
+                      # (lab SC-07: "quantile: unsupported aggregate column type string"); chi2 is the categorical test
+                      var_tag("feature", "Feature (numeric)", "feature_name",
+                              'r._measurement == "pulsar_results" and r.model_id == "${model}" and r.metric_type == "drift"'
+                              ' and r.metric_name != "chi2"', "income")])
     d.text("**How to read**: each window is tested against the reference with thresholds calibrated by A/A resampling of the "
            "reference; p-values are adjusted for the number of features (Benjamini-Hochberg, 5 %). A raw alert becomes "
            "**confirmed** only when it persists over two consecutive windows.", h=3)
