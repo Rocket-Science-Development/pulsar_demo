@@ -42,7 +42,7 @@ charge.
   les files se remplissent et les plus anciens lots sont écartés et comptés : 12 300 / 13 700 lignes sans spool, et
   aussi **10 550 / 1000 lignes avec spool**. Le stockage répond toujours, il n'est donc jamais jugé indisponible, et
   le spool ne prend pas le débordement de la file.
-- **Aucun bogue trouvé dans `pulsar_data_collection` 0.13.0.** Les comportements observés sont ceux que la
+- **Aucun bogue trouvé dans `pulsar_data_collection` 0.13.0** (R1 est corrigé depuis en 0.13.1 : section 9). Les comportements observés sont ceux que la
   documentation décrit. Ce sont des limites de conception, documentées dans le README de dc (section « Capacity and
   degraded networks », branche `doc/plafond-capture-reseau`). Aucune version n'est changée.
 
@@ -205,7 +205,7 @@ SC-04, elle est majeure : c'est elle qui fait échouer le critère du registre. 
   connexion puis la ferme. `dc` voit alors une coupure (incertaine), et non un refus (sûrement non stocké, remis en
   file depuis 0.12.1). Les 150 entrées en back-off du lien instable sont toutes des `StorageConnectionResetError`.
 
-Proposition (à décider, non appliquée) : sans spool, remettre en file une fois, dans `max_queue_rows`, les lignes
+Proposition (appliquée en 0.13.1, avec en plus l'attente de `/ping` : section 9) : sans spool, remettre en file une fois, dans `max_queue_rows`, les lignes
 d'une écriture incertaine, et ne compter en `uncertain_rows` que celles qui échouent encore ou qui sortent de la file.
 En attendant, la documentation de dc recommande `spool_dir` sur tout lien qui peut couper des connexions.
 
@@ -272,3 +272,79 @@ docker rm -f -v sc04-influxdb sc04-toxiproxy && docker network rm sc04-net
 
 Démontage vérifié après la campagne : les deux conteneurs `sc04-*`, leurs deux volumes anonymes et le réseau
 `sc04-net` sont supprimés. Les conteneurs de SC-07 et de la validation n'ont pas été touchés.
+
+## 9. Après le correctif R1 (0.13.1)
+
+R1 est corrigé dans `pulsar_data_collection` 0.13.1 (branche `doc/plafond-capture-reseau`, PR #35, commit `b70b542`).
+Sans `spool_dir`, les lignes d'une écriture incertaine (expirée, ou coupée après l'envoi) reviennent dans leur file, à
+leur place, et sont écrites **une seconde fois**. Elles ne sont comptées dans `uncertain_rows` que si cette seconde
+écriture est incertaine elle aussi, si la borne de la file les écarte, ou si `close()` les trouve encore en attente.
+La seconde écriture part à la fin du back-off, **et seulement si InfluxDB répond à `/ping`**. Le nouveau compteur
+`retried_uncertain_rows` compte ces lignes. L'option `CaptureOptions(retry_uncertain=False)` rétablit l'ancien
+comportement. Avec spool, rien ne change.
+
+**Ce qui a été relancé** : les cas sans spool `perte 5 %`, `perte 20 %` et `lien instable`, plus la référence, dans
+les deux profils. Mêmes paramètres et mêmes conteneurs dédiés que la campagne (recréés pour l'occasion, puis
+supprimés). `dc` est importé depuis le worktree `doc-dc`. Variables : `LAB_TOXICS=none,loss5,loss20,flap
+LAB_SPOOL=nospool`, avec `LAB_RUN_TAG=default-v0131` puis `tuned-v0131`. Les résultats d'origine
+(`SC-04.default.json`, `SC-04.tuned.json`) ne sont pas touchés. SC-07 tournait encore sur la machine (conteneurs
+`sc07-*`, non touchés) : la charge était partagée, comme pendant la campagne.
+
+**Deux passages.** Un premier passage a testé une version du correctif sans l'attente de `/ping`. Ses résultats sont
+dans `SC-04.<profil>-v0131-sansping.json`. Les pertes baissaient, mais restaient fortes sous lien instable (20 700 et
+21 400 lignes). La cause : le premier back-off dure 1 s, alors que le lien reste coupé 5 s. L'unique seconde écriture
+partait donc sur un lien encore mort. La version livrée attend que le stockage réponde avant de l'envoyer. Un ping
+sans réponse relance le back-off, sans compter d'erreur d'écriture.
+
+### 9.1 Lignes perdues sans spool (absentes d'InfluxDB, toutes comptées)
+
+| Cas | Profil | 0.13.0 | 0.13.1 sans attente de `/ping` | 0.13.1 livrée | Réécrites une fois (`retried_uncertain_rows`) |
+|---|---|---|---|---|---|
+| perte 5 % | défaut | 11 700 | 2400 | **200** | 10 100 |
+| perte 5 % | tuned | 6050 | 0 | **0** | 14 800 |
+| perte 20 % | défaut | 37 100 | 11 950 | **600** | 18 350 |
+| perte 20 % | tuned | 35 650 | 16 800 | **5000** | 25 200 |
+| lien instable | défaut | 41 450 | 20 700 | **0** | 10 250 |
+| lien instable | tuned | 39 800 | 21 400 | **0** | 10 250 |
+
+Environ 130 000 lignes capturées par cas. Les pertes passent de 4,6 à 32 % du trafic à 0 à 3,8 %.
+
+### 9.2 Le reste ne bouge pas
+
+| Cas | Profil | p99 ms (pendant) | max ms | ΔRSS Mo (borne) | file max (10 Pulse) | écrites/s | doublons | non expliquées |
+|---|---|---|---|---|---|---|---|---|
+| référence | défaut | 2,31 | 4,5 | 3,6 (178) | 2150 | 1991 | 0 | 0 |
+| perte 5 % | défaut | 2,51 | 7,8 | 15,7 (178) | 5100 | 1982 | 0 | 0 |
+| perte 20 % | défaut | 2,08 | 23,1 | 25,8 (178) | 14 300 | 1961 | 0 | 0 |
+| lien instable | défaut | 2,48 | 43,6 | 16,2 (178) | 11 750 | 1783 | 0 | 0 |
+| référence | tuned | 1,75 | 40,7 | 1,5 (99) | 2000 | 2029 | 0 | 0 |
+| perte 5 % | tuned | 2,41 | 4,8 | 13,9 (99) | 6900 | 2012 | 0 | 0 |
+| perte 20 % | tuned | 5,72 | 83,4 | 51,7 (99) | 20 950 | 1607 | 0 | 0 |
+| lien instable | tuned | 4,91 | 28,7 | 22,9 (99) | 13 150 | 1810 | 0 | 0 |
+
+- **L'appelant n'est toujours pas bloqué** : 0 capture de 200 ms ou plus. Les 9 critères chiffrés du test sont tenus
+  (`checks` tous vrais) dans les deux profils.
+- **Les comptes restent exacts** : 0 ligne non expliquée, 0 doublon. La réécriture est idempotente : les points
+  réécrits ont le même horodatage, et InfluxDB les écrase.
+- **La mémoire reste bornée.** Les files sont plus pleines, car les lignes à réécrire y attendent la fin du back-off :
+  jusqu'à 20 950 lignes pour 10 Pulse (tuned, perte 20 %). Aucune file ne dépasse `max_queue_rows` (5000 par Pulse),
+  et la RSS reste sous la borne (+51,7 Mo pour 99 Mo).
+- **Le débit sous défaut remonte** : 1607 à 2012 lignes/s écrites dans ces cas, contre 869 à 1882 en 0.13.0.
+
+### 9.3 Ce qui reste
+
+- **Perte 20 % : 600 lignes (défaut) et 5000 (tuned).** Ce sont des lignes dont la seconde écriture a été coupée elle
+  aussi. À 20 % de connexions coupées, une requête sur cinq environ peut échouer deux fois. En tuned, une requête du
+  `SharedWriter` porte jusqu'à 5000 lignes de plusieurs modèles : une double coupure coûte donc plus cher. Le
+  correctif ne réessaie qu'une fois, par conception, pour ne pas boucler sur un lien qui coupe tout. `spool_dir`
+  reste la réponse pour ces liens (0 perte dans la campagne), et le README le recommande toujours.
+- Le harness classe ces restes en limites mineures (« rows lost while the queues had room ») : 2 en défaut (perte 5 %
+  et 20 %), 1 en tuned (perte 20 %). Le critère du registre (pertes seulement au-delà de la borne) est maintenant tenu
+  pour le lien instable (deux profils) et pour la perte à 5 % en tuned. Il reste en échec, à un niveau bien plus bas,
+  pour la perte à 20 % (deux profils) et pour la perte à 5 % en défaut (200 lignes).
+- Le test enregistre maintenant `retried_uncertain` par cas (compteur `retried_uncertain_rows` de dc 0.13.1).
+- Les cas avec spool, de latence et de débit n'ont pas été relancés : ils n'empruntent pas le chemin modifié. Avec
+  spool, une écriture incertaine est spoolée, comme avant.
+
+Statut harness : `limit-found` dans les deux profils. Démontage vérifié : `sc04-influxdb`, `sc04-toxiproxy`, leurs
+volumes anonymes et le réseau `sc04-net` sont supprimés.

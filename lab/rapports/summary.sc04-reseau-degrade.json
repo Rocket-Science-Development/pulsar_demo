@@ -2285,5 +2285,2214 @@
     }
    }
   }
+ },
+ "after_r1_fix": {
+  "dc_version": "0.13.1 (branche doc/plafond-capture-reseau, commit b70b542, PR #35 de pulsar_data_collection)",
+  "source": "lab/results/SC-04.default-v0131.json, lab/results/SC-04.tuned-v0131.json; premier passage sans attente du /ping : lab/results/SC-04.<profil>-v0131-sansping.json",
+  "script": "LAB_TOXICS=none,loss5,loss20,flap LAB_SPOOL=nospool python -m lab.harness SC-04 (LAB_PROFILE=default|tuned, LAB_RUN_TAG=default-v0131|tuned-v0131)",
+  "rows_lost_without_spool": {
+   "default": {
+    "loss5": {
+     "0.13.0": 11700,
+     "0.13.1_sans_ping": 2400,
+     "0.13.1": 200
+    },
+    "loss20": {
+     "0.13.0": 37100,
+     "0.13.1_sans_ping": 11950,
+     "0.13.1": 600
+    },
+    "flap": {
+     "0.13.0": 41450,
+     "0.13.1_sans_ping": 20700,
+     "0.13.1": 0
+    }
+   },
+   "tuned": {
+    "loss5": {
+     "0.13.0": 6050,
+     "0.13.1_sans_ping": 0,
+     "0.13.1": 0
+    },
+    "loss20": {
+     "0.13.0": 35650,
+     "0.13.1_sans_ping": 16800,
+     "0.13.1": 5000
+    },
+    "flap": {
+     "0.13.0": 39800,
+     "0.13.1_sans_ping": 21400,
+     "0.13.1": 0
+    }
+   }
+  },
+  "runs": {
+   "default-v0131": {
+    "status": "limit-found",
+    "started": "2026-11-05T15:12:54+00:00",
+    "seconds": 264.7,
+    "host": "rocketscience",
+    "params": {
+     "models": 10,
+     "batch_rows": 50,
+     "rows_per_s": 2000.0,
+     "max_queue_rows": 5000,
+     "pre_s": 10.0,
+     "toxic_s": 45.0,
+     "post_s": 10.0,
+     "drain_timeout_s": 240.0,
+     "toxics": [
+      "none",
+      "loss5",
+      "loss20",
+      "flap"
+     ],
+     "write_timeout_s": 5.0,
+     "spool": "nospool",
+     "flap_period_s": 10.0,
+     "loss_slot_s": 0.25,
+     "blocked_ms": 200.0,
+     "proxy": "Toxiproxy 2.12.0 (container sc04-toxiproxy)",
+     "storage": "InfluxDB 2.6.1 (container sc04-influxdb)",
+     "env_note": "local, reduced size (registry env aws-scale); workstation shared with SC-07 (Flux query timings)",
+     "write": {
+      "profile": "default",
+      "write_concurrency": null,
+      "pulsar-data-collection": "0.13.1",
+      "pulsar-metrics": null,
+      "influxdb-client": "1.50.0",
+      "pandas": "3.1.0"
+     },
+     "tuned_spool": "spool_compression=gzip (with spool)",
+     "toxiproxy_version": "{\"version\": \"2.12.0\"}"
+    },
+    "checks": {
+     "blocked_captures_total": true,
+     "unexplained_total": true,
+     "unexplained_loss_total": true,
+     "unexplained_stored_total": true,
+     "duplicates_total": true,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": true,
+     "drops_only_beyond_bound_all": true
+    },
+    "health": {
+     "cpu_max": 35.4,
+     "mem_max": 71.3,
+     "rss_mb_max": 128.953125,
+     "threads_max": 39,
+     "fds_max": 524,
+     "disk_max": 50.0,
+     "rss_growth_mb_per_h": 309.44140890964553,
+     "samples": 53
+    },
+    "notes": [
+     "profile default; 4 cases; local reduced-size run (registry env aws-scale), workstation shared with SC-07 (Flux query timings) running at the same time"
+    ],
+    "environment": {
+     "collected_at": "2026-11-05T15:17:19+00:00",
+     "host": "rocketscience",
+     "hardware": {
+      "cpu_model": "AMD Ryzen 7 7730U with Radeon Graphics",
+      "logical_cpus": 16,
+      "physical_cpus": 8,
+      "ram_gib": 38.8,
+      "gpus": [],
+      "cloud": null
+     },
+     "software": {
+      "os": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.10",
+      "python_executable": "C:\\dev\\pulsar-ml\\pulsar_data_collection\\.venv\\Scripts\\python.exe",
+      "packages": {
+       "pulsar_data_collection": "0.13.1 (dist-info says 0.5.1)",
+       "pulsar_metrics": null,
+       "influxdb-client": "1.50.0",
+       "pandas": "3.1.0",
+       "numpy": "2.5.4",
+       "scipy": "1.18.1",
+       "scikit-learn": "1.9.1",
+       "pydantic": "2.14.2",
+       "opentelemetry-sdk": "1.45.2",
+       "torch": null,
+       "transformers": null,
+       "gliner": null,
+       "sentence-transformers": null,
+       "psutil": "7.2.2"
+      },
+      "docker": "28.0.4",
+      "containers": [
+       {
+        "name": "sc07-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "sc07-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "sc04-toxiproxy",
+        "image": "ghcr.io/shopify/toxiproxy:2.12.0"
+       },
+       {
+        "name": "sc04-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "pulsar-validation-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-ollama",
+        "image": "ollama/ollama:0.6.8"
+       }
+      ]
+     },
+     "services": {
+      "influxdb": {
+       "url": "http://127.0.0.1:8097/health",
+       "reachable": true,
+       "version": "v2.6.1"
+      },
+      "grafana": {
+       "url": "http://localhost:3000/api/health",
+       "reachable": true,
+       "version": "11.3.0"
+      },
+      "ollama": {
+       "url": "http://localhost:11434/api/tags",
+       "reachable": true,
+       "models": [
+        {
+         "name": "granite-embedding:278m",
+         "digest": "1a37926bf842899cbf90583e3932f3820548716d9d07661ba622199ffe95c552",
+         "size_gb": 0.56,
+         "quantization": "F16"
+        },
+        {
+         "name": "nomic-embed-text:latest",
+         "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+         "size_gb": 0.27,
+         "quantization": "F16"
+        },
+        {
+         "name": "granite3.3:2b",
+         "digest": "07bd1f170855240f9e162bf54ea494a8bc1c73d8cbd1365d7fccbeb7d2504947",
+         "size_gb": 1.55,
+         "quantization": "Q4_K_M"
+        },
+        {
+         "name": "llama3.2:3b",
+         "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+         "size_gb": 2.02,
+         "quantization": "Q4_K_M"
+        }
+       ]
+      }
+     },
+     "sources": {
+      "pulsar_data_collection": {
+       "path": "C:/dev/pulsar-ml/wt/doc-dc",
+       "commit": "b70b54252ef9673a223fb4c57ca58211f6d47d9f",
+       "branch": "doc/plafond-capture-reseau",
+       "tag": null,
+       "dirty": false
+      },
+      "pulsar_metrics": null,
+      "pulsar_demo": {
+       "path": "C:/dev/pulsar-ml/wt/sc04",
+       "commit": "0ef28ab18d633521ea2efe108654544191d06332",
+       "branch": "fonction/sc04-reseau-degrade",
+       "tag": null,
+       "dirty": true
+      }
+     }
+    },
+    "limits": [
+     {
+      "finding": "[default loss5_nospool] without spool, 200 rows lost while the queues had room: writes that timed out or were cut (200 uncertain rows, 0 of them stored by InfluxDB anyway); counted (dc >= 0.13.1: after their single second write, 10100 rows retried)",
+      "evidence": "{\"uncertain\": 200, \"uncertain_stored\": 0, \"retried_uncertain\": 10100, \"write_timeouts\": 0, \"write_errors\": 47, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 47}, \"queued_max\": 5100}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     },
+     {
+      "finding": "[default loss20_nospool] without spool, 600 rows lost while the queues had room: writes that timed out or were cut (600 uncertain rows, 0 of them stored by InfluxDB anyway); counted (dc >= 0.13.1: after their single second write, 18350 rows retried)",
+      "evidence": "{\"uncertain\": 600, \"uncertain_stored\": 0, \"retried_uncertain\": 18350, \"write_timeouts\": 0, \"write_errors\": 77, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 77}, \"queued_max\": 14300}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     }
+    ],
+    "metrics": {
+     "blocked_captures_total": 0,
+     "unexplained_total": 0,
+     "unexplained_loss_total": 0,
+     "unexplained_stored_total": 0,
+     "duplicates_total": 0,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": 0,
+     "spool_dropped_total": 0,
+     "drops_only_beyond_bound_all": true,
+     "p99_ms_toxic_max": 2.506,
+     "baseline_p99_ms": 2.305,
+     "errors": 0
+    },
+    "cases": {
+     "none_nospool": {
+      "case": "none_nospool",
+      "toxic": "none",
+      "spool": false,
+      "profile": "default",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 0,
+      "write_timeouts": 0,
+      "retried_uncertain": 0,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 89600,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 2150,
+      "inflight_max": 1550,
+      "queued_max_per_channel": 250,
+      "rss_base_mb": 111.7,
+      "rss_max_mb": 115.4,
+      "rss_delta_mb": 3.6,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 0,
+      "breaker_max_delay_s": 0.0,
+      "breaker_error_kinds": {},
+      "breaker_entries_during_toxic": 0,
+      "breaker_transitions_sampled": {},
+      "endpoints": null,
+      "fault": {
+       "events": {},
+       "stalled_s": 0.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 6,
+      "written_rows_per_s_toxic": 1991.1,
+      "effective_mbit_s_toxic": 8.879,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.539,
+      "p99_ms_pre": 2.838,
+      "max_ms_pre": 12.6,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.526,
+      "p99_ms_toxic": 2.305,
+      "max_ms_toxic": 4.5,
+      "captures_post": 400,
+      "p50_ms_post": 1.162,
+      "p99_ms_post": 2.128,
+      "max_ms_post": 2.7,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss5_nospool": {
+      "case": "loss5_nospool",
+      "toxic": "loss5",
+      "spool": false,
+      "profile": "default",
+      "captured": 130200,
+      "submitted": 130200,
+      "written": 130000,
+      "dropped": 0,
+      "uncertain": 200,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 47,
+      "write_timeouts": 0,
+      "retried_uncertain": 10100,
+      "stored_points": 130000,
+      "distinct": 130000,
+      "duplicates": 0,
+      "lost": 200,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 89200,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 200,
+      "spooled_during_toxic": 0,
+      "queued_max": 5100,
+      "inflight_max": 4200,
+      "queued_max_per_channel": 800,
+      "rss_base_mb": 108.9,
+      "rss_max_mb": 124.6,
+      "rss_delta_mb": 15.7,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 47,
+      "breaker_max_delay_s": 2,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 47
+      },
+      "breaker_entries_during_toxic": 47,
+      "breaker_transitions_sampled": {
+       "closed->open": 52,
+       "open->closed": 52
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 153,
+        "stalled_slots": 16
+       },
+       "stalled_s": 4.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 60,
+      "written_rows_per_s_toxic": 1982.2,
+      "effective_mbit_s_toxic": 8.839,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.386,
+      "p99_ms_pre": 2.871,
+      "max_ms_pre": 3.2,
+      "captures_toxic": 1803,
+      "p50_ms_toxic": 1.195,
+      "p99_ms_toxic": 2.506,
+      "max_ms_toxic": 7.8,
+      "captures_post": 400,
+      "p50_ms_post": 1.091,
+      "p99_ms_post": 2.478,
+      "max_ms_post": 37.0,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 200,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss20_nospool": {
+      "case": "loss20_nospool",
+      "toxic": "loss20",
+      "spool": false,
+      "profile": "default",
+      "captured": 131950,
+      "submitted": 131950,
+      "written": 131350,
+      "dropped": 0,
+      "uncertain": 600,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 77,
+      "write_timeouts": 0,
+      "retried_uncertain": 18350,
+      "stored_points": 131350,
+      "distinct": 131350,
+      "duplicates": 0,
+      "lost": 600,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 88250,
+      "line_bytes_per_row": 556.3,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 600,
+      "spooled_during_toxic": 0,
+      "queued_max": 14300,
+      "inflight_max": 7600,
+      "queued_max_per_channel": 2400,
+      "rss_base_mb": 112.1,
+      "rss_max_mb": 137.9,
+      "rss_delta_mb": 25.8,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 77,
+      "breaker_max_delay_s": 16,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 77
+      },
+      "breaker_entries_during_toxic": 77,
+      "breaker_transitions_sampled": {
+       "closed->open": 113,
+       "open->closed": 113
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 113,
+        "stalled_slots": 28
+       },
+       "stalled_s": 7.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 162,
+      "written_rows_per_s_toxic": 1961.1,
+      "effective_mbit_s_toxic": 8.728,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.161,
+      "p99_ms_pre": 2.36,
+      "max_ms_pre": 6.0,
+      "captures_toxic": 1838,
+      "p50_ms_toxic": 1.176,
+      "p99_ms_toxic": 2.082,
+      "max_ms_toxic": 23.1,
+      "captures_post": 400,
+      "p50_ms_post": 1.219,
+      "p99_ms_post": 2.426,
+      "max_ms_post": 3.3,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 600,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "flap_nospool": {
+      "case": "flap_nospool",
+      "toxic": "flap",
+      "spool": false,
+      "profile": "default",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 50,
+      "write_timeouts": 0,
+      "retried_uncertain": 10250,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 80250,
+      "line_bytes_per_row": 556.1,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 11750,
+      "inflight_max": 6300,
+      "queued_max_per_channel": 1300,
+      "rss_base_mb": 117.6,
+      "rss_max_mb": 133.7,
+      "rss_delta_mb": 16.2,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 50,
+      "breaker_max_delay_s": 1,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 50
+      },
+      "breaker_entries_during_toxic": 50,
+      "breaker_transitions_sampled": {
+       "closed->open": 72,
+       "open->closed": 72
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "down": 5,
+        "up": 5
+       },
+       "stalled_s": 0.0,
+       "down_s": 24.83
+      },
+      "toxiproxy_calls": 176,
+      "written_rows_per_s_toxic": 1783.3,
+      "effective_mbit_s_toxic": 7.934,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.207,
+      "p99_ms_pre": 2.836,
+      "max_ms_pre": 5.0,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.217,
+      "p99_ms_toxic": 2.482,
+      "max_ms_toxic": 43.6,
+      "captures_post": 400,
+      "p50_ms_post": 1.132,
+      "p99_ms_post": 2.103,
+      "max_ms_post": 34.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     }
+    },
+    "run_tag": "default-v0131"
+   },
+   "tuned-v0131": {
+    "status": "limit-found",
+    "started": "2026-11-05T15:17:29+00:00",
+    "seconds": 263.5,
+    "host": "rocketscience",
+    "params": {
+     "models": 10,
+     "batch_rows": 50,
+     "rows_per_s": 2000.0,
+     "max_queue_rows": 5000,
+     "pre_s": 10.0,
+     "toxic_s": 45.0,
+     "post_s": 10.0,
+     "drain_timeout_s": 240.0,
+     "toxics": [
+      "none",
+      "loss5",
+      "loss20",
+      "flap"
+     ],
+     "write_timeout_s": 5.0,
+     "spool": "nospool",
+     "flap_period_s": 10.0,
+     "loss_slot_s": 0.25,
+     "blocked_ms": 200.0,
+     "proxy": "Toxiproxy 2.12.0 (container sc04-toxiproxy)",
+     "storage": "InfluxDB 2.6.1 (container sc04-influxdb)",
+     "env_note": "local, reduced size (registry env aws-scale); workstation shared with SC-07 (Flux query timings)",
+     "write": {
+      "profile": "tuned",
+      "write_concurrency": 4,
+      "pulsar-data-collection": "0.13.1",
+      "pulsar-metrics": null,
+      "influxdb-client": "1.50.0",
+      "pandas": "3.1.0"
+     },
+     "tuned_spool": "spool_compression=gzip (with spool)",
+     "toxiproxy_version": "{\"version\": \"2.12.0\"}"
+    },
+    "checks": {
+     "blocked_captures_total": true,
+     "unexplained_total": true,
+     "unexplained_loss_total": true,
+     "unexplained_stored_total": true,
+     "duplicates_total": true,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": true,
+     "drops_only_beyond_bound_all": true
+    },
+    "health": {
+     "cpu_max": 83.6,
+     "mem_max": 74.5,
+     "rss_mb_max": 152.8828125,
+     "threads_max": 31,
+     "fds_max": 462,
+     "disk_max": 50.0,
+     "rss_growth_mb_per_h": 276.67576016117255,
+     "samples": 53
+    },
+    "notes": [
+     "profile tuned; 4 cases; local reduced-size run (registry env aws-scale), workstation shared with SC-07 (Flux query timings) running at the same time"
+    ],
+    "environment": {
+     "collected_at": "2026-11-05T15:21:53+00:00",
+     "host": "rocketscience",
+     "hardware": {
+      "cpu_model": "AMD Ryzen 7 7730U with Radeon Graphics",
+      "logical_cpus": 16,
+      "physical_cpus": 8,
+      "ram_gib": 38.8,
+      "gpus": [],
+      "cloud": null
+     },
+     "software": {
+      "os": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.10",
+      "python_executable": "C:\\dev\\pulsar-ml\\pulsar_data_collection\\.venv\\Scripts\\python.exe",
+      "packages": {
+       "pulsar_data_collection": "0.13.1 (dist-info says 0.5.1)",
+       "pulsar_metrics": null,
+       "influxdb-client": "1.50.0",
+       "pandas": "3.1.0",
+       "numpy": "2.5.4",
+       "scipy": "1.18.1",
+       "scikit-learn": "1.9.1",
+       "pydantic": "2.14.2",
+       "opentelemetry-sdk": "1.45.2",
+       "torch": null,
+       "transformers": null,
+       "gliner": null,
+       "sentence-transformers": null,
+       "psutil": "7.2.2"
+      },
+      "docker": "28.0.4",
+      "containers": [
+       {
+        "name": "sc07-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "sc07-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "sc04-toxiproxy",
+        "image": "ghcr.io/shopify/toxiproxy:2.12.0"
+       },
+       {
+        "name": "sc04-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "pulsar-validation-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-ollama",
+        "image": "ollama/ollama:0.6.8"
+       }
+      ]
+     },
+     "services": {
+      "influxdb": {
+       "url": "http://127.0.0.1:8097/health",
+       "reachable": true,
+       "version": "v2.6.1"
+      },
+      "grafana": {
+       "url": "http://localhost:3000/api/health",
+       "reachable": true,
+       "version": "11.3.0"
+      },
+      "ollama": {
+       "url": "http://localhost:11434/api/tags",
+       "reachable": true,
+       "models": [
+        {
+         "name": "granite-embedding:278m",
+         "digest": "1a37926bf842899cbf90583e3932f3820548716d9d07661ba622199ffe95c552",
+         "size_gb": 0.56,
+         "quantization": "F16"
+        },
+        {
+         "name": "nomic-embed-text:latest",
+         "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+         "size_gb": 0.27,
+         "quantization": "F16"
+        },
+        {
+         "name": "granite3.3:2b",
+         "digest": "07bd1f170855240f9e162bf54ea494a8bc1c73d8cbd1365d7fccbeb7d2504947",
+         "size_gb": 1.55,
+         "quantization": "Q4_K_M"
+        },
+        {
+         "name": "llama3.2:3b",
+         "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+         "size_gb": 2.02,
+         "quantization": "Q4_K_M"
+        }
+       ]
+      }
+     },
+     "sources": {
+      "pulsar_data_collection": {
+       "path": "C:/dev/pulsar-ml/wt/doc-dc",
+       "commit": "b70b54252ef9673a223fb4c57ca58211f6d47d9f",
+       "branch": "doc/plafond-capture-reseau",
+       "tag": null,
+       "dirty": false
+      },
+      "pulsar_metrics": null,
+      "pulsar_demo": {
+       "path": "C:/dev/pulsar-ml/wt/sc04",
+       "commit": "0ef28ab18d633521ea2efe108654544191d06332",
+       "branch": "fonction/sc04-reseau-degrade",
+       "tag": null,
+       "dirty": true
+      }
+     }
+    },
+    "limits": [
+     {
+      "finding": "[tuned loss20_nospool] without spool, 5000 rows lost while the queues had room: writes that timed out or were cut (5000 uncertain rows, 0 of them stored by InfluxDB anyway); counted (dc >= 0.13.1: after their single second write, 25200 rows retried)",
+      "evidence": "{\"uncertain\": 5000, \"uncertain_stored\": 0, \"retried_uncertain\": 25200, \"write_timeouts\": 0, \"write_errors\": 90, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 9}, \"queued_max\": 20950}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     }
+    ],
+    "metrics": {
+     "blocked_captures_total": 0,
+     "unexplained_total": 0,
+     "unexplained_loss_total": 0,
+     "unexplained_stored_total": 0,
+     "duplicates_total": 0,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": 0,
+     "spool_dropped_total": 0,
+     "drops_only_beyond_bound_all": true,
+     "p99_ms_toxic_max": 5.716,
+     "baseline_p99_ms": 1.75,
+     "errors": 0
+    },
+    "cases": {
+     "none_nospool": {
+      "case": "none_nospool",
+      "toxic": "none",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 0,
+      "write_timeouts": 0,
+      "retried_uncertain": 0,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.0,
+      "replay_s": null,
+      "written_during_toxic": 91300,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 2000,
+      "inflight_max": 2050,
+      "queued_max_per_channel": 200,
+      "rss_base_mb": 112.2,
+      "rss_max_mb": 113.7,
+      "rss_delta_mb": 1.5,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 0,
+      "breaker_max_delay_s": 0.0,
+      "breaker_error_kinds": {},
+      "breaker_entries_during_toxic": 0,
+      "breaker_transitions_sampled": {},
+      "endpoints": null,
+      "fault": {
+       "events": {},
+       "stalled_s": 0.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 6,
+      "written_rows_per_s_toxic": 2028.9,
+      "effective_mbit_s_toxic": 9.047,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.095,
+      "p99_ms_pre": 1.63,
+      "max_ms_pre": 17.1,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.139,
+      "p99_ms_toxic": 1.75,
+      "max_ms_toxic": 40.7,
+      "captures_post": 400,
+      "p50_ms_post": 1.086,
+      "p99_ms_post": 1.518,
+      "max_ms_post": 1.8,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss5_nospool": {
+      "case": "loss5_nospool",
+      "toxic": "loss5",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130200,
+      "submitted": 130200,
+      "written": 130200,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 72,
+      "write_timeouts": 0,
+      "retried_uncertain": 14800,
+      "stored_points": 130200,
+      "distinct": 130200,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.0,
+      "replay_s": null,
+      "written_during_toxic": 90550,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 6900,
+      "inflight_max": 5000,
+      "queued_max_per_channel": 700,
+      "rss_base_mb": 113.5,
+      "rss_max_mb": 127.4,
+      "rss_delta_mb": 13.9,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 8,
+      "breaker_max_delay_s": 1,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 8
+      },
+      "breaker_entries_during_toxic": 8,
+      "breaker_transitions_sampled": {
+       "closed->open": 9,
+       "open->closed": 9
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 154,
+        "stalled_slots": 16
+       },
+       "stalled_s": 4.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 60,
+      "written_rows_per_s_toxic": 2012.2,
+      "effective_mbit_s_toxic": 8.973,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.067,
+      "p99_ms_pre": 1.629,
+      "max_ms_pre": 2.1,
+      "captures_toxic": 1803,
+      "p50_ms_toxic": 1.156,
+      "p99_ms_toxic": 2.405,
+      "max_ms_toxic": 4.8,
+      "captures_post": 400,
+      "p50_ms_post": 1.79,
+      "p99_ms_post": 3.781,
+      "max_ms_post": 9.9,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss20_nospool": {
+      "case": "loss20_nospool",
+      "toxic": "loss20",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130250,
+      "submitted": 130250,
+      "written": 125250,
+      "dropped": 0,
+      "uncertain": 5000,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 90,
+      "write_timeouts": 0,
+      "retried_uncertain": 25200,
+      "stored_points": 125250,
+      "distinct": 125250,
+      "duplicates": 0,
+      "lost": 5000,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 72300,
+      "line_bytes_per_row": 556.3,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 5000,
+      "spooled_during_toxic": 0,
+      "queued_max": 20950,
+      "inflight_max": 15000,
+      "queued_max_per_channel": 2100,
+      "rss_base_mb": 117.8,
+      "rss_max_mb": 169.4,
+      "rss_delta_mb": 51.7,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 9,
+      "breaker_max_delay_s": 32,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 9
+      },
+      "breaker_entries_during_toxic": 9,
+      "breaker_transitions_sampled": {
+       "closed->open": 12,
+       "open->closed": 12
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 121,
+        "stalled_slots": 35
+       },
+       "stalled_s": 8.75,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 174,
+      "written_rows_per_s_toxic": 1606.7,
+      "effective_mbit_s_toxic": 7.15,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.915,
+      "p99_ms_pre": 6.614,
+      "max_ms_pre": 16.8,
+      "captures_toxic": 1804,
+      "p50_ms_toxic": 1.879,
+      "p99_ms_toxic": 5.716,
+      "max_ms_toxic": 83.4,
+      "captures_post": 400,
+      "p50_ms_post": 1.955,
+      "p99_ms_post": 3.717,
+      "max_ms_post": 4.3,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 5000,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "flap_nospool": {
+      "case": "flap_nospool",
+      "toxic": "flap",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 50,
+      "write_timeouts": 0,
+      "retried_uncertain": 10250,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 81450,
+      "line_bytes_per_row": 556.1,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 13150,
+      "inflight_max": 10000,
+      "queued_max_per_channel": 1350,
+      "rss_base_mb": 113.5,
+      "rss_max_mb": 136.3,
+      "rss_delta_mb": 22.9,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 5,
+      "breaker_max_delay_s": 1,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 5
+      },
+      "breaker_entries_during_toxic": 5,
+      "breaker_transitions_sampled": {
+       "closed->open": 13,
+       "open->closed": 13
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "down": 5,
+        "up": 5
+       },
+       "stalled_s": 0.0,
+       "down_s": 24.75
+      },
+      "toxiproxy_calls": 188,
+      "written_rows_per_s_toxic": 1810.0,
+      "effective_mbit_s_toxic": 8.052,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.859,
+      "p99_ms_pre": 8.218,
+      "max_ms_pre": 51.1,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.898,
+      "p99_ms_toxic": 4.91,
+      "max_ms_toxic": 28.7,
+      "captures_post": 400,
+      "p50_ms_post": 1.81,
+      "p99_ms_post": 3.798,
+      "max_ms_post": 15.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     }
+    },
+    "run_tag": "tuned-v0131"
+   }
+  },
+  "runs_without_ping_gate": {
+   "default-v0131-sansping": {
+    "status": "limit-found",
+    "started": "2026-11-05T15:00:11+00:00",
+    "seconds": 264.1,
+    "host": "rocketscience",
+    "params": {
+     "models": 10,
+     "batch_rows": 50,
+     "rows_per_s": 2000.0,
+     "max_queue_rows": 5000,
+     "pre_s": 10.0,
+     "toxic_s": 45.0,
+     "post_s": 10.0,
+     "drain_timeout_s": 240.0,
+     "toxics": [
+      "none",
+      "loss5",
+      "loss20",
+      "flap"
+     ],
+     "write_timeout_s": 5.0,
+     "spool": "nospool",
+     "flap_period_s": 10.0,
+     "loss_slot_s": 0.25,
+     "blocked_ms": 200.0,
+     "proxy": "Toxiproxy 2.12.0 (container sc04-toxiproxy)",
+     "storage": "InfluxDB 2.6.1 (container sc04-influxdb)",
+     "env_note": "local, reduced size (registry env aws-scale); workstation shared with SC-07 (Flux query timings)",
+     "write": {
+      "profile": "default",
+      "write_concurrency": null,
+      "pulsar-data-collection": "0.13.1",
+      "pulsar-metrics": null,
+      "influxdb-client": "1.50.0",
+      "pandas": "3.1.0"
+     },
+     "tuned_spool": "spool_compression=gzip (with spool)",
+     "toxiproxy_version": "{\"version\": \"2.12.0\"}"
+    },
+    "checks": {
+     "blocked_captures_total": true,
+     "unexplained_total": true,
+     "unexplained_loss_total": true,
+     "unexplained_stored_total": true,
+     "duplicates_total": true,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": true,
+     "drops_only_beyond_bound_all": true
+    },
+    "health": {
+     "cpu_max": 38.5,
+     "mem_max": 86.0,
+     "rss_mb_max": 128.79296875,
+     "threads_max": 42,
+     "fds_max": 546,
+     "disk_max": 50.0,
+     "rss_growth_mb_per_h": 341.88853815490904,
+     "samples": 53
+    },
+    "notes": [
+     "profile default; 4 cases; local reduced-size run (registry env aws-scale), workstation shared with SC-07 (Flux query timings) running at the same time"
+    ],
+    "environment": {
+     "collected_at": "2026-11-05T15:04:35+00:00",
+     "host": "rocketscience",
+     "hardware": {
+      "cpu_model": "AMD Ryzen 7 7730U with Radeon Graphics",
+      "logical_cpus": 16,
+      "physical_cpus": 8,
+      "ram_gib": 38.8,
+      "gpus": [],
+      "cloud": null
+     },
+     "software": {
+      "os": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.10",
+      "python_executable": "C:\\dev\\pulsar-ml\\pulsar_data_collection\\.venv\\Scripts\\python.exe",
+      "packages": {
+       "pulsar_data_collection": "0.13.1 (dist-info says 0.5.1)",
+       "pulsar_metrics": null,
+       "influxdb-client": "1.50.0",
+       "pandas": "3.1.0",
+       "numpy": "2.5.4",
+       "scipy": "1.18.1",
+       "scikit-learn": "1.9.1",
+       "pydantic": "2.14.2",
+       "opentelemetry-sdk": "1.45.2",
+       "torch": null,
+       "transformers": null,
+       "gliner": null,
+       "sentence-transformers": null,
+       "psutil": "7.2.2"
+      },
+      "docker": "28.0.4",
+      "containers": [
+       {
+        "name": "sc04-toxiproxy",
+        "image": "ghcr.io/shopify/toxiproxy:2.12.0"
+       },
+       {
+        "name": "sc04-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "pulsar-validation-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-ollama",
+        "image": "ollama/ollama:0.6.8"
+       }
+      ]
+     },
+     "services": {
+      "influxdb": {
+       "url": "http://127.0.0.1:8097/health",
+       "reachable": true,
+       "version": "v2.6.1"
+      },
+      "grafana": {
+       "url": "http://localhost:3000/api/health",
+       "reachable": true,
+       "version": "11.3.0"
+      },
+      "ollama": {
+       "url": "http://localhost:11434/api/tags",
+       "reachable": true,
+       "models": [
+        {
+         "name": "granite-embedding:278m",
+         "digest": "1a37926bf842899cbf90583e3932f3820548716d9d07661ba622199ffe95c552",
+         "size_gb": 0.56,
+         "quantization": "F16"
+        },
+        {
+         "name": "nomic-embed-text:latest",
+         "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+         "size_gb": 0.27,
+         "quantization": "F16"
+        },
+        {
+         "name": "granite3.3:2b",
+         "digest": "07bd1f170855240f9e162bf54ea494a8bc1c73d8cbd1365d7fccbeb7d2504947",
+         "size_gb": 1.55,
+         "quantization": "Q4_K_M"
+        },
+        {
+         "name": "llama3.2:3b",
+         "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+         "size_gb": 2.02,
+         "quantization": "Q4_K_M"
+        }
+       ]
+      }
+     },
+     "sources": {
+      "pulsar_data_collection": {
+       "path": "C:/dev/pulsar-ml/wt/doc-dc",
+       "commit": "031f1ad64d977b6d5be83925c27f287e013907d7",
+       "branch": "doc/plafond-capture-reseau",
+       "tag": null,
+       "dirty": false
+      },
+      "pulsar_metrics": null,
+      "pulsar_demo": {
+       "path": "C:/dev/pulsar-ml/wt/sc04",
+       "commit": "0ef28ab18d633521ea2efe108654544191d06332",
+       "branch": "fonction/sc04-reseau-degrade",
+       "tag": null,
+       "dirty": false
+      }
+     }
+    },
+    "limits": [
+     {
+      "finding": "[default loss5_nospool] without spool, 2400 rows lost while the queues had room: writes that timed out or were cut (2400 uncertain rows, 0 of them stored by InfluxDB anyway); counted, never retried",
+      "evidence": "{\"uncertain\": 2400, \"uncertain_stored\": 0, \"write_timeouts\": 0, \"write_errors\": 70, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 70}, \"queued_max\": 5050}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     },
+     {
+      "finding": "[default loss20_nospool] without spool, 11950 rows lost while the queues had room: writes that timed out or were cut (12500 uncertain rows, 550 of them stored by InfluxDB anyway); counted, never retried",
+      "evidence": "{\"uncertain\": 12500, \"uncertain_stored\": 550, \"write_timeouts\": 0, \"write_errors\": 130, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 130}, \"queued_max\": 7350}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     },
+     {
+      "finding": "[default flap_nospool] without spool, 20700 rows lost while the queues had room: writes that timed out or were cut (20700 uncertain rows, 0 of them stored by InfluxDB anyway); counted, never retried",
+      "evidence": "{\"uncertain\": 20700, \"uncertain_stored\": 0, \"write_timeouts\": 0, \"write_errors\": 150, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 150}, \"queued_max\": 7750}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     }
+    ],
+    "metrics": {
+     "blocked_captures_total": 0,
+     "unexplained_total": 0,
+     "unexplained_loss_total": 0,
+     "unexplained_stored_total": 0,
+     "duplicates_total": 0,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": 0,
+     "spool_dropped_total": 0,
+     "drops_only_beyond_bound_all": true,
+     "p99_ms_toxic_max": 2.709,
+     "baseline_p99_ms": 2.57,
+     "errors": 0
+    },
+    "cases": {
+     "none_nospool": {
+      "case": "none_nospool",
+      "toxic": "none",
+      "spool": false,
+      "profile": "default",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 0,
+      "write_timeouts": 0,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 89750,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 2000,
+      "inflight_max": 1000,
+      "queued_max_per_channel": 250,
+      "rss_base_mb": 112.4,
+      "rss_max_mb": 114.5,
+      "rss_delta_mb": 2.1,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 0,
+      "breaker_max_delay_s": 0.0,
+      "breaker_error_kinds": {},
+      "breaker_entries_during_toxic": 0,
+      "breaker_transitions_sampled": {},
+      "endpoints": null,
+      "fault": {
+       "events": {},
+       "stalled_s": 0.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 6,
+      "written_rows_per_s_toxic": 1994.4,
+      "effective_mbit_s_toxic": 8.893,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.485,
+      "p99_ms_pre": 3.241,
+      "max_ms_pre": 6.8,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.508,
+      "p99_ms_toxic": 2.57,
+      "max_ms_toxic": 30.1,
+      "captures_post": 400,
+      "p50_ms_post": 1.612,
+      "p99_ms_post": 2.829,
+      "max_ms_post": 4.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss5_nospool": {
+      "case": "loss5_nospool",
+      "toxic": "loss5",
+      "spool": false,
+      "profile": "default",
+      "captured": 130200,
+      "submitted": 130200,
+      "written": 127800,
+      "dropped": 0,
+      "uncertain": 2400,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 70,
+      "write_timeouts": 0,
+      "stored_points": 127800,
+      "distinct": 127800,
+      "duplicates": 0,
+      "lost": 2400,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 88300,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 2400,
+      "spooled_during_toxic": 0,
+      "queued_max": 5050,
+      "inflight_max": 5100,
+      "queued_max_per_channel": 850,
+      "rss_base_mb": 109.1,
+      "rss_max_mb": 128.1,
+      "rss_delta_mb": 19.1,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 70,
+      "breaker_max_delay_s": 2,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 70
+      },
+      "breaker_entries_during_toxic": 70,
+      "breaker_transitions_sampled": {
+       "closed->open": 70,
+       "open->closed": 70
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 151,
+        "stalled_slots": 16
+       },
+       "stalled_s": 4.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 60,
+      "written_rows_per_s_toxic": 1962.2,
+      "effective_mbit_s_toxic": 8.75,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.487,
+      "p99_ms_pre": 2.646,
+      "max_ms_pre": 8.8,
+      "captures_toxic": 1803,
+      "p50_ms_toxic": 1.446,
+      "p99_ms_toxic": 2.709,
+      "max_ms_toxic": 48.0,
+      "captures_post": 400,
+      "p50_ms_post": 1.518,
+      "p99_ms_post": 2.438,
+      "max_ms_post": 3.3,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 2400,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss20_nospool": {
+      "case": "loss20_nospool",
+      "toxic": "loss20",
+      "spool": false,
+      "profile": "default",
+      "captured": 130150,
+      "submitted": 130150,
+      "written": 117650,
+      "dropped": 0,
+      "uncertain": 12500,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 130,
+      "write_timeouts": 0,
+      "stored_points": 118200,
+      "distinct": 118200,
+      "duplicates": 0,
+      "lost": 11950,
+      "flushed": true,
+      "drain_s": 0.2,
+      "replay_s": null,
+      "written_during_toxic": 77300,
+      "line_bytes_per_row": 556.3,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 12500,
+      "spooled_during_toxic": 0,
+      "queued_max": 7350,
+      "inflight_max": 4550,
+      "queued_max_per_channel": 1350,
+      "rss_base_mb": 113.3,
+      "rss_max_mb": 132.7,
+      "rss_delta_mb": 19.5,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 130,
+      "breaker_max_delay_s": 8,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 130
+      },
+      "breaker_entries_during_toxic": 130,
+      "breaker_transitions_sampled": {
+       "closed->open": 123,
+       "open->closed": 123
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 114,
+        "stalled_slots": 28
+       },
+       "stalled_s": 7.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 162,
+      "written_rows_per_s_toxic": 1717.8,
+      "effective_mbit_s_toxic": 7.645,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.436,
+      "p99_ms_pre": 2.091,
+      "max_ms_pre": 2.6,
+      "captures_toxic": 1802,
+      "p50_ms_toxic": 1.442,
+      "p99_ms_toxic": 2.606,
+      "max_ms_toxic": 49.3,
+      "captures_post": 400,
+      "p50_ms_post": 1.534,
+      "p99_ms_post": 3.343,
+      "max_ms_post": 6.3,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 550,
+      "uncertain_lost": 11950,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "flap_nospool": {
+      "case": "flap_nospool",
+      "toxic": "flap",
+      "spool": false,
+      "profile": "default",
+      "captured": 130150,
+      "submitted": 130150,
+      "written": 109450,
+      "dropped": 0,
+      "uncertain": 20700,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 150,
+      "write_timeouts": 0,
+      "stored_points": 109450,
+      "distinct": 109450,
+      "duplicates": 0,
+      "lost": 20700,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 63650,
+      "line_bytes_per_row": 556.1,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 20700,
+      "spooled_during_toxic": 0,
+      "queued_max": 7750,
+      "inflight_max": 3900,
+      "queued_max_per_channel": 850,
+      "rss_base_mb": 118.2,
+      "rss_max_mb": 137.1,
+      "rss_delta_mb": 18.9,
+      "rss_bound_mb": 178.3,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 150,
+      "breaker_max_delay_s": 4,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 150
+      },
+      "breaker_entries_during_toxic": 150,
+      "breaker_transitions_sampled": {
+       "closed->open": 80,
+       "open->closed": 80
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "down": 5,
+        "up": 5
+       },
+       "stalled_s": 0.0,
+       "down_s": 24.79
+      },
+      "toxiproxy_calls": 176,
+      "written_rows_per_s_toxic": 1414.4,
+      "effective_mbit_s_toxic": 6.292,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.508,
+      "p99_ms_pre": 2.476,
+      "max_ms_pre": 8.3,
+      "captures_toxic": 1802,
+      "p50_ms_toxic": 1.465,
+      "p99_ms_toxic": 2.422,
+      "max_ms_toxic": 20.4,
+      "captures_post": 400,
+      "p50_ms_post": 1.503,
+      "p99_ms_post": 3.763,
+      "max_ms_post": 12.8,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 20700,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     }
+    },
+    "run_tag": "default-v0131-sansping"
+   },
+   "tuned-v0131-sansping": {
+    "status": "limit-found",
+    "started": "2026-11-05T15:04:46+00:00",
+    "seconds": 263.9,
+    "host": "rocketscience",
+    "params": {
+     "models": 10,
+     "batch_rows": 50,
+     "rows_per_s": 2000.0,
+     "max_queue_rows": 5000,
+     "pre_s": 10.0,
+     "toxic_s": 45.0,
+     "post_s": 10.0,
+     "drain_timeout_s": 240.0,
+     "toxics": [
+      "none",
+      "loss5",
+      "loss20",
+      "flap"
+     ],
+     "write_timeout_s": 5.0,
+     "spool": "nospool",
+     "flap_period_s": 10.0,
+     "loss_slot_s": 0.25,
+     "blocked_ms": 200.0,
+     "proxy": "Toxiproxy 2.12.0 (container sc04-toxiproxy)",
+     "storage": "InfluxDB 2.6.1 (container sc04-influxdb)",
+     "env_note": "local, reduced size (registry env aws-scale); workstation shared with SC-07 (Flux query timings)",
+     "write": {
+      "profile": "tuned",
+      "write_concurrency": 4,
+      "pulsar-data-collection": "0.13.1",
+      "pulsar-metrics": null,
+      "influxdb-client": "1.50.0",
+      "pandas": "3.1.0"
+     },
+     "tuned_spool": "spool_compression=gzip (with spool)",
+     "toxiproxy_version": "{\"version\": \"2.12.0\"}"
+    },
+    "checks": {
+     "blocked_captures_total": true,
+     "unexplained_total": true,
+     "unexplained_loss_total": true,
+     "unexplained_stored_total": true,
+     "duplicates_total": true,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": true,
+     "drops_only_beyond_bound_all": true
+    },
+    "health": {
+     "cpu_max": 48.3,
+     "mem_max": 75.4,
+     "rss_mb_max": 133.73046875,
+     "threads_max": 31,
+     "fds_max": 457,
+     "disk_max": 50.0,
+     "rss_growth_mb_per_h": 261.0870103626384,
+     "samples": 53
+    },
+    "notes": [
+     "profile tuned; 4 cases; local reduced-size run (registry env aws-scale), workstation shared with SC-07 (Flux query timings) running at the same time"
+    ],
+    "environment": {
+     "collected_at": "2026-11-05T15:09:10+00:00",
+     "host": "rocketscience",
+     "hardware": {
+      "cpu_model": "AMD Ryzen 7 7730U with Radeon Graphics",
+      "logical_cpus": 16,
+      "physical_cpus": 8,
+      "ram_gib": 38.8,
+      "gpus": [],
+      "cloud": null
+     },
+     "software": {
+      "os": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.10",
+      "python_executable": "C:\\dev\\pulsar-ml\\pulsar_data_collection\\.venv\\Scripts\\python.exe",
+      "packages": {
+       "pulsar_data_collection": "0.13.1 (dist-info says 0.5.1)",
+       "pulsar_metrics": null,
+       "influxdb-client": "1.50.0",
+       "pandas": "3.1.0",
+       "numpy": "2.5.4",
+       "scipy": "1.18.1",
+       "scikit-learn": "1.9.1",
+       "pydantic": "2.14.2",
+       "opentelemetry-sdk": "1.45.2",
+       "torch": null,
+       "transformers": null,
+       "gliner": null,
+       "sentence-transformers": null,
+       "psutil": "7.2.2"
+      },
+      "docker": "28.0.4",
+      "containers": [
+       {
+        "name": "sc04-toxiproxy",
+        "image": "ghcr.io/shopify/toxiproxy:2.12.0"
+       },
+       {
+        "name": "sc04-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-grafana",
+        "image": "grafana/grafana-oss:11.3.0"
+       },
+       {
+        "name": "pulsar-validation-influxdb",
+        "image": "influxdb:2.6.1"
+       },
+       {
+        "name": "pulsar-ollama",
+        "image": "ollama/ollama:0.6.8"
+       }
+      ]
+     },
+     "services": {
+      "influxdb": {
+       "url": "http://127.0.0.1:8097/health",
+       "reachable": true,
+       "version": "v2.6.1"
+      },
+      "grafana": {
+       "url": "http://localhost:3000/api/health",
+       "reachable": true,
+       "version": "11.3.0"
+      },
+      "ollama": {
+       "url": "http://localhost:11434/api/tags",
+       "reachable": true,
+       "models": [
+        {
+         "name": "granite-embedding:278m",
+         "digest": "1a37926bf842899cbf90583e3932f3820548716d9d07661ba622199ffe95c552",
+         "size_gb": 0.56,
+         "quantization": "F16"
+        },
+        {
+         "name": "nomic-embed-text:latest",
+         "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+         "size_gb": 0.27,
+         "quantization": "F16"
+        },
+        {
+         "name": "granite3.3:2b",
+         "digest": "07bd1f170855240f9e162bf54ea494a8bc1c73d8cbd1365d7fccbeb7d2504947",
+         "size_gb": 1.55,
+         "quantization": "Q4_K_M"
+        },
+        {
+         "name": "llama3.2:3b",
+         "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+         "size_gb": 2.02,
+         "quantization": "Q4_K_M"
+        }
+       ]
+      }
+     },
+     "sources": {
+      "pulsar_data_collection": {
+       "path": "C:/dev/pulsar-ml/wt/doc-dc",
+       "commit": "031f1ad64d977b6d5be83925c27f287e013907d7",
+       "branch": "doc/plafond-capture-reseau",
+       "tag": null,
+       "dirty": true
+      },
+      "pulsar_metrics": null,
+      "pulsar_demo": {
+       "path": "C:/dev/pulsar-ml/wt/sc04",
+       "commit": "0ef28ab18d633521ea2efe108654544191d06332",
+       "branch": "fonction/sc04-reseau-degrade",
+       "tag": null,
+       "dirty": false
+      }
+     }
+    },
+    "limits": [
+     {
+      "finding": "[tuned loss20_nospool] without spool, 16800 rows lost while the queues had room: writes that timed out or were cut (16800 uncertain rows, 0 of them stored by InfluxDB anyway); counted, never retried",
+      "evidence": "{\"uncertain\": 16800, \"uncertain_stored\": 0, \"write_timeouts\": 0, \"write_errors\": 160, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 16}, \"queued_max\": 11250}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     },
+     {
+      "finding": "[tuned flap_nospool] without spool, 21400 rows lost while the queues had room: writes that timed out or were cut (21400 uncertain rows, 0 of them stored by InfluxDB anyway); counted, never retried",
+      "evidence": "{\"uncertain\": 21400, \"uncertain_stored\": 0, \"write_timeouts\": 0, \"write_errors\": 150, \"breaker_error_kinds\": {\"StorageConnectionResetError (uncertain)\": 15}, \"queued_max\": 8650}",
+      "proposal": "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry uncertain writes in memory once, since InfluxDB writes are idempotent",
+      "severity": "minor"
+     }
+    ],
+    "metrics": {
+     "blocked_captures_total": 0,
+     "unexplained_total": 0,
+     "unexplained_loss_total": 0,
+     "unexplained_stored_total": 0,
+     "duplicates_total": 0,
+     "rss_within_bound_all": true,
+     "queue_within_bound_all": true,
+     "spool_lost_total": 0,
+     "spool_dropped_total": 0,
+     "drops_only_beyond_bound_all": true,
+     "p99_ms_toxic_max": 4.424,
+     "baseline_p99_ms": 4.424,
+     "errors": 0
+    },
+    "cases": {
+     "none_nospool": {
+      "case": "none_nospool",
+      "toxic": "none",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 130100,
+      "dropped": 0,
+      "uncertain": 0,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 0,
+      "write_timeouts": 0,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 90150,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 0,
+      "spooled_during_toxic": 0,
+      "queued_max": 2050,
+      "inflight_max": 2100,
+      "queued_max_per_channel": 250,
+      "rss_base_mb": 112.1,
+      "rss_max_mb": 113.7,
+      "rss_delta_mb": 1.6,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 0,
+      "breaker_max_delay_s": 0.0,
+      "breaker_error_kinds": {},
+      "breaker_entries_during_toxic": 0,
+      "breaker_transitions_sampled": {},
+      "endpoints": null,
+      "fault": {
+       "events": {},
+       "stalled_s": 0.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 6,
+      "written_rows_per_s_toxic": 2003.3,
+      "effective_mbit_s_toxic": 8.933,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.552,
+      "p99_ms_pre": 2.618,
+      "max_ms_pre": 6.0,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.669,
+      "p99_ms_toxic": 4.424,
+      "max_ms_toxic": 18.1,
+      "captures_post": 400,
+      "p50_ms_post": 1.761,
+      "p99_ms_post": 2.808,
+      "max_ms_post": 3.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss5_nospool": {
+      "case": "loss5_nospool",
+      "toxic": "loss5",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130100,
+      "submitted": 130100,
+      "written": 128050,
+      "dropped": 0,
+      "uncertain": 2050,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 70,
+      "write_timeouts": 0,
+      "stored_points": 130100,
+      "distinct": 130100,
+      "duplicates": 0,
+      "lost": 0,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 87700,
+      "line_bytes_per_row": 557.4,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 2050,
+      "spooled_during_toxic": 0,
+      "queued_max": 5250,
+      "inflight_max": 5000,
+      "queued_max_per_channel": 550,
+      "rss_base_mb": 108.4,
+      "rss_max_mb": 128.1,
+      "rss_delta_mb": 19.7,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 7,
+      "breaker_max_delay_s": 2,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 7
+      },
+      "breaker_entries_during_toxic": 7,
+      "breaker_transitions_sampled": {
+       "closed->open": 7,
+       "open->closed": 7
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 153,
+        "stalled_slots": 16
+       },
+       "stalled_s": 4.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 60,
+      "written_rows_per_s_toxic": 1948.9,
+      "effective_mbit_s_toxic": 8.691,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.725,
+      "p99_ms_pre": 2.91,
+      "max_ms_pre": 4.8,
+      "captures_toxic": 1801,
+      "p50_ms_toxic": 1.637,
+      "p99_ms_toxic": 3.152,
+      "max_ms_toxic": 55.4,
+      "captures_post": 400,
+      "p50_ms_post": 1.636,
+      "p99_ms_post": 2.887,
+      "max_ms_post": 9.2,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 2050,
+      "uncertain_lost": 0,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "loss20_nospool": {
+      "case": "loss20_nospool",
+      "toxic": "loss20",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130300,
+      "submitted": 130300,
+      "written": 113500,
+      "dropped": 0,
+      "uncertain": 16800,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 160,
+      "write_timeouts": 0,
+      "stored_points": 113500,
+      "distinct": 113500,
+      "duplicates": 0,
+      "lost": 16800,
+      "flushed": true,
+      "drain_s": 0.2,
+      "replay_s": null,
+      "written_during_toxic": 68450,
+      "line_bytes_per_row": 556.3,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 16800,
+      "spooled_during_toxic": 0,
+      "queued_max": 11250,
+      "inflight_max": 10000,
+      "queued_max_per_channel": 1150,
+      "rss_base_mb": 115.7,
+      "rss_max_mb": 143.9,
+      "rss_delta_mb": 28.1,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 16,
+      "breaker_max_delay_s": 8,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 16
+      },
+      "breaker_entries_during_toxic": 16,
+      "breaker_transitions_sampled": {
+       "closed->open": 13,
+       "open->closed": 13
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "clear_slots": 120,
+        "stalled_slots": 32
+       },
+       "stalled_s": 8.0,
+       "down_s": 0.0
+      },
+      "toxiproxy_calls": 174,
+      "written_rows_per_s_toxic": 1521.1,
+      "effective_mbit_s_toxic": 6.77,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.76,
+      "p99_ms_pre": 4.453,
+      "max_ms_pre": 20.0,
+      "captures_toxic": 1805,
+      "p50_ms_toxic": 1.617,
+      "p99_ms_toxic": 3.52,
+      "max_ms_toxic": 44.7,
+      "captures_post": 400,
+      "p50_ms_post": 1.675,
+      "p99_ms_post": 2.847,
+      "max_ms_post": 10.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 16800,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     },
+     "flap_nospool": {
+      "case": "flap_nospool",
+      "toxic": "flap",
+      "spool": false,
+      "profile": "tuned",
+      "captured": 130200,
+      "submitted": 130200,
+      "written": 108800,
+      "dropped": 0,
+      "uncertain": 21400,
+      "rejected": 0,
+      "spooled": 0,
+      "replayed": 0,
+      "queued_end": 0,
+      "spool_left_rows": 0,
+      "spool_files_end": 0,
+      "write_errors": 150,
+      "write_timeouts": 0,
+      "stored_points": 108800,
+      "distinct": 108800,
+      "duplicates": 0,
+      "lost": 21400,
+      "flushed": true,
+      "drain_s": 0.1,
+      "replay_s": null,
+      "written_during_toxic": 63350,
+      "line_bytes_per_row": 556.1,
+      "dropped_during_toxic": 0,
+      "uncertain_during_toxic": 21400,
+      "spooled_during_toxic": 0,
+      "queued_max": 8650,
+      "inflight_max": 5000,
+      "queued_max_per_channel": 900,
+      "rss_base_mb": 109.8,
+      "rss_max_mb": 131.5,
+      "rss_delta_mb": 21.7,
+      "rss_bound_mb": 99.1,
+      "rss_bound_queue_only_mb": 46.3,
+      "spool_mb_max": 0.0,
+      "breaker_entries": 15,
+      "breaker_max_delay_s": 4,
+      "breaker_error_kinds": {
+       "StorageConnectionResetError (uncertain)": 15
+      },
+      "breaker_entries_during_toxic": 15,
+      "breaker_transitions_sampled": {
+       "closed->open": 12,
+       "open->closed": 12
+      },
+      "endpoints": null,
+      "fault": {
+       "events": {
+        "down": 5,
+        "up": 5
+       },
+       "stalled_s": 0.0,
+       "down_s": 24.77
+      },
+      "toxiproxy_calls": 188,
+      "written_rows_per_s_toxic": 1407.8,
+      "effective_mbit_s_toxic": 6.263,
+      "captures_pre": 401,
+      "p50_ms_pre": 1.665,
+      "p99_ms_pre": 3.108,
+      "max_ms_pre": 11.5,
+      "captures_toxic": 1803,
+      "p50_ms_toxic": 1.744,
+      "p99_ms_toxic": 3.665,
+      "max_ms_toxic": 18.5,
+      "captures_post": 400,
+      "p50_ms_post": 1.643,
+      "p99_ms_post": 2.881,
+      "max_ms_post": 9.1,
+      "blocked_captures": 0,
+      "unexplained": 0,
+      "unexplained_loss": 0,
+      "unexplained_stored": 0,
+      "uncertain_stored": 0,
+      "uncertain_lost": 21400,
+      "rss_within_bound": true,
+      "queue_within_bound": true,
+      "drops_only_beyond_bound": true
+     }
+    },
+    "run_tag": "tuned-v0131-sansping"
+   }
+  }
  }
 }

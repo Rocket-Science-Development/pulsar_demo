@@ -398,7 +398,9 @@ def _case(ctx, env, toxi, kind, spool, seed):
            "submitted": submitted, "written": written, "dropped": dropped, "uncertain": uncertain,
            "rejected": rejected, "spooled": spooled, "replayed": replayed, "queued_end": queued_end,
            "spool_left_rows": spool_left, "spool_files_end": tot("spool_files"), "write_errors": tot("write_errors"),
-           "write_timeouts": tot("write_timeouts"), "stored_points": points, "distinct": distinct,
+           "write_timeouts": tot("write_timeouts"),
+           "retried_uncertain": tot("retried_uncertain_rows"),  # dc >= 0.13.1: uncertain rows written once more
+           "stored_points": points, "distinct": distinct,
            "duplicates": points - distinct, "lost": submitted - distinct, "flushed": flushed,
            "drain_s": round(drain_s, 1), "replay_s": None if replay_s is None else round(replay_s, 1),
            "written_during_toxic": sum(b["written_rows"] - a["written_rows"] for a, b in zip(st_start, st_toxic)),
@@ -533,9 +535,10 @@ def evaluate(ctx, rows):
         if not r["spool"] and r["uncertain_lost"] > 0:
             ctx.limit(f"{tag} without spool, {r['uncertain_lost']} rows lost while the queues had room: writes that "
                       f"timed out or were cut ({r['uncertain']} uncertain rows, {r['uncertain_stored']} of them stored "
-                      "by InfluxDB anyway); counted, never retried",
-                      json.dumps({k: r[k] for k in ("uncertain", "uncertain_stored", "write_timeouts", "write_errors",
-                                                     "breaker_error_kinds", "queued_max")}),
+                      "by InfluxDB anyway); counted (dc >= 0.13.1: after their single second write, "
+                      f"{r.get('retried_uncertain', 0)} rows retried)",
+                      json.dumps({k: r.get(k) for k in ("uncertain", "uncertain_stored", "retried_uncertain", "write_timeouts",
+                                                         "write_errors", "breaker_error_kinds", "queued_max")}),
                       "Set spool_dir on links that time out (uncertain writes are then replayed, idempotent); or retry "
                       "uncertain writes in memory once, since InfluxDB writes are idempotent", "minor")
         if r["dropped"] and not r["spool"]:
