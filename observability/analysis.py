@@ -191,6 +191,31 @@ def write_hourly_quantiles(sink, frame: pd.DataFrame, features: list, tags: dict
             "write_s": time.perf_counter() - t1}
 
 
+def quantile_gaps(raw: dict, aggregated: dict) -> list:
+    """Hours to (re)aggregate: hour end -> count of raw values of the features (`raw`) against hour end -> sum of the
+    `n` written for that hour (`aggregated`). An hour is a gap when it has more raw values than its aggregates counted:
+    never aggregated, a feature missing, or rows that arrived after it was aggregated. Sorted, oldest first.
+
+    `n` counts the finite values of each numeric feature, as InfluxDB counts the stored values of the field (InfluxDB
+    stores no NaN), so an hour aggregated from all its rows is never a gap: a backfill run on it writes nothing."""
+    return sorted(h for h, count in raw.items() if count > aggregated.get(h, 0))
+
+
+def backfill_ranges(hours: list, max_hours: int = None, chunk_hours: int = 24) -> list:
+    """[start, stop) ranges to aggregate for the given hour ends: the `max_hours` oldest (all if None), consecutive
+    hours merged into one range, each range at most `chunk_hours` long (so one read stays bounded in memory)."""
+    hours = sorted(hours)[:max_hours] if max_hours is not None else sorted(hours)
+    one = timedelta(hours=1)
+    ranges = []
+    for end in hours:
+        start = end - one
+        if ranges and ranges[-1][1] == start and ranges[-1][1] - ranges[-1][0] < timedelta(hours=chunk_hours):
+            ranges[-1][1] = end
+        else:
+            ranges.append([start, end])
+    return [tuple(r) for r in ranges]
+
+
 def to_numeric(frame: pd.DataFrame, columns: list) -> pd.DataFrame:
     for column in columns:
         frame[column] = pd.to_numeric(frame.get(column, 0), errors="coerce").fillna(0).astype(float)

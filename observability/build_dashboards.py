@@ -384,7 +384,9 @@ def drift(bucket):
                                  "job (pulsar_feature_quantiles): exact quantiles of the rows captured in that hour "
                                  "(linear interpolation), recomputed for the last 24 hours at every run so that late rows "
                                  "count. After the last pre-aggregated hour, up to 24 hours are computed live from the raw "
-                                 "captures (t-digest estimate); older hours never aggregated are left as a gap.",
+                                 "captures (t-digest estimate). Older hours never aggregated (history captured before the job, job "
+                                 "down) are backfilled by the job, oldest first, up to 168 hours per run; until "
+                                 "then they show as a gap.",
                      fill=0, span_nulls=2 * 3600 * 1000), 16, 9)
     d.add(table("Latest window: tests by feature",
                 f'{base} |> filter(fn: (r) => r._field == "metric_value" or r._field == "p_adjusted" or r._field == "status" or r._field == "confirmed")'
