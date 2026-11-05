@@ -275,76 +275,80 @@ Démontage vérifié après la campagne : les deux conteneurs `sc04-*`, leurs de
 
 ## 9. Après le correctif R1 (0.13.1)
 
-R1 est corrigé dans `pulsar_data_collection` 0.13.1 (branche `doc/plafond-capture-reseau`, PR #35, commit `b70b542`).
+R1 est corrigé dans `pulsar_data_collection` 0.13.1 (branche `doc/plafond-capture-reseau`, PR #35, commit `ca01dc5`).
 Sans `spool_dir`, les lignes d'une écriture incertaine (expirée, ou coupée après l'envoi) reviennent dans leur file, à
 leur place, et sont écrites **une seconde fois**. Elles ne sont comptées dans `uncertain_rows` que si cette seconde
 écriture est incertaine elle aussi, si la borne de la file les écarte, ou si `close()` les trouve encore en attente.
-La seconde écriture part à la fin du back-off, **et seulement si InfluxDB répond à `/ping`**. Le nouveau compteur
-`retried_uncertain_rows` compte ces lignes. L'option `CaptureOptions(retry_uncertain=False)` rétablit l'ancien
-comportement. Avec spool, rien ne change.
+La seconde écriture part à la fin du back-off, **une fois qu'InfluxDB répond à `/ping`**. Seules ces lignes attendent
+le ping, et après 3 pings sans réponse elles partent quand même. Le nouveau compteur `retried_uncertain_rows` compte
+ces lignes, et `CaptureOptions(retry_uncertain=False)` rétablit l'ancien comportement. Avec spool, rien ne change.
 
 **Ce qui a été relancé** : les cas sans spool `perte 5 %`, `perte 20 %` et `lien instable`, plus la référence, dans
-les deux profils. Mêmes paramètres et mêmes conteneurs dédiés que la campagne (recréés pour l'occasion, puis
+les deux profils. Mêmes paramètres et mêmes conteneurs dédiés que la campagne (recréés pour chaque passage, puis
 supprimés). `dc` est importé depuis le worktree `doc-dc`. Variables : `LAB_TOXICS=none,loss5,loss20,flap
 LAB_SPOOL=nospool`, avec `LAB_RUN_TAG=default-v0131` puis `tuned-v0131`. Les résultats d'origine
 (`SC-04.default.json`, `SC-04.tuned.json`) ne sont pas touchés. SC-07 tournait encore sur la machine (conteneurs
 `sc07-*`, non touchés) : la charge était partagée, comme pendant la campagne.
 
-**Deux passages.** Un premier passage a testé une version du correctif sans l'attente de `/ping`. Ses résultats sont
-dans `SC-04.<profil>-v0131-sansping.json`. Les pertes baissaient, mais restaient fortes sous lien instable (20 700 et
-21 400 lignes). La cause : le premier back-off dure 1 s, alors que le lien reste coupé 5 s. L'unique seconde écriture
-partait donc sur un lien encore mort. La version livrée attend que le stockage réponde avant de l'envoyer. Un ping
-sans réponse relance le back-off, sans compter d'erreur d'écriture.
+**Trois passages.** Le correctif a changé deux fois entre les passages. Une seule exécution par cas et par passage :
+les écarts de quelques milliers de lignes entre passages sont du même ordre que le bruit du tirage et de la charge.
+1. **Sans attente de `/ping`** (`SC-04.<profil>-v0131-sansping.json`). Les pertes baissaient, mais restaient fortes
+   sous lien instable (20 700 et 21 400 lignes). La cause : le premier back-off dure 1 s, alors que le lien reste
+   coupé 5 s. L'unique seconde écriture partait donc sur un lien encore mort.
+2. **Avec attente de `/ping` pour toute la requête** (commit `b70b542`, `SC-04.<profil>-v0131-b70b542.json`). La
+   revue indépendante y a trouvé un défaut : si `/ping` échoue alors que les écritures passent (proxy qui n'expose que
+   l'API d'écriture), les lignes neuves restaient bloquées derrière les lignes à réessayer.
+3. **Version livrée** (commit `ca01dc5`, `SC-04.<profil>-v0131.json`) : seules les lignes à réessayer attendent le
+   ping, avec leur propre délai, et 3 pings au plus.
 
 ### 9.1 Lignes perdues sans spool (absentes d'InfluxDB, toutes comptées)
 
-| Cas | Profil | 0.13.0 | 0.13.1 sans attente de `/ping` | 0.13.1 livrée | Réécrites une fois (`retried_uncertain_rows`) |
-|---|---|---|---|---|---|
-| perte 5 % | défaut | 11 700 | 2400 | **200** | 10 100 |
-| perte 5 % | tuned | 6050 | 0 | **0** | 14 800 |
-| perte 20 % | défaut | 37 100 | 11 950 | **600** | 18 350 |
-| perte 20 % | tuned | 35 650 | 16 800 | **5000** | 25 200 |
-| lien instable | défaut | 41 450 | 20 700 | **0** | 10 250 |
-| lien instable | tuned | 39 800 | 21 400 | **0** | 10 250 |
+| Cas | Profil | 0.13.0 | passage 1 | passage 2 | **0.13.1 livrée** | réécrites une fois (`retried_uncertain_rows`) |
+|---|---|---|---|---|---|---|
+| perte 5 % | défaut | 11 700 | 2400 | 200 | **0** | 16 900 |
+| perte 5 % | tuned | 6050 | 0 | 0 | **0** | 15 050 |
+| perte 20 % | défaut | 37 100 | 11 950 | 600 | **5200** | 32 200 |
+| perte 20 % | tuned | 35 650 | 16 800 | 5000 | **5000** | 27 300 |
+| lien instable | défaut | 41 450 | 20 700 | 0 | **0** | 41 300 |
+| lien instable | tuned | 39 800 | 21 400 | 0 | **0** | 26 600 |
 
-Environ 130 000 lignes capturées par cas. Les pertes passent de 4,6 à 32 % du trafic à 0 à 3,8 %.
+Environ 130 000 lignes capturées par cas. Les pertes passent de 4,6 à 32 % du trafic à 0 % (perte 5 %, lien
+instable) et environ 4 % (perte 20 %). En tuned, perte 5 %, 2000 lignes restent comptées incertaines, mais InfluxDB les
+avait toutes stockées : 0 perte.
 
-### 9.2 Le reste ne bouge pas
+### 9.2 Le reste ne bouge pas (version livrée)
 
 | Cas | Profil | p99 ms (pendant) | max ms | ΔRSS Mo (borne) | file max (10 Pulse) | écrites/s | doublons | non expliquées |
 |---|---|---|---|---|---|---|---|---|
-| référence | défaut | 2,31 | 4,5 | 3,6 (178) | 2150 | 1991 | 0 | 0 |
-| perte 5 % | défaut | 2,51 | 7,8 | 15,7 (178) | 5100 | 1982 | 0 | 0 |
-| perte 20 % | défaut | 2,08 | 23,1 | 25,8 (178) | 14 300 | 1961 | 0 | 0 |
-| lien instable | défaut | 2,48 | 43,6 | 16,2 (178) | 11 750 | 1783 | 0 | 0 |
-| référence | tuned | 1,75 | 40,7 | 1,5 (99) | 2000 | 2029 | 0 | 0 |
-| perte 5 % | tuned | 2,41 | 4,8 | 13,9 (99) | 6900 | 2012 | 0 | 0 |
-| perte 20 % | tuned | 5,72 | 83,4 | 51,7 (99) | 20 950 | 1607 | 0 | 0 |
-| lien instable | tuned | 4,91 | 28,7 | 22,9 (99) | 13 150 | 1810 | 0 | 0 |
+| référence | défaut | 3,07 | 32,8 | 1,5 (178) | 1900 | 2003 | 0 | 0 |
+| perte 5 % | défaut | 3,25 | 46,9 | 20,8 (178) | 6450 | 1989 | 0 | 0 |
+| perte 20 % | défaut | 3,18 | 71,2 | 23,3 (178) | 8850 | 1854 | 0 | 0 |
+| lien instable | défaut | 2,69 | 46,1 | 12,1 (178) | 11 000 | 1787 | 0 | 0 |
+| référence | tuned | 2,86 | 47,5 | 1,5 (99) | 2000 | 2012 | 0 | 0 |
+| perte 5 % | tuned | 2,91 | 32,0 | 12,9 (99) | 6100 | 1947 | 0 | 0 |
+| perte 20 % | tuned | 2,00 | 10,3 | 8,5 (99) | 10 550 | 1883 | 0 | 0 |
+| lien instable | tuned | 1,78 | 36,0 | 27,6 (99) | 12 650 | 1799 | 0 | 0 |
 
 - **L'appelant n'est toujours pas bloqué** : 0 capture de 200 ms ou plus. Les 9 critères chiffrés du test sont tenus
-  (`checks` tous vrais) dans les deux profils.
+  (`checks` tous vrais) dans les deux profils, aux trois passages.
 - **Les comptes restent exacts** : 0 ligne non expliquée, 0 doublon. La réécriture est idempotente : les points
   réécrits ont le même horodatage, et InfluxDB les écrase.
-- **La mémoire reste bornée.** Les files sont plus pleines, car les lignes à réécrire y attendent la fin du back-off :
-  jusqu'à 20 950 lignes pour 10 Pulse (tuned, perte 20 %). Aucune file ne dépasse `max_queue_rows` (5000 par Pulse),
-  et la RSS reste sous la borne (+51,7 Mo pour 99 Mo).
-- **Le débit sous défaut remonte** : 1607 à 2012 lignes/s écrites dans ces cas, contre 869 à 1882 en 0.13.0.
+- **La mémoire reste bornée.** Les files sont plus pleines, car les lignes à réécrire y attendent : jusqu'à 12 650
+  lignes pour 10 Pulse. Aucune file ne dépasse `max_queue_rows` (5000 par Pulse), et la RSS reste sous la borne.
+- **Le débit sous défaut remonte** : 1787 à 1989 lignes/s écrites dans ces cas, contre 869 à 1882 en 0.13.0.
 
 ### 9.3 Ce qui reste
 
-- **Perte 20 % : 600 lignes (défaut) et 5000 (tuned).** Ce sont des lignes dont la seconde écriture a été coupée elle
-  aussi. À 20 % de connexions coupées, une requête sur cinq environ peut échouer deux fois. En tuned, une requête du
-  `SharedWriter` porte jusqu'à 5000 lignes de plusieurs modèles : une double coupure coûte donc plus cher. Le
-  correctif ne réessaie qu'une fois, par conception, pour ne pas boucler sur un lien qui coupe tout. `spool_dir`
-  reste la réponse pour ces liens (0 perte dans la campagne), et le README le recommande toujours.
-- Le harness classe ces restes en limites mineures (« rows lost while the queues had room ») : 2 en défaut (perte 5 %
-  et 20 %), 1 en tuned (perte 20 %). Le critère du registre (pertes seulement au-delà de la borne) est maintenant tenu
-  pour le lien instable (deux profils) et pour la perte à 5 % en tuned. Il reste en échec, à un niveau bien plus bas,
-  pour la perte à 20 % (deux profils) et pour la perte à 5 % en défaut (200 lignes).
+- **Perte 20 % : 5200 lignes (défaut) et 5000 (tuned).** Ce sont des lignes dont la seconde écriture a été coupée elle
+  aussi. À 20 % de connexions coupées, une requête sur cinq environ peut échouer deux fois. Le correctif ne réessaie
+  qu'une fois, par conception, pour ne pas boucler sur un lien qui coupe tout. `spool_dir` reste la réponse pour ces
+  liens (0 perte dans la campagne), et le README le recommande toujours.
+- Le harness classe ce reste en limite mineure (« rows lost while the queues had room »), une par profil. Le critère du
+  registre (pertes seulement au-delà de la borne) est maintenant tenu pour la perte à 5 % et pour le lien instable,
+  dans les deux profils. Il reste en échec pour la perte à 20 %, avec 4 % du trafic au lieu de 27 à 28 %.
 - Le test enregistre maintenant `retried_uncertain` par cas (compteur `retried_uncertain_rows` de dc 0.13.1).
 - Les cas avec spool, de latence et de débit n'ont pas été relancés : ils n'empruntent pas le chemin modifié. Avec
   spool, une écriture incertaine est spoolée, comme avant.
 
-Statut harness : `limit-found` dans les deux profils. Démontage vérifié : `sc04-influxdb`, `sc04-toxiproxy`, leurs
-volumes anonymes et le réseau `sc04-net` sont supprimés.
+Statut harness : `limit-found` dans les deux profils (1 limite mineure chacun). Démontage vérifié après chaque
+passage : `sc04-influxdb`, `sc04-toxiproxy`, leurs volumes anonymes et le réseau `sc04-net` sont supprimés.
