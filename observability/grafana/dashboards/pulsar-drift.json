@@ -412,7 +412,7 @@
     {
       "type": "timeseries",
       "title": "Hourly quantiles of ${feature}",
-      "description": "Numeric features: the band spans the 10th to 90th percentiles of each hour; a shift of the band is the drift that the tests measure. Each hour is pre-aggregated by the analysis job (pulsar_feature_quantiles): exact quantiles of the rows captured in that hour (linear interpolation), recomputed for the last 24 hours at every run so that late rows count. After the last pre-aggregated hour, up to 24 hours are computed live from the raw captures (t-digest estimate); older hours never aggregated are left as a gap.",
+      "description": "Numeric features: the band spans the 10th to 90th percentiles of each hour; a shift of the band is the drift that the tests measure. Each hour is pre-aggregated by the analysis job (pulsar_feature_quantiles): exact quantiles of the rows captured in that hour (linear interpolation), recomputed for the last 24 hours at every run so that late rows count. After the last pre-aggregated hour, up to 24 hours are computed live from the raw captures (t-digest estimate). Older hours never aggregated (history captured before the job, job down) are backfilled by the job, oldest first, up to 168 hours per run; until then they show as a gap.",
       "targets": [
         {
           "refId": "A",
