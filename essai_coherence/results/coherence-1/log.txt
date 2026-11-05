@@ -1,4 +1,0 @@
-2026-11-04 20:19:12 llama_t07: 180 calls, 0 errors, 187 s, median 2.0 s
-2026-11-04 20:21:30 granite_t07: 90 calls, 0 errors, 138 s, median 2.2 s
-2026-11-04 20:23:19 llama_t15: 90 calls, 0 errors, 109 s, median 2.2 s
-2026-11-04 20:27:44 granite_t15: 90 calls, 0 errors, 138 s, median 1.9 s
