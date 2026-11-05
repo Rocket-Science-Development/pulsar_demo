@@ -1,0 +1,911 @@
+{
+ "condition": "granite_t07",
+ "model": "granite3.3:2b",
+ "temperature": 0.7,
+ "repeats": 3,
+ "max_tokens": 48,
+ "workers": 2,
+ "elapsed_s": 137.8,
+ "answers": [
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 9.6180489
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 9.7408902
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.7008752
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8649688
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Hiver",
+   "normalized": "hiver",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.3410989
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.2248085
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Oui. (Yes)",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.450637
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2792383
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Colombie-Britannique.",
+   "normalized": "Colombie-Britannique",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.252632
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2638073
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Nunavut",
+   "normalized": "Nunavut",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.7461661
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "45%",
+   "normalized": "45",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2164501
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Il n'y a pas de capitale pour le territoire du Nunavut en raison de son statut unique dans le Système Polaire Australien. Le Nunavut est div",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 13.8828611
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4770977
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5957235
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Pacific.",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4713734
+  },
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0557341
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1861452
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "10",
+   "normalized": "10",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1109374
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "801",
+   "normalized": "801",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.6189906
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "36000",
+   "normalized": "36000",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3918293
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.6690963
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "13. (Canada compte actuellement 10 provinces et 2 territoires.)",
+   "normalized": "13",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 7.3542844999
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Quenneville.",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 1.8620681
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "1302",
+   "normalized": "1302",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2729476
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Winnipeg.",
+   "normalized": "Winnipeg",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.6778662
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "25200",
+   "normalized": "25200",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.9412816
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "26070",
+   "normalized": "26070",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.0590708
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9348847
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "466",
+   "normalized": "466",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8523659
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.4597613
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1080",
+   "normalized": "1080",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.5953849
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3964029
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.395585
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.5548396001
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "385",
+   "normalized": "385",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.4314513
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5641542
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 6.1199846
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 6.1342671
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "366",
+   "normalized": "366",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 5.2327676
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "45%",
+   "normalized": "45",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 5.2131053
+  },
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2150152
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Winnipeg.",
+   "normalized": "Winnipeg",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.4262463
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Pacific",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.761673
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Hiver.",
+   "normalized": "hiver",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.2502865
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "25200",
+   "normalized": "25200",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 5.2757144
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Colombie-Britannique.",
+   "normalized": "Colombie-Britannique",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.5904389
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.1088182
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "13",
+   "normalized": "13",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3572804
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Charlottetown.",
+   "normalized": "Charlottetown",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.3632495
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "36000",
+   "normalized": "36000",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.5959194
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "10",
+   "normalized": "10",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.64467
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Yukon",
+   "normalized": "Yukon",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.0423512
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.8582258
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0308598
+  },
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.02293
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9277476
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.8474863
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1001",
+   "normalized": "1001",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3317145
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Il n'y a pas de capitale au Nunavut, car il n'est pas un État mais une région autonome au Canada. Le plus haut point administratif est Arvi.",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 12.7130581
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3320248
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "43% rounds to 43.",
+   "normalized": "43",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.1581529
+  },
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2083445
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5352164001
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Winnipeg",
+   "normalized": "Winnipeg",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4300642
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4320407
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2284087
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1729",
+   "normalized": "1729",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0823414
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.1155538
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2923941
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "36000",
+   "normalized": "36000",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.5918919
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Nunavut",
+   "normalized": "Nunavut",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9013151
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9227561
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "466",
+   "normalized": "466",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2308829
+  },
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 0.9934944
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5881464
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.1780903
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "10",
+   "normalized": "10",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1827773
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "25200",
+   "normalized": "25200",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.0180534
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.6723014
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "13",
+   "normalized": "13",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.588781
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Colombie-Britannique",
+   "normalized": "Colombie-Britannique",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 4.6070617
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Hiver.",
+   "normalized": "hiver",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.4319618
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1080",
+   "normalized": "1080",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.0538481
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Il n'y a pas de capitale au Nunavut car c'est un territoire d'Canada qui ne possède aucune ville en tant que capitale.",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 12.3446909
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1492439
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1306$",
+   "normalized": "1306",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2265245
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Pacific",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4901738
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4461261
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Quebec City",
+   "normalized": "Québec",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9524456
+  }
+ ]
+}
