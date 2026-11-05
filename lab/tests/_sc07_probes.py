@@ -2,10 +2,13 @@
 
 - `quantiles`: the drift dashboard's "Hourly quantiles of ${feature}" (3 queries, t-digest) against 3 queries with
   exact quantiles and against a single query that reads the captures once (union), one user and 20 at once, 7 and 30 d;
+- `quantiles-l1`: the raw panel ("current") against the pre-aggregated panel of this branch (`pulsar_feature_quantiles`,
+  queries taken from `build_dashboards.drift`), same protocol;
 - `modelvar <bucket>`: the model variable as provisioned before SC-07 (negation in the predicate) against four other
   ways to list the models.
 
     LAB_INFLUX_ENV=lab/results/SC-07/influx.env python -m lab.tests._sc07_probes quantiles lab/results/SC-07/bench_quantiles.json
+    LAB_INFLUX_ENV=lab/results/SC-07/influx.env python -m lab.tests._sc07_probes quantiles-l1 lab/results/SC-07/bench_quantiles_l1.json
     LAB_INFLUX_ENV=lab/results/SC-07/influx.env python -m lab.tests._sc07_probes modelvar sc07_ladder lab/results/SC-07/bench_modelvar.json
 """
 
@@ -42,9 +45,28 @@ def union(method=None) -> list:
     return ["data = " + SRC + " union(tables: [" + ", ".join(parts) + "])" + TAIL]
 
 
-def quantiles(env: dict) -> dict:
+def preaggregated() -> list:
+    """The 3 queries of the drift panel as generated now (pre-aggregated hours, then the raw tail), as templates"""
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "observability"))
+    from build_dashboards import drift
+
+    panel = next(p for p in drift("monitoring").json([])["panels"] if p.get("title", "").startswith("Hourly quantiles"))
+    out = []
+    for t in panel["targets"]:
+        q = t["query"].replace("${bucket}", "monitoring").replace("${version}", "1.0")
+        q = q.replace("${model}", "{m}").replace("${feature}", "{f}")
+        out.append(q.replace("v.timeRangeStart", "{start}").replace("v.timeRangeStop", "{stop}"))
+    return out
+
+
+def quantiles(env: dict, l1: bool = False) -> dict:
     variants = {"current (3 queries, tdigest)": three(), "3 queries, exact_mean": three("exact_mean"),
                 "1 query (union), tdigest": union(), "1 query (union), exact_mean": union("exact_mean")}
+    if l1:
+        variants = {"current (3 queries, tdigest)": three(), "pre-aggregated (3 queries, pulsar_feature_quantiles)": preaggregated()}
     now = datetime.now(timezone.utc)
 
     def panel(qs, m, f, days):
@@ -96,8 +118,8 @@ def modelvar(env: dict, bucket: str) -> dict:
 
 if __name__ == "__main__":
     env = C.influx_env()
-    if sys.argv[1] == "quantiles":
-        result, path = quantiles(env), sys.argv[2] if len(sys.argv) > 2 else None
+    if sys.argv[1] in ("quantiles", "quantiles-l1"):
+        result, path = quantiles(env, sys.argv[1] == "quantiles-l1"), sys.argv[2] if len(sys.argv) > 2 else None
     else:
         result, path = modelvar(env, sys.argv[2]), sys.argv[3] if len(sys.argv) > 3 else None
     if path:

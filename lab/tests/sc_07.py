@@ -10,6 +10,9 @@
 3) every templating variable and every panel query of the 8 provisioned dashboards (the real JSON of
    `observability/grafana/dashboards`), variables substituted as Grafana does, timed against InfluxDB directly
    (`/api/v2/query`, one user) at 7 d and 30 d, several models;
+   the hourly quantiles of the captured models (p10 / median / p90 of the 16 numeric features) through
+   `analysis_job.aggregate_quantiles`, the job's own function (read the captures back, compute, `write_stats_many` to
+   `pulsar_feature_quantiles`), one call per model and day as the job's 24-hour recompute does;
 4) Grafana with 20 concurrent viewers (`/api/ds/query`, anonymous viewer, 6 requests in flight per viewer as a browser
    over HTTP/1.1), each loading overview, drift and fairness at 7 d then 30 d.
 
@@ -35,6 +38,8 @@ from pathlib import Path
 import numpy as np
 
 from lab.tests import _platform as C
+
+OBSERVABILITY = Path(__file__).resolve().parents[2] / "observability"
 
 DRY = os.environ.get("LAB_DRY") == "1"
 N_MODELS = int(os.environ.get("LAB_MODELS", 30 if DRY else 300))
@@ -247,6 +252,44 @@ def load_captures(end: datetime) -> dict:
     return out
 
 
+def load_quantiles(end: datetime) -> dict:
+    """Hourly quantiles of the CAPTURED models over DAYS, through analysis_job.aggregate_quantiles (the job's code:
+    read the captures back from InfluxDB, exact quantiles in pandas, write_stats_many), one call per model and day"""
+    import sys
+
+    sys.path.insert(0, str(OBSERVABILITY))
+    from analysis_job import aggregate_quantiles
+    from influxdb_client import InfluxDBClient
+    from pulsar_data_collection.results import ResultsSink
+
+    env = C.influx_env()
+    conn = {**env, "bucket": BUCKET}
+    calls = []
+    t0 = time.perf_counter()
+    with InfluxDBClient(url=env["url"], token=env["token"], org=env["org"], timeout=120_000) as client,             ResultsSink(env["url"], env["token"], env["org"], BUCKET, timeout_s=60) as sink:
+        for i in range(CAPTURED):
+            for day in range(DAYS):
+                start = end - timedelta(hours=DAYS * 24 - 24 * day)
+                t1 = time.perf_counter()
+                r = aggregate_quantiles(client, conn, sink, f"model{i:03d}", VERSION, start, start + timedelta(hours=24), FEATURES)
+                calls.append({**r, "seconds": time.perf_counter() - t1})
+    total = time.perf_counter() - t0
+    hours = sum(c["hours"] for c in calls)
+    secs = sorted(c["seconds"] for c in calls)
+    return {
+        "quantile_models": CAPTURED, "quantile_hours": hours, "quantile_points": sum(c["points"] for c in calls),
+        "quantile_requests": sum(c["requests"] for c in calls), "quantile_rows_read": sum(c["rows"] for c in calls),
+        "quantile_points_per_model_hour": round(sum(c["points"] for c in calls) / max(1, hours), 2),
+        "quantile_seconds": round(total, 1),
+        "quantile_ms_per_model_hour": round(1000 * total / max(1, hours), 2),
+        "quantile_read_ms_per_model_hour": round(1000 * sum(c["read_s"] for c in calls) / max(1, hours), 2),
+        "quantile_compute_ms_per_model_hour": round(1000 * sum(c["compute_s"] for c in calls) / max(1, hours), 3),
+        "quantile_write_ms_per_model_hour": round(1000 * sum(c["write_s"] for c in calls) / max(1, hours), 2),
+        "quantile_24h_call_p50_s": pctl(secs, 50), "quantile_24h_call_p95_s": pctl(secs, 95),
+        "quantile_24h_call_max_s": round(secs[-1], 3) if secs else None,
+    }
+
+
 def load(ctx) -> dict:
     end = _end()
     t0 = time.perf_counter()
@@ -263,13 +306,14 @@ def load(ctx) -> dict:
     t2 = time.perf_counter()
     stats = load_stats(end, template)
     stats_s = time.perf_counter() - t2
+    quantiles = load_quantiles(end)
     return {
         "end": end.isoformat(), "results_points": res["points"], "results_requests": res["requests"],
         "results_write_errors": res["errors"], "results_seconds": round(results_s, 1),
         "results_points_per_s": round(res["points"] / results_s), "results_points_per_request": round(res["points"] / max(1, res["requests"]), 1),
         "results_request_ms_mean": round(1000 * res["write_seconds_sum"] / max(1, res["requests"]), 2),
         "capture_rows": cap["rows"], "capture_dropped": cap["dropped"], "captures_seconds": round(captures_s, 1),
-        "stats_points": stats["points"], "stats_seconds": round(stats_s, 1),
+        "stats_points": stats["points"], "stats_seconds": round(stats_s, 1), **quantiles,
     }
 
 
@@ -514,7 +558,7 @@ def cardinality(env: dict) -> dict:
     start = f"-{DAYS + 2}d"
     q = 'import "influxdata/influxdb"\ninfluxdb.cardinality(bucket: "{b}", start: {s}{p})'
     out["bucket_series"] = int(flux_values(q.format(b=BUCKET, s=start, p=""), env)[0])
-    for m in ("pulsar_results", "pulsar_capture_stats"):
+    for m in ("pulsar_results", "pulsar_capture_stats", "pulsar_feature_quantiles"):
         out[f"{m}_series"] = int(flux_values(q.format(b=BUCKET, s=start, p=f', predicate: (r) => r._measurement == "{m}"'), env)[0])
     one = 'import "influxdata/influxdb"\ninfluxdb.cardinality(bucket: "{b}", start: {s}, predicate: (r) => r._measurement == "pulsar_results" and r.model_id == "model001")'
     out["pulsar_results_series_per_model"] = int(flux_values(one.format(b=BUCKET, s=start), env)[0])
@@ -641,8 +685,9 @@ def ladder(env: dict) -> list:
 # ------------------------------------------------------------------------------------------- run
 def run(ctx):
     env = C.influx_env()
+    others = subprocess.run(["docker", "ps", "--format", "{{.Names}}"], capture_output=True, text=True, timeout=60).stdout.split()
     ctx.note("Run locally on the workstation (registry env: aws-db): own containers sc07-influxdb 2.6.1 and sc07-grafana "
-             "11.3.0; the host was shared with SC-04 (network toxics) running at the same time.")
+             f"11.3.0; other containers running on the host at start: {', '.join(n for n in others if not n.startswith('sc07-')) or 'none'}.")
     metrics = {}
     C.ensure_bucket(BUCKET, env)
     if os.environ.get("LAB_SC07_SKIP_LOAD") != "1":
@@ -753,5 +798,7 @@ if __name__ == "__main__":
 
     if sys.argv[1:] == ["load"]:
         print(json.dumps(load(None), indent=2))
+    elif sys.argv[1:2] == ["quantiles"]:  # quantiles of a bucket already loaded: python -m lab.tests.sc_07 quantiles <end ISO>
+        print(json.dumps(load_quantiles(datetime.fromisoformat(sys.argv[2])), indent=2))
     elif sys.argv[1:] == ["ladder"]:
         print(json.dumps(ladder(C.influx_env()), indent=2))

@@ -1251,5 +1251,532 @@
     "dirty": true
    }
   }
+ },
+ "correctif_l1": {
+  "change": "hourly p10/median/p90 and n of each numeric feature written by the analysis job to pulsar_feature_quantiles (analysis.write_hourly_quantiles via ResultsSink.write_stats_many); drift panel reads it, raw captures only for at most 24 h after the last aggregated hour",
+  "sources": [
+   "lab/results/SC-07.before-l1.json",
+   "lab/results/SC-07.after-l1.json",
+   "lab/results/SC-07/bench_quantiles_l1.json"
+  ],
+  "same_bucket": "both runs on the same fresh load (end 2026-11-05T12:00Z); before-l1 with the dashboards of commit 506d545, after-l1 with the regenerated ones",
+  "host_load": "SC-04 containers (sc04-influxdb, sc04-toxiproxy) running during before-l1, stopped before after-l1; the probe ran after, both variants in the same minutes",
+  "load": {
+   "end": "2026-11-05T12:00:00+00:00",
+   "results_points": 5066400,
+   "results_requests": 36000,
+   "results_write_errors": 0,
+   "results_seconds": 146.4,
+   "results_points_per_s": 34597,
+   "results_points_per_request": 140.7,
+   "results_request_ms_mean": 30.68,
+   "capture_rows": 1080000,
+   "capture_dropped": 0,
+   "captures_seconds": 93.2,
+   "stats_points": 216000,
+   "stats_seconds": 19.5,
+   "quantile_models": 10,
+   "quantile_hours": 7200,
+   "quantile_points": 115200,
+   "quantile_requests": 7200,
+   "quantile_rows_read": 1080000,
+   "quantile_points_per_model_hour": 16.0,
+   "quantile_seconds": 130.1,
+   "quantile_ms_per_model_hour": 18.06,
+   "quantile_read_ms_per_model_hour": 9.71,
+   "quantile_compute_ms_per_model_hour": 2.904,
+   "quantile_write_ms_per_model_hour": 5.38,
+   "quantile_24h_call_p50_s": 0.427,
+   "quantile_24h_call_p95_s": 0.492,
+   "quantile_24h_call_max_s": 0.565
+  },
+  "aggregation_cost": {
+   "quantile_models": 10,
+   "quantile_hours": 7200,
+   "quantile_points": 115200,
+   "quantile_requests": 7200,
+   "quantile_rows_read": 1080000,
+   "quantile_points_per_model_hour": 16.0,
+   "quantile_seconds": 130.1,
+   "quantile_ms_per_model_hour": 18.06,
+   "quantile_read_ms_per_model_hour": 9.71,
+   "quantile_compute_ms_per_model_hour": 2.904,
+   "quantile_write_ms_per_model_hour": 5.38,
+   "quantile_24h_call_p50_s": 0.427,
+   "quantile_24h_call_p95_s": 0.492,
+   "quantile_24h_call_max_s": 0.565
+  },
+  "cardinality_added": {
+   "pulsar_feature_quantiles_index_series": 160,
+   "per_captured_model_index_series": 16,
+   "field_series": 640,
+   "per_captured_model_field_series": 64,
+   "fields": [
+    "median",
+    "n",
+    "p10",
+    "p90"
+   ],
+   "categorical_features_skipped": [
+    "region",
+    "language",
+    "channel",
+    "segment"
+   ],
+   "bucket_series_before_l1_in_previous_run": 42610,
+   "bucket_series_now": 42770
+  },
+  "idempotency_check": "24 h of model002 rewritten (384 points): p90 point count 11520 before and after",
+  "accuracy_check": "over 48 h of model003/f00: median identical between pre-aggregated (exact) and raw tail (t-digest); p10/p90 differ by at most 0.073 and 0.050 (standard normal feature)",
+  "run_before_l1": {
+   "status": "passed",
+   "started": "2026-11-05T15:19:27+00:00",
+   "seconds": 546.0,
+   "checks": {
+    "worst_key_panel_p95_7d_direct_s": true,
+    "worst_key_panel_p95_7d_20_viewers_s": true,
+    "model_variable_values": true,
+    "flux_timeouts": true,
+    "query_errors": true
+   },
+   "notes": [
+    "Run locally on the workstation (registry env: aws-db): own containers sc07-influxdb 2.6.1 and sc07-grafana 11.3.0; other containers running on the host at start: sc04-toxiproxy, sc04-influxdb, pulsar-grafana, pulsar-validation-influxdb, pulsar-ollama."
+   ],
+   "quantile_panel": {
+    "7d": {
+     "direct_p95_s": 0.115,
+     "direct_max_s": 0.119,
+     "1_viewer_p50_s": 0.19,
+     "1_viewer_p95_s": 0.191,
+     "1_viewer_max_s": 0.191,
+     "20_viewers_p50_s": 1.543,
+     "20_viewers_p95_s": 2.3,
+     "20_viewers_max_s": 2.602
+    },
+    "30d": {
+     "direct_p95_s": 0.404,
+     "direct_max_s": 0.406,
+     "1_viewer_p50_s": 0.532,
+     "1_viewer_p95_s": 0.553,
+     "1_viewer_max_s": 0.556,
+     "20_viewers_p50_s": 6.78,
+     "20_viewers_p95_s": 8.508,
+     "20_viewers_max_s": 9.102
+    }
+   },
+   "drift_dashboard": {
+    "7d": {
+     "1_viewer": {
+      "whole_p50_s": 0.21,
+      "whole_p95_s": 0.23,
+      "whole_max_s": 0.232
+     },
+     "20_viewers": {
+      "whole_p50_s": 1.948,
+      "whole_p95_s": 2.449,
+      "whole_max_s": 2.613
+     },
+     "direct_worst_p95_s": 0.115,
+     "direct_worst_panel": "7A Hourly quantiles of ${feature}"
+    },
+    "30d": {
+     "1_viewer": {
+      "whole_p50_s": 0.557,
+      "whole_p95_s": 0.59,
+      "whole_max_s": 0.594
+     },
+     "20_viewers": {
+      "whole_p50_s": 7.214,
+      "whole_p95_s": 8.787,
+      "whole_max_s": 9.109
+     },
+     "direct_worst_p95_s": 0.404,
+     "direct_worst_panel": "7B Hourly quantiles of ${feature}"
+    }
+   },
+   "viewers_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "worst_p95_s": 0.98,
+      "worst_max_s": 1.256,
+      "worst_panel": "5A Explanation changes (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.725,
+      "whole_dashboard_p95_s": 1.242,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.729,
+      "worst_max_s": 1.327,
+      "worst_panel": "8A Alerts over time, by kind",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.651,
+      "whole_dashboard_p95_s": 1.141,
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "worst_p95_s": 2.3,
+      "worst_max_s": 2.602,
+      "worst_panel": "7A Hourly quantiles of ${feature}",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 1.948,
+      "whole_dashboard_p95_s": 2.449,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 8.508,
+      "worst_max_s": 9.102,
+      "worst_panel": "7B Hourly quantiles of ${feature}",
+      "over_budget": 3,
+      "whole_dashboard_p50_s": 7.214,
+      "whole_dashboard_p95_s": 8.787,
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "worst_p95_s": 0.821,
+      "worst_max_s": 1.144,
+      "worst_panel": "2A Latest window, by group",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.658,
+      "whole_dashboard_p95_s": 1.075,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.576,
+      "worst_max_s": 0.637,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.509,
+      "whole_dashboard_p95_s": 0.811,
+      "errors": 0
+     }
+    }
+   },
+   "direct_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.043,
+      "worst_max_s": 0.043,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.052,
+      "worst_max_s": 0.055,
+      "worst_panel": "4A Disparities established (latest)",
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.115,
+      "worst_max_s": 0.119,
+      "worst_panel": "7A Hourly quantiles of ${feature}",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.404,
+      "worst_max_s": 0.406,
+      "worst_panel": "7B Hourly quantiles of ${feature}",
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.048,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.052,
+      "worst_max_s": 0.054,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     }
+    }
+   },
+   "panel_queries_p95_over_3s_20_viewers": {
+    "7d": 0,
+    "30d": 3
+   },
+   "docker_cpu_peak_pct": {
+    "sc07-influxdb": 1395.64,
+    "sc07-grafana": 840.6
+   },
+   "viewers_phase_seconds": 48.0,
+   "query_errors": 0,
+   "flux_timeouts": 0,
+   "host_health": {
+    "cpu_max": 99.4,
+    "mem_max": 79.7,
+    "rss_mb_max": 204.578125,
+    "threads_max": 182,
+    "fds_max": 1671,
+    "disk_max": 50.0,
+    "rss_growth_mb_per_h": 813.7750150837074,
+    "samples": 108
+   }
+  },
+  "run_after_l1": {
+   "status": "passed",
+   "started": "2026-11-05T15:29:45+00:00",
+   "seconds": 128.5,
+   "checks": {
+    "worst_key_panel_p95_7d_direct_s": true,
+    "worst_key_panel_p95_7d_20_viewers_s": true,
+    "model_variable_values": true,
+    "flux_timeouts": true,
+    "query_errors": true
+   },
+   "notes": [
+    "Run locally on the workstation (registry env: aws-db): own containers sc07-influxdb 2.6.1 and sc07-grafana 11.3.0; other containers running on the host at start: pulsar-grafana, pulsar-validation-influxdb, pulsar-ollama."
+   ],
+   "quantile_panel": {
+    "7d": {
+     "direct_p95_s": 0.034,
+     "direct_max_s": 0.035,
+     "1_viewer_p50_s": 0.042,
+     "1_viewer_p95_s": 0.048,
+     "1_viewer_max_s": 0.049,
+     "20_viewers_p50_s": 0.291,
+     "20_viewers_p95_s": 0.787,
+     "20_viewers_max_s": 1.016
+    },
+    "30d": {
+     "direct_p95_s": 0.033,
+     "direct_max_s": 0.033,
+     "1_viewer_p50_s": 0.053,
+     "1_viewer_p95_s": 0.058,
+     "1_viewer_max_s": 0.059,
+     "20_viewers_p50_s": 0.408,
+     "20_viewers_p95_s": 0.915,
+     "20_viewers_max_s": 1.259
+    }
+   },
+   "drift_dashboard": {
+    "7d": {
+     "1_viewer": {
+      "whole_p50_s": 0.105,
+      "whole_p95_s": 0.116,
+      "whole_max_s": 0.117
+     },
+     "20_viewers": {
+      "whole_p50_s": 0.784,
+      "whole_p95_s": 1.23,
+      "whole_max_s": 1.292
+     },
+     "direct_worst_p95_s": 0.057,
+     "direct_worst_panel": "8A Latest window: tests by feature"
+    },
+    "30d": {
+     "1_viewer": {
+      "whole_p50_s": 0.127,
+      "whole_p95_s": 0.163,
+      "whole_max_s": 0.167
+     },
+     "20_viewers": {
+      "whole_p50_s": 1.287,
+      "whole_p95_s": 1.917,
+      "whole_max_s": 2.201
+     },
+     "direct_worst_p95_s": 0.092,
+     "direct_worst_panel": "3A Confirmed drift (2 windows), by feature"
+    }
+   },
+   "viewers_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "worst_p95_s": 1.154,
+      "worst_max_s": 1.222,
+      "worst_panel": "4A Disparities established (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.845,
+      "whole_dashboard_p95_s": 1.497,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 1.11,
+      "worst_max_s": 1.214,
+      "worst_panel": "5A Explanation changes (latest)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.85,
+      "whole_dashboard_p95_s": 1.337,
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "worst_p95_s": 1.046,
+      "worst_max_s": 1.191,
+      "worst_panel": "3A Confirmed drift (2 windows), by feature",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.784,
+      "whole_dashboard_p95_s": 1.23,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 1.882,
+      "worst_max_s": 1.988,
+      "worst_panel": "5A Windows with a confirmed drift, by feature (period)",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 1.287,
+      "whole_dashboard_p95_s": 1.917,
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "worst_p95_s": 0.837,
+      "worst_max_s": 0.903,
+      "worst_panel": "4B Parity difference of ${group}, with its confidence interval",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.667,
+      "whole_dashboard_p95_s": 1.111,
+      "errors": 0
+     },
+     "30d": {
+      "worst_p95_s": 0.779,
+      "worst_max_s": 0.879,
+      "worst_panel": "4C Parity difference of ${group}, with its confidence interval",
+      "over_budget": 0,
+      "whole_dashboard_p50_s": 0.635,
+      "whole_dashboard_p95_s": 1.034,
+      "errors": 0
+     }
+    }
+   },
+   "direct_by_dashboard": {
+    "pulsar-overview": {
+     "7d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.045,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 12,
+      "over_budget": 0,
+      "worst_p95_s": 0.046,
+      "worst_max_s": 0.049,
+      "worst_panel": "9A Latest verdict by kind",
+      "errors": 0
+     }
+    },
+    "pulsar-drift": {
+     "7d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.057,
+      "worst_max_s": 0.058,
+      "worst_panel": "8A Latest window: tests by feature",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 8,
+      "over_budget": 0,
+      "worst_p95_s": 0.092,
+      "worst_max_s": 0.092,
+      "worst_panel": "3A Confirmed drift (2 windows), by feature",
+      "errors": 0
+     }
+    },
+    "pulsar-fairness": {
+     "7d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     },
+     "30d": {
+      "panels": 9,
+      "over_budget": 0,
+      "worst_p95_s": 0.047,
+      "worst_max_s": 0.047,
+      "worst_panel": "9A Disparate impact ratio of intersectional groups",
+      "errors": 0
+     }
+    }
+   },
+   "panel_queries_p95_over_3s_20_viewers": {
+    "7d": 0,
+    "30d": 0
+   },
+   "docker_cpu_peak_pct": {
+    "sc07-influxdb": 711.17,
+    "sc07-grafana": 874.06
+   },
+   "viewers_phase_seconds": 29.4,
+   "query_errors": 0,
+   "flux_timeouts": 0,
+   "host_health": {
+    "cpu_max": 98.4,
+    "mem_max": 74.9,
+    "rss_mb_max": 110.38671875,
+    "threads_max": 155,
+    "fds_max": 1650,
+    "disk_max": 50.1,
+    "rss_growth_mb_per_h": 808.8431861227928,
+    "samples": 26
+   }
+  },
+  "probe_quantiles_l1": {
+   "current (3 queries, tdigest) @7d": {
+    "single_p50_s": 0.128,
+    "single_max_s": 0.209,
+    "rows": 492,
+    "errors": 0,
+    "20_concurrent_p50_s": 1.378,
+    "20_concurrent_max_s": 1.446,
+    "20_wall_s": 1.47
+   },
+   "current (3 queries, tdigest) @30d": {
+    "single_p50_s": 0.482,
+    "single_max_s": 0.509,
+    "rows": 2148,
+    "errors": 0,
+    "20_concurrent_p50_s": 6.851,
+    "20_concurrent_max_s": 7.01,
+    "20_wall_s": 7.03
+   },
+   "pre-aggregated (3 queries, pulsar_feature_quantiles) @7d": {
+    "single_p50_s": 0.033,
+    "single_max_s": 0.039,
+    "rows": 495,
+    "errors": 0,
+    "20_concurrent_p50_s": 0.396,
+    "20_concurrent_max_s": 0.442,
+    "20_wall_s": 0.47
+   },
+   "pre-aggregated (3 queries, pulsar_feature_quantiles) @30d": {
+    "single_p50_s": 0.036,
+    "single_max_s": 0.052,
+    "rows": 2151,
+    "errors": 0,
+    "20_concurrent_p50_s": 0.481,
+    "20_concurrent_max_s": 0.514,
+    "20_wall_s": 0.55
+   }
+  }
  }
 }

@@ -1,10 +1,13 @@
 """Analyses run on each window and written to InfluxDB for the dashboards (shared by seed_demo.py and analysis_job.py).
 
 Each function returns a list of result dicts (the fields of pulsar_metrics' MetricResults, plus `p_adjusted` and
-`confirmed` for drift); `ResultsSink.write_results` stores them in the `pulsar_results` measurement.
+`confirmed` for drift); `ResultsSink.write_results` stores them in the `pulsar_results` measurement. The hourly
+quantiles of the numeric features (`hourly_quantiles`, `write_hourly_quantiles`) go to their own compact measurement,
+`pulsar_feature_quantiles`, read by the drift dashboard instead of the raw captures.
 """
 
 import warnings
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
@@ -129,6 +132,63 @@ def agent_windows(runs: pd.DataFrame, window: int = 30, model_id: str = "permit_
         for start in range(0, len(frame) - window + 1, window):
             current = frame.iloc[start : start + window]
             yield current["pred_timestamp"].iloc[-1], phase, watch.run(current)
+
+
+QUANTILE_MEASUREMENT = "pulsar_feature_quantiles"
+QUANTILES = {"p10": 0.1, "median": 0.5, "p90": 0.9}
+
+
+def hourly_quantiles(frame: pd.DataFrame, features: list, time_column: str = "pred_timestamp") -> list:
+    """Exact p10, median and p90 (linear interpolation, as numpy) and row count of each numeric feature, per hour.
+
+    Returns (hour end, feature, {"p10", "median", "p90", "n"}) sorted by time then feature. The point of an hour is
+    stamped at its end, as `aggregateWindow` does. Non-numeric (categorical, boolean) and missing columns are skipped,
+    so are missing values; an hour where a feature has no value gives no point. Only complete hours should be passed:
+    the rows of a partial hour would overwrite the point of the full hour written earlier.
+    """
+    if frame.empty or time_column not in frame:
+        return []
+    numeric = [f for f in features if f in frame and pd.api.types.is_numeric_dtype(frame[f])
+               and not pd.api.types.is_bool_dtype(frame[f])]
+    if not numeric:
+        return []
+    times = pd.to_datetime(frame[time_column], utc=True)
+    hours = times.dt.floor("h")
+    out = []
+    for hour, chunk in frame[numeric].groupby(hours.to_numpy(), sort=True):
+        end = pd.Timestamp(hour)
+        end = (end.tz_localize("UTC") if end.tzinfo is None else end).to_pydatetime() + timedelta(hours=1)
+        for feature in numeric:
+            values = chunk[feature].dropna().to_numpy(dtype=float)
+            values = values[np.isfinite(values)]
+            if not len(values):
+                continue
+            p10, median, p90 = np.quantile(values, list(QUANTILES.values()))
+            out.append((end, feature, {"p10": float(p10), "median": float(median), "p90": float(p90),
+                                                       "n": float(len(values))}))
+    return out
+
+
+def write_hourly_quantiles(sink, frame: pd.DataFrame, features: list, tags: dict,
+                           time_column: str = "pred_timestamp") -> dict:
+    """Write `hourly_quantiles` to `pulsar_feature_quantiles` through `ResultsSink.write_stats_many`, one request per
+    hour, tags `model_id`, `model_version` (from `tags`) and `feature_name`. Rewriting an hour overwrites its points
+    (same series, same timestamp), so the hours can be recomputed when late rows arrive.
+
+    Returns {"points", "requests", "hours", "compute_s", "write_s"}."""
+    import time
+
+    t0 = time.perf_counter()
+    rows = hourly_quantiles(frame, features, time_column)
+    compute_s = time.perf_counter() - t0
+    by_hour = {}
+    for end, feature, fields in rows:
+        by_hour.setdefault(end, []).append((fields, {**tags, "feature_name": feature}))
+    t1 = time.perf_counter()
+    points = sum(sink.write_stats_many(items, timestamp=end, measurement=QUANTILE_MEASUREMENT)
+                 for end, items in by_hour.items())
+    return {"points": points, "requests": len(by_hour), "hours": len(by_hour), "compute_s": compute_s,
+            "write_s": time.perf_counter() - t1}
 
 
 def to_numeric(frame: pd.DataFrame, columns: list) -> pd.DataFrame:

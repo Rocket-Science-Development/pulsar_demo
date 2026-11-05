@@ -6,7 +6,8 @@ Everything is synthetic or comes from the demo agent; no real person.
    applicants every hour for 7 days, captured with Pulse (non-blocking, personal information masked in the free-text
    comment). Injected on purpose: income drops by 15 % from day 4 (data drift), and from day 5 a rule withdraws 40 %
    of the approvals of applicants whose language is "other" (bias). Labels arrive after 48 hours.
-2. Analyses every 6 hours, written with ResultsSink: calibrated drift with confirmation, performance, fairness
+2. Hourly p10 / median / p90 of the numeric features (`pulsar_feature_quantiles`, for the drift dashboard's band).
+   Analyses every 6 hours, written with ResultsSink: calibrated drift with confirmation, performance, fairness
    (fixed on a rolling 24-hour window, and anytime-valid), explanation drift (TreeSHAP), importance by group. Pulse's counters every hour.
 3. Agent: drift analysis of the agent runs of a campaign already in the bucket (e.g. copied from the S2 campaign),
    scripted conversations that exercise personal-information detection and leaks, and the counterfactual probe rows
@@ -46,6 +47,7 @@ from analysis import (
     performance_results,
     to_numeric,
     windows,
+    write_hourly_quantiles,
 )
 
 MODEL_ID, MODEL_VERSION = "admissibilite", "1.0"
@@ -132,6 +134,9 @@ def seed_tabular(conn, sink, days: int, batch: int, seed: int):
     print(f"tabular: {len(history)} rows captured, stats {pulse.stats()}")
 
     tags = {"model_id": MODEL_ID, "model_version": MODEL_VERSION}
+    # hourly quantiles of the numeric features, read by the drift dashboard instead of the raw captures (lab SC-07 L1)
+    quantiles = write_hourly_quantiles(sink, history, TABULAR_NUMERIC, tags)
+    print(f"tabular: hourly quantiles of {quantiles['hours']} hours written ({quantiles['points']} points)")
     reference = history[history["pred_timestamp"] < start + timedelta(days=2)]
     # the synthetic rows are independent draws: A/A windows of random rows (a 2-day reference holds only 8 contiguous
     # 6-hour windows, too few for a contiguous calibration)

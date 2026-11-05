@@ -8,7 +8,10 @@ Sources :
 - `lab/results/SC-07.after.json` et `lab/results/SC-07.after/` : mêmes mesures après les deux correctifs de
   `observability/build_dashboards.py`, et échelle de cardinalité (1000 à 20 000 modèles) ;
 - `lab/results/SC-07/bench_quantiles.json`, `bench_modelvar_monitoring.json`, `bench_modelvar_ladder20k.json` : sondes ;
-- résumé versionné : `lab/rapports/summary.sc07.json` (statuts, chiffres de ce rapport, bloc `environment`).
+- `lab/results/SC-07.before-l1.json`, `lab/results/SC-07.after-l1.json` et `lab/results/SC-07/bench_quantiles_l1.json` :
+  correctif L1 (section 11) ;
+- résumé versionné : `lab/rapports/summary.sc07.json` (statuts, chiffres de ce rapport, bloc `environment`, bloc
+  `correctif_l1`).
 
 Dans chaque dossier de résultats : `load.json` (écriture), `direct_samples.json` et `direct_panels.json` (requêtes
 directes à InfluxDB), `grafana_samples.json` et `grafana_panels.json` (Grafana, 1 puis 20 lecteurs).
@@ -28,7 +31,10 @@ directes à InfluxDB), `grafana_samples.json` et `grafana_panels.json` (Grafana,
   14 000 modèles. Sous 20 lecteurs, elle coûte déjà 0,73 à 0,88 s (p50) à 300 modèles. Corrigé : le filtre s'applique
   aux valeurs, après la recherche dans l'index. On mesure alors 0,10 s à 20 000 modèles et 0,2 s sous 20 lecteurs. Les
   panneaux par modèle restent plats : 0,065 s au plus jusqu'à 20 000 modèles (2,82 millions de séries).
-- **Limite restante : le panneau des quantiles horaires à 30 jours sous charge.** Il met 0,46 s seul, mais **8,9 s au
+- **L1 corrigée depuis (section 11).** Le panneau lit des quantiles horaires pré-agrégés par la tâche d'analyse. À 30
+  jours sous 20 lecteurs, son p95 passe de 8,51 s à **0,92 s**, et celui du tableau drift entier de 8,79 s à
+  **1,92 s**. Le constat d'origine suit.
+- **Limite restante, à l'origine : le panneau des quantiles horaires à 30 jours sous charge.** Il met 0,46 s seul, mais **8,9 s au
   p95** avec 20 lecteurs, et le tableau drift entier 9,3 s. La cardinalité n'y est pour rien. `quantile` et `median`
   ne sont pas poussés vers le stockage dans InfluxDB 2.6 : chaque requête lit 107 550 points bruts. InfluxDB sature
   alors 14 des 16 fils du poste. Les variantes essayées (quantile exact, une requête au lieu de trois) n'y changent
@@ -200,7 +206,7 @@ existantes. Les panneaux par modèle ne dépendent pas du nombre de modèles. Le
 
 ## 7. Limites trouvées
 
-### L1 (majeure, non corrigée) : quantiles horaires à 30 jours sous charge
+### L1 (majeure, corrigée, section 11) : quantiles horaires à 30 jours sous charge
 
 - **Constat** : « Hourly quantiles of ${feature} » (drift, 3 requêtes) met 0,46 s seul à 30 jours, mais 8,9 s au p95
   (max 9,6 s) avec 20 lecteurs. Le tableau drift entier passe à 9,3 s au p95. À 7 jours, il reste sous le budget, mais
@@ -218,8 +224,8 @@ existantes. Les panneaux par modèle ne dépendent pas du nombre de modèles. Le
 - **Proposition** : pré-agréger. `analysis_job.py` écrirait chaque heure p10, médiane et p90 de chaque variable
   numérique dans `pulsar_results`, avec `metric_type = "statistics"`, que l'overview exclut déjà. Une autre voie est
   une tâche InfluxDB qui alimente une mesure sous-échantillonnée. Le panneau lirait alors 720 points par quantile à
-  30 jours, comme les autres panneaux de résultats, qui mettent 0,05 à 0,1 s ici. Cela touche le chemin d'écriture et
-  reste à faire.
+  30 jours, comme les autres panneaux de résultats, qui mettent 0,05 à 0,1 s ici. Cela touche le chemin d'écriture. C'est
+  fait depuis, dans une mesure dédiée plutôt que dans `pulsar_results` (section 11).
 
 ### L2 (majeure, corrigée) : variable `model` linéaire en cardinalité, la limite attendue
 
@@ -254,7 +260,7 @@ existantes. Les panneaux par modèle ne dépendent pas du nombre de modèles. Le
 | Tableau | 7 j, 1 utilisateur | 7 j, 20 lecteurs | 30 j, 1 utilisateur | 30 j, 20 lecteurs |
 |---|---|---|---|---|
 | overview | OK (0,09 s) | OK (1,14 s) | OK (0,06 s) | OK (1,01 s) |
-| drift | OK (0,13 s ; erreurs avant correctif) | OK de justesse (2,44 s, max 2,93 s) | OK (0,46 s) | **Hors budget** (8,90 s, L1) |
+| drift | OK (0,13 s ; erreurs avant correctif) | OK de justesse (2,44 s, max 2,93 s) ; après L1 : OK (1,05 s) | OK (0,46 s) ; après L1 : 0,09 s | **Hors budget** (8,90 s, L1) ; après L1 : **OK (1,88 s)** |
 | fairness | OK (0,05 s) | OK (0,72 s) | OK (0,05 s) | OK (0,65 s) |
 | performance, explain, privacy, capture | OK (≤ 0,11 s) | non mesuré | OK (≤ 0,10 s) | non mesuré |
 | agents | sans objet : pas de données d'agent, requêtes à vide | — | — | — |
@@ -306,3 +312,136 @@ python -m lab.tests._sc07_probes modelvar sc07_ladder lab/results/SC-07/bench_mo
 
 Les conteneurs `sc07-influxdb` et `sc07-grafana`, les volumes `sc07-influxdb-data` et `sc07-grafana-data` et le réseau
 `sc07-net` ont été supprimés après la mesure.
+
+Correctif L1 (mêmes conteneurs recréés, puis supprimés de nouveau, ainsi que les fichiers de secrets) :
+
+```bash
+LAB_RUN_TAG=before-l1 python -m lab.harness SC-07       # chargement complet, quantiles compris ; anciens tableaux
+python observability/build_dashboards.py --out observability/grafana/dashboards --bucket monitoring
+mkdir -p lab/results/SC-07.after-l1 && cp lab/results/SC-07.before-l1/load.json lab/results/SC-07.after-l1/
+LAB_RUN_TAG=after-l1 LAB_SC07_SKIP_LOAD=1 python -m lab.harness SC-07
+python -m lab.tests._sc07_probes quantiles-l1 lab/results/SC-07/bench_quantiles_l1.json
+(cd observability && python -m unittest discover -s tests -v)
+```
+
+## 11. Correctif L1 : quantiles pré-agrégés
+
+### Ce qui change
+
+- **Écriture** (`observability/analysis.py`) : `hourly_quantiles(frame, features)` calcule, pour chaque heure et chaque
+  variable numérique, le p10, la médiane et le p90 exacts (`numpy.quantile`, interpolation linéaire) et le nombre de
+  lignes. Les variables catégorielles ou booléennes, les colonnes absentes et les valeurs manquantes sont écartées. Le
+  point d'une heure est daté de la fin de l'heure, comme `aggregateWindow`. `write_hourly_quantiles(sink, …)` les
+  écrit avec `ResultsSink.write_stats_many`, une requête par heure, dans la mesure **`pulsar_feature_quantiles`** :
+  tags `model_id`, `model_version`, `feature_name` ; champs `p10`, `median`, `p90`, `n` (flottants). Rien ne change
+  dans `pulsar_data_collection` ni dans `pulsar_metrics`.
+- **Tâche d'analyse** (`observability/analysis_job.py`) : `aggregate_quantiles(...)` relit les captures par tranches de
+  24 h et écrit leurs quantiles. À chaque passage, la tâche recalcule les `--quantile-hours` dernières heures closes
+  (24 par défaut), donc les lignes arrivées en retard sont prises en compte. Réécrire une heure écrase ses points (même
+  série, même instant) : c'est idempotent. Vérifié sur InfluxDB : 24 h de `model002` réécrites (384 points), le nombre
+  de points `p90` reste 11 520. Pour l'historique d'un modèle déjà capturé : `--once --quantile-hours 720`.
+  `seed_demo.py` écrit les quantiles de la semaine de démonstration.
+- **Mesure dédiée plutôt que `pulsar_results`** (proposé en section 7) : `ResultsSink.write_results` ajoute à chaque
+  point un champ `status` (-1 ici) et des tags de résultat. Une mesure à part reste compacte (4 champs, 3 tags) et ne
+  touche ni la variable `model` ni les panneaux de verdicts.
+- **Panneau** (`build_dashboards.py`, `hourly_quantile`) : chaque quantile est l'union de deux lectures.
+  1. Les heures pré-agrégées de la plage, soit un point par heure.
+  2. Après la dernière heure agrégée, les captures brutes, sur 24 h au plus (`QUANTILE_TAIL_HOURS`). Ce sont les heures
+     que la tâche n'a pas encore traitées ; leurs quantiles sont estimés par t-digest, comme avant.
+
+  Les heures plus anciennes jamais agrégées (modèle capturé avant la mise en place de la tâche, sans rattrapage)
+  restent un **trou**. `spanNulls` vaut 2 h : un trou n'est plus relié par un trait. La description du panneau donne
+  la méthode.
+- **Tests** : `observability/tests/test_quantiles.py` (6 tests `unittest`). Ils couvrent les quantiles exacts par heure
+  datés de la fin, l'écartement des variables catégorielles, booléennes et absentes, les valeurs manquantes, le cadre
+  vide, l'idempotence, une ligne tardive qui ne change que son heure, et une requête par heure avec les bons tags.
+- **Lab** : `sc_07.py` écrit les quantiles des 10 modèles capturés par `analysis_job.aggregate_quantiles`, le code de
+  la tâche, sans raccourci : relecture d'InfluxDB, calcul pandas, `write_stats_many`. Il fait un appel par modèle et
+  par jour, comme le recalcul de 24 h. La cardinalité compte la nouvelle mesure. `_sc07_probes.py quantiles-l1`
+  compare l'ancien et le nouveau panneau dans la même session.
+
+### Protocole
+
+Les conteneurs sont recréés comme avant et le bucket est rechargé en entier : 300 modèles, 30 jours, fin à
+2026-11-05T12:00Z. Deux essais tournent ensuite **sur le même bucket** :
+- `before-l1` : tableaux du commit 506d545, panneau sur les captures brutes ;
+- `after-l1` : tableaux régénérés, rechargés par le provisionnement de Grafana.
+
+Le protocole est celui des sections 4 et 5 : 5 répétitions directes, puis 1 et 20 lecteurs, 3 tours. Charge du poste :
+les conteneurs SC-04 (`sc04-influxdb`, `sc04-toxiproxy`) tournaient pendant `before-l1` et étaient arrêtés avant
+`after-l1`. Pour neutraliser cet écart, la sonde `quantiles-l1` mesure ensuite les deux panneaux dans les mêmes
+minutes, sans SC-04. CPU du poste : max 99,4 % pendant `before-l1`, 98,4 % pendant `after-l1`.
+
+### Avant / après : panneau « Hourly quantiles of ${feature} » (pire des 3 requêtes)
+
+| Plage | Mode | Avant : p95 (max) | Après : p95 (max) |
+|---|---|---|---|
+| 7 j | direct, 1 utilisateur | 0,115 s (0,119) | **0,034 s** (0,035) |
+| 7 j | Grafana, 1 lecteur | 0,191 s | 0,048 s |
+| 7 j | Grafana, 20 lecteurs | 2,30 s (2,60) | **0,79 s** (1,02) |
+| 30 j | direct, 1 utilisateur | 0,404 s (0,406) | **0,033 s** (0,033) |
+| 30 j | Grafana, 1 lecteur | 0,553 s | 0,058 s |
+| 30 j | Grafana, 20 lecteurs | **8,51 s (9,10)** | **0,92 s** (1,26) |
+
+### Avant / après : tableau drift entier (du premier envoi à la dernière réponse des panneaux)
+
+| Plage | Mode | Avant : p50 / p95 (max) | Après : p50 / p95 (max) |
+|---|---|---|---|
+| 7 j | direct : pire panneau p95 | 0,115 s (quantiles) | 0,057 s (Latest window) |
+| 7 j | Grafana, 1 lecteur | 0,21 / 0,23 s | 0,11 / 0,12 s |
+| 7 j | Grafana, 20 lecteurs | 1,95 / 2,45 s (2,61) | **0,78 / 1,23 s** (1,29) |
+| 30 j | direct : pire panneau p95 | 0,404 s (quantiles) | 0,092 s (Confirmed drift) |
+| 30 j | Grafana, 1 lecteur | 0,56 / 0,59 s | 0,13 / 0,16 s |
+| 30 j | Grafana, 20 lecteurs | 7,21 / **8,79 s** (9,11) | 1,29 / **1,92 s** (2,20) |
+
+- Sous 20 lecteurs, à 30 jours, les requêtes de panneau dont le p95 dépasse 3 s passent de 3 (les trois quantiles) à
+  **0**. À 7 jours, il y en a 0 dans les deux essais. Aucune erreur ni aucun timeout, et les deux essais sont `passed`.
+- À 30 jours sous 20 lecteurs, le pire panneau du drift est désormais « Windows with a confirmed drift » (1,88 s au
+  p95). C'est un panneau de résultats, pas de captures. Pic CPU d'InfluxDB : 1396 % avant, 711 % après. La phase à 20
+  lecteurs prend 48,0 s avant et 29,4 s après, pour le même nombre de requêtes.
+
+**Sonde, même session** (`bench_quantiles_l1.json`, InfluxDB en direct, 20 panneaux en même temps) :
+
+| Variante | 7 j : 1 seul p50 | 7 j : 20 simultanés p50 (max) | 30 j : 1 seul p50 | 30 j : 20 simultanés p50 (max) |
+|---|---|---|---|---|
+| captures brutes (avant) | 0,128 s | 1,38 s (1,45) | 0,482 s | 6,85 s (7,01) |
+| pré-agrégé (après) | 0,033 s | 0,40 s (0,44) | 0,036 s | 0,48 s (0,51) |
+
+Le gain ne vient donc pas de l'arrêt de SC-04 : dans les mêmes minutes, l'ancien panneau met encore 6,85 s à 30 jours
+sous 20 requêtes simultanées. Le nouveau ne dépend presque plus de la plage (0,40 à 0,48 s). Ce qui reste, c'est
+surtout la lecture brute des dernières 24 h, la même à 7 et à 30 jours.
+
+### Exactitude
+
+Comparaison sur 48 h de `model003` / `f00` : la médiane est identique entre les heures pré-agrégées (exactes) et la
+voie brute (t-digest). Le p10 et le p90 diffèrent d'au plus 0,073 et 0,050, sur une variable de loi normale centrée
+réduite. C'est l'écart entre t-digest et quantile exact sur 150 lignes : les heures pré-agrégées sont désormais les
+plus exactes. Les deux voies ne se chevauchent jamais, puisque la partie brute commence à la fin de la dernière heure
+agrégée.
+
+### Coût de l'écriture et cardinalité ajoutée
+
+| Mesure | Valeur |
+|---|---|
+| Points écrits | **16 par heure et par modèle** (un par variable numérique ; les 4 catégorielles sont écartées), 4 champs chacun |
+| Rattrapage de 30 jours, 10 modèles | 7200 heures, 115 200 points, 7200 requêtes, 1 080 000 lignes relues, 130,1 s |
+| Coût par heure et par modèle | **18,1 ms** : relecture 9,7 ms, calcul pandas 2,9 ms, écriture 5,4 ms |
+| Recalcul de 24 h d'un modèle (un passage de la tâche) | **0,43 s** au p50, 0,49 s au p95, 0,57 s au max |
+| Séries d'index ajoutées | **16 par modèle capturé**, 160 ici (bucket : 42 770 séries, contre 42 610 avant) |
+| Séries par champ | 64 par modèle capturé, 640 ici (contre 930 par modèle pour `pulsar_results`) |
+| Volume lu par le panneau | 1 point par heure et par quantile au lieu de 150 lignes brutes ; à 30 jours, 720 points par quantile |
+
+Pour 300 modèles capturés, il faudrait compter 4800 séries d'index de plus, soit +11 % par rapport aux 42 300 de
+`pulsar_results`. Le recalcul coûterait 300 × 0,43 s, soit environ 2 min de travail par passage de 6 h, réparties sur
+les tâches des modèles.
+
+### Ce qui n'est pas fait
+
+- **Pas de rattrapage automatique de l'historique** : un modèle capturé avant la tâche montre un trou au-delà des
+  dernières 24 h, tant que `--once --quantile-hours 720` n'a pas été lancé.
+- **Retard au-delà de `--quantile-hours`** : une ligne arrivée plus de 24 h après son heure n'est recomptée qu'avec
+  une valeur plus grande de ce paramètre.
+- **Mesure sur 10 modèles capturés, en local, pas sur aws-db** : mêmes réserves qu'en section 9. `before-l1`
+  partageait le poste avec SC-04, d'où la sonde de même session.
+- `pulsar_feature_quantiles` n'est pas encore décrite dans `pulsar_data_collection`. La démonstration l'écrit par
+  `write_stats_many`, sans modifier ce paquet.
