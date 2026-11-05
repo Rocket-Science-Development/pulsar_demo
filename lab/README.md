@@ -69,6 +69,11 @@ LAB_DRY=1 python -m lab.harness LP-02       # short dry run (reduced sizes); LAB
 python -m lab.harness LP-02                 # full run
 ```
 
+SC-04 (degraded network) needs its own InfluxDB 2.6.1 and a Toxiproxy 2.x container on one Docker network, the
+InfluxDB env file in `LAB_PLATFORM_INFLUX_ENV`, and `LAB_TOXIPROXY_URL` / `LAB_TOXI_PROXY_URL` / `LAB_TOXI_UPSTREAM`
+(see the docstring of `tests/sc_04.py`). Run it once per write profile (`LAB_PROFILE=default` and `tuned`, with
+`LAB_RUN_TAG`). Report: `rapports/rapport_sc04_reseau_degrade.md`.
+
 Each run writes `results/<ID>.json`, which overwrites the previous result of that test. Copy the night's files away
 before a local dry run. Datasets are read from `C:/dev/pulsar-ml/data/lab/` (`/data/lab` on AWS), outside the
 repositories. Most ML tests need their dataset, and the LLM tests need Ollama or a GPU.
