@@ -45,8 +45,14 @@ to change before any shared use).
   `genai_agent/campaign.py`); `--probe-rows` adds the counterfactual probe results of `genai_agent/probe_agent.py`.
 - `analysis_job.py` is the periodic analysis of a live model: every `--every` minutes it reads the window that just
   closed and writes its results (`--once` for a single run). It also recomputes the hourly quantiles of the last
-  `--quantile-hours` closed hours (default 24, so that late rows count; rewriting an hour overwrites it). For a model
-  already captured before the job, backfill once with `--once --quantile-hours 720`.
+  `--quantile-hours` closed hours (default 24, so that late rows count; rewriting an hour overwrites it), then
+  backfills the older ones: over the last `--backfill-days` (default 30) it finds, in one grouped Flux query, the closed
+  hours that have captures but no aggregate, or fewer aggregated values than captured ones (rows that arrived after the
+  hour was aggregated), and aggregates the oldest `--backfill-max-hours` of them (default 168 per model and run), in
+  reads of at most 24 hours. The history thus fills up over a few runs, and a rerun on complete hours writes nothing.
+  The hour being captured is never aggregated. For a model already captured before the job, fill the history at once
+  with `--backfill-only` (no analyses, no reference needed; `--backfill-days 365` for a longer history, `--models
+  a:1.0,b:2.1` for several models found in the same query).
 - `build_dashboards.py` regenerates the dashboards (`grafana/dashboards/*.json`) from their Python description; edit
   it rather than the JSON, then restart Grafana or wait for the provisioning to reload.
 
@@ -65,7 +71,16 @@ to change before any shared use).
   at 20,000 models, 0.1 s now). The drift feature selector lists numeric features only. The hourly quantile band
   read the raw captures (quantiles are not pushed down to storage in InfluxDB 2.6): about 9 s at 30 days with 20
   viewers. It now reads the hours pre-aggregated by the analysis job (`pulsar_feature_quantiles`); only the hours after
-  the last aggregated one (24 at most) are computed from the raw captures, and older hours never aggregated show as a
-  gap. With 20 viewers at 30 days, the band now answers in 0.92 s at p95 (8.51 s before), and the whole drift
-  dashboard in 1.92 s (8.79 s before).
-- Tests of the aggregation: `python -m unittest discover -s tests -v` (from this folder).
+  the last aggregated one (24 at most) are computed from the raw captures. With 20 viewers at 30 days, the band now
+  answers in 0.92 s at p95 (8.51 s before), and the whole drift dashboard in 1.92 s (8.79 s before). Older hours never
+  aggregated showed as a gap; the job now backfills them (the panel query is unchanged). Measured on a local InfluxDB
+  2.6.1 with 300 models x 20 numeric features x 30 days, 12 rows per hour (52 million raw values), the first 10 days
+  never aggregated and 2 % of the other hours missing (74,700 model-hours): finding the gaps takes 7.8 s for the 300
+  models in one query (13 s with one query per model, 43 ms each), 1.3 s for 50 models, 4.3 s for 300 models over 7
+  days. Filling them costs about 20 ms per model-hour (read 5, quantiles 5, write 9 to 28: one write request per
+  hour), so 6.6 s per model for a run capped at 168 hours, and about 40 min for the whole history of the 300 models
+  at once. A rerun finds no gap and writes nothing; the backfilled values equal numpy's on the raw rows, and the band
+  then shows the 720 hours of the month.
+- Tests of the aggregation and the backfill: `python -m unittest discover -s tests -v` (from this folder); with
+  `PULSAR_TEST_INFLUX_URL` and `PULSAR_TEST_INFLUX_TOKEN` set, one test also runs against a real InfluxDB 2 (it writes
+  a model of its own and deletes it).

@@ -154,18 +154,25 @@ def hourly_quantiles(frame: pd.DataFrame, features: list, time_column: str = "pr
         return []
     times = pd.to_datetime(frame[time_column], utc=True)
     hours = times.dt.floor("h")
+    values = frame[numeric].to_numpy(dtype=float)
+    values[~np.isfinite(values)] = np.nan
+    keys = hours.to_numpy()
+    order = np.argsort(keys, kind="stable")
+    keys, values = keys[order], values[order]
+    starts = np.flatnonzero(np.r_[True, keys[1:] != keys[:-1]])
     out = []
-    for hour, chunk in frame[numeric].groupby(hours.to_numpy(), sort=True):
-        end = pd.Timestamp(hour)
+    for i, first in enumerate(starts):  # one hour at a time, every feature at once (same result as np.quantile)
+        chunk = values[first: starts[i + 1] if i + 1 < len(starts) else len(values)]
+        counts = np.isfinite(chunk).sum(axis=0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)  # a feature without value in this hour: no point
+            q = np.nanquantile(chunk, list(QUANTILES.values()), axis=0)
+        end = pd.Timestamp(keys[first])
         end = (end.tz_localize("UTC") if end.tzinfo is None else end).to_pydatetime() + timedelta(hours=1)
-        for feature in numeric:
-            values = chunk[feature].dropna().to_numpy(dtype=float)
-            values = values[np.isfinite(values)]
-            if not len(values):
-                continue
-            p10, median, p90 = np.quantile(values, list(QUANTILES.values()))
-            out.append((end, feature, {"p10": float(p10), "median": float(median), "p90": float(p90),
-                                                       "n": float(len(values))}))
+        for j, feature in enumerate(numeric):
+            if counts[j]:
+                out.append((end, feature, {"p10": float(q[0, j]), "median": float(q[1, j]), "p90": float(q[2, j]),
+                                           "n": float(counts[j])}))
     return out
 
 

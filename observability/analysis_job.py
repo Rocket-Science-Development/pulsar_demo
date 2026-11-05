@@ -63,8 +63,17 @@ def _flux_string(value) -> str:
     return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def _or(terms: list) -> str:
+    """Disjunction as a balanced tree: Flux refuses a long flat chain of `or` ("Program is nested too deep" at 300
+    models), and a balanced one stays a predicate pushed down to storage, unlike `contains()`"""
+    if len(terms) == 1:
+        return terms[0]
+    half = len(terms) // 2
+    return f"({_or(terms[:half])} or {_or(terms[half:])})"
+
+
 def _any(column: str, values) -> str:
-    return "(" + " or ".join(f"r.{column} == {_flux_string(v)}" for v in values) + ")"
+    return "(" + _or([f"r.{column} == {_flux_string(v)}" for v in values]) + ")"
 
 
 def read(client, conn, model: str, version: str, start: datetime, stop: datetime, fields: list = None) -> pd.DataFrame:
@@ -113,10 +122,10 @@ def aggregate_quantiles(client, conn, sink, model: str, version: str, start: dat
 def gaps_flux(bucket: str, models: list, features: list, start: datetime, stop: datetime) -> str:
     """One query for every model and feature: per model and closed hour of [start, stop), the count of the raw values
     of the features (result "raw") and the sum of the `n` of their aggregates (result "agg"), both stamped at the start
-    of the window. The raw counts are pushed down to storage (aggregateWindow count per series), then summed per
-    model: the answer is one row per model and hour, whatever the number of features."""
+    of the window. Both sides are first reduced in storage, per series and hour (aggregateWindow count / sum are
+    pushed down), then summed per model: the answer is one row per model and hour, whatever the number of features."""
     by_name = _any("_measurement", [captures(m, v) for m, v in models])
-    pairs = " or ".join(f"(r.model_id == {_flux_string(m)} and r.model_version == {_flux_string(v)})" for m, v in models)
+    pairs = _or([f"(r.model_id == {_flux_string(m)} and r.model_version == {_flux_string(v)})" for m, v in models])
     return f"""
 from(bucket: {_flux_string(bucket)})
   |> range(start: {_flux_time(start)}, stop: {_flux_time(stop)})
@@ -128,8 +137,9 @@ from(bucket: {_flux_string(bucket)})
   |> yield(name: "raw")
 from(bucket: {_flux_string(bucket)})
   |> range(start: {_flux_time(start + HOUR)}, stop: {_flux_time(stop + HOUR)})
-  |> filter(fn: (r) => r._measurement == "{QUANTILE_MEASUREMENT}" and r._field == "n" and ({pairs})
+  |> filter(fn: (r) => r._measurement == "{QUANTILE_MEASUREMENT}" and r._field == "n" and {pairs}
                        and {_any("feature_name", features)})
+  |> aggregateWindow(every: 1h, fn: sum, timeSrc: "_start", createEmpty: false)
   |> group(columns: ["model_id", "model_version"])
   |> aggregateWindow(every: 1h, fn: sum, timeSrc: "_start", createEmpty: false)
   |> keep(columns: ["model_id", "model_version", "_time", "_value"])

@@ -120,6 +120,16 @@ class FindQuantileGaps(unittest.TestCase):
         gaps = job.find_quantile_gaps(FakeClient(tables), CONN, [("a", "1.0"), ("b", "2")], ["income"], at(0), at(3))
         self.assertEqual(gaps, {("a", "1.0"): [at(2)], ("b", "2"): [at(1)]})
 
+    def test_disjunctions_stay_shallow_at_300_models(self):
+        query = job.gaps_flux("monitoring", [(f"m{i}", "1.0") for i in range(300)], [f"f{j}" for j in range(20)],
+                              at(0), at(1))
+        depth = deepest = 0
+        for char in query:
+            depth += {"(": 1, ")": -1}.get(char, 0)
+            deepest = max(deepest, depth)
+        self.assertLess(deepest, 20)  # a flat chain of 300 `or` is refused by Flux: "Program is nested too deep"
+        self.assertNotIn("contains(", query)  # not pushed down to storage in InfluxDB 2.6
+
     def test_quotes_are_escaped(self):
         query = job.gaps_flux("monitoring", [('we"ird', "1")], ["x"], at(0), at(1))
         self.assertIn('r.model_id == "we\\"ird"', query)

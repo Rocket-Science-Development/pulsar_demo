@@ -68,6 +68,17 @@ class HourlyQuantiles(unittest.TestCase):
         rows = hourly_quantiles(data, ["income", "age"])
         self.assertEqual([(r[1], r[2]["n"]) for r in rows], [("income", 50.0), ("age", 49.0), ("age", 50.0)])
 
+    def test_same_values_as_numpy_per_feature_with_infinities_and_gaps(self):
+        data = frame(hours=4).sample(frac=1, random_state=3)
+        data.iloc[::5, data.columns.get_loc("income")] = np.inf
+        data.iloc[::7, data.columns.get_loc("age")] = np.nan
+        hours = data["pred_timestamp"].dt.floor("h")
+        for end, feature, fields in hourly_quantiles(data, ["income", "age"]):
+            values = data.loc[hours == pd.Timestamp(end) - pd.Timedelta(hours=1), feature].to_numpy(dtype=float)
+            values = values[np.isfinite(values)]
+            self.assertEqual([fields["p10"], fields["median"], fields["p90"], fields["n"]],
+                             [*np.quantile(values, [0.1, 0.5, 0.9]).tolist(), float(len(values))])
+
     def test_empty_frame(self):
         self.assertEqual(hourly_quantiles(pd.DataFrame(), ["income"]), [])
 
