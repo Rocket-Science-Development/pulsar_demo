@@ -1,0 +1,911 @@
+{
+ "condition": "granite_t15",
+ "model": "granite3.3:2b",
+ "temperature": 1.5,
+ "repeats": 3,
+ "max_tokens": 48,
+ "workers": 2,
+ "elapsed_s": 137.6,
+ "answers": [
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.6797977
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9477403
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9544911
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "13।",
+   "normalized": "13",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9308442
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "67000",
+   "normalized": "67000",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.8976706
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Oui",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.5152285
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Pacific",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8045932
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9086813999
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "1369",
+   "normalized": "1369",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8055214
+  },
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5636523
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "La nieuve loyer mensuelle est égale à $130 $. \nExplication: Avant d'augmentation, le loyer était de $1250$. Au compteur d'un t",
+   "normalized": "130",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 9.6526959
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.955113
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Laapjiat",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 1.5315783
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Oui🇺₰États-Unis & Canada are separated by the International border, which is physically crossing both Canadian and American territories (mainly in Québec).",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 9.3874552
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Charlottetown",
+   "normalized": "Charlottetown",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0624361
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4168112
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.5793031
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "automne",
+   "normalized": "automne",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.4685876
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Ontario.",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.5120768
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "45%",
+   "normalized": "45",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.4926725
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Winnipeg",
+   "normalized": "Winnipeg",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.7894961
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0312453
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3995726
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Total s'éleve à 18,240 $$, soit un montant par trimestre d'environ 730,9 $",
+   "normalized": "18240",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 8.4418032001
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1077484
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "366",
+   "normalized": "366",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4196109
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "Nunavut (but note that all three territorial capitals are Yellowknife)",
+   "normalized": "Nunavut",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 3.9985498
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2497863
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "10",
+   "normalized": "10",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3817258
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 0,
+   "answer": "2520",
+   "normalized": "2520",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.8279346
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Hiver.",
+   "normalized": "hiver",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.7010802
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "25440",
+   "normalized": "25440",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3221906
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "811",
+   "normalized": "811",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2019617
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Yes, French is one of two official languages at the federal level in Canada (along with English). In practice, many tasks and options are available in both languages throughout the country through an act known as the Official Languages Act of",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 11.5380978
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "10",
+   "normalized": "10",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3457302
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.226509
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3259404
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Non",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2331778
+  },
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 0.8933464
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1",
+   "normalized": "1",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0007375
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "360 $",
+   "normalized": "360",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0142738
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Queville en Île du Prince-Enediard.",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 4.0965658
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2771398
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Yukon",
+   "normalized": "Yukon",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.2189245
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Winnipeg",
+   "normalized": "Winnipeg",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.1583928
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9276625
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8386739
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Colombie-Britannique (Canada) ; Coqué, Ontario ont chacun pris 4ème place avec moins de superficie que la CCB.",
+   "normalized": "Colombie-Britannique",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 14.7447435
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "1080",
+   "normalized": "1080",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.9393179
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Non",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2330614
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2396298
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "7800",
+   "normalized": "7800",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.1052175
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1614296
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Pacific",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2214798999
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "50%",
+   "normalized": "50",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4448258
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "There is no capital city for Nunavut, as it doesn't have one in the traditional sense, being an administrative division of Canada instead, consisting of territories with primarily isolated Inuit populations and minimal permanently",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 10.7465804
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Non.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.1449528
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "13. (- dont 2 satellites intérimaires)",
+   "normalized": "13",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.6723174
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0739329
+  },
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 1,
+   "answer": "No, followed by an explanation: A common year is considered a non-leap (or rather, a not extra \"normal\") year if it is divisible by four. However, century years are exceptions.\nSpecifically,",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 9.5567459
+  },
+  {
+   "question_id": "y01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Oui.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2138092
+  },
+  {
+   "question_id": "l09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Yukon",
+   "normalized": "Yukon",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.4070107
+  },
+  {
+   "question_id": "y08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Non",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2780376
+  },
+  {
+   "question_id": "y02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 0.987907
+  },
+  {
+   "question_id": "l03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "CQFN - Iqaluit",
+   "normalized": "Iqaluit",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9210426
+  },
+  {
+   "question_id": "l04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Whitehorse",
+   "normalized": "Whitehorse",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5051093
+  },
+  {
+   "question_id": "y03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Non, le Nunavut n’est pas une province au Québec ou dans un autre pays à la manière traditionnelle. C’est une territaire autonome incommence",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 11.3479742
+  },
+  {
+   "question_id": "y06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Non, pas réellement. Bien qu'il y ait la rive canadienne (ou côte est), aucune frontière physique ou administrative terrestre distincte avec les Ét",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 11.5384838
+  },
+  {
+   "question_id": "n09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "42%",
+   "normalized": "42",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8505411
+  },
+  {
+   "question_id": "l07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "colombie-Brittannique",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 4.0550242
+  },
+  {
+   "question_id": "n05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "860",
+   "normalized": "860",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.9609646
+  },
+  {
+   "question_id": "y05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0691238
+  },
+  {
+   "question_id": "y07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.6078404
+  },
+  {
+   "question_id": "l08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Pacific",
+   "normalized": "Pacific",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5966335
+  },
+  {
+   "question_id": "n07",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1867",
+   "normalized": "1867",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.7626335
+  },
+  {
+   "question_id": "y09",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Yes.",
+   "normalized": "yes",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.5230473
+  },
+  {
+   "question_id": "l01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Ottawa.",
+   "normalized": "Ottawa",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.9704501
+  },
+  {
+   "question_id": "l06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Ontario",
+   "normalized": "Ontario",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.0952071
+  },
+  {
+   "question_id": "n06",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "To find out how much the program pays, perform this calculation: \n\nFirst calculate what part of this amount 15%, excluding 40000:\n   (52000 - 4000",
+   "normalized": "15",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 8.5794828
+  },
+  {
+   "question_id": "y04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 2.3538923
+  },
+  {
+   "question_id": "n02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "25.2 thousand dollars; 180 dollars/month * 18 months = 3,240 dollars; $3,240 thousands = $3,240,0",
+   "normalized": "25.2",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 7.565272
+  },
+  {
+   "question_id": "n10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "841",
+   "normalized": "841",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.3497847
+  },
+  {
+   "question_id": "n04",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Forty-four (including three oversea extrapolated territories).",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 3.3986999
+  },
+  {
+   "question_id": "l05",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Charlevoix. (though it's usually considered a town and not city that qualifies an official capital, in practice, people refer to \"Charlevoix\" as capital when referring to the region administrative seat). \n\n",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 9.0939039
+  },
+  {
+   "question_id": "n03",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Quatorze.\n(Fourteen)",
+   "normalized": null,
+   "answer_status": "unparsed",
+   "error": null,
+   "latency_s": 1.8031943
+  },
+  {
+   "question_id": "n08",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "466",
+   "normalized": "466",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.2275349
+  },
+  {
+   "question_id": "l10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "L'hIVER.\n[Exposition] Lire et comprendre un contexte oral ou rédaction, en tirer des informations notables à partir, répondre ensuite de manière co",
+   "normalized": "hiver",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 8.7428335
+  },
+  {
+   "question_id": "y10",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "No.",
+   "normalized": "no",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0012273
+  },
+  {
+   "question_id": "l02",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "Halifax",
+   "normalized": "Halifax",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.0788938
+  },
+  {
+   "question_id": "n01",
+   "variant": "original",
+   "repeat": 2,
+   "answer": "1086",
+   "normalized": "1086",
+   "answer_status": "ok",
+   "error": null,
+   "latency_s": 1.8303826
+  }
+ ]
+}
