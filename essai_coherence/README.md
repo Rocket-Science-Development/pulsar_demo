@@ -28,7 +28,7 @@ The questions are synthetic and public: no personal data, and the answers are ke
 pip install "pulsar-metrics @ git+https://github.com/Rocket-Science-Development/pulsar_metrics.git" \
             "pulsar-data-collection[genai] @ git+https://github.com/Rocket-Science-Development/pulsar_data_collection.git" scipy
 ollama pull llama3.2:3b && ollama pull granite3.3:2b && ollama pull granite-embedding:278m
-python campaign.py --campaign coherence-1 --workers 2      450 calls with the next line: under 10 min of LLM time on a 16-core CPU
+python campaign.py --campaign coherence-1 --workers 2      # 450 calls, under 10 min of LLM time on a 16-core CPU
 python analyze.py --campaign coherence-1 --embeddings granite-embedding:278m
 ```
 
