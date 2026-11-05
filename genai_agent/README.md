@@ -55,7 +55,7 @@ from(bucket: "monitoring")
 Ollama serves `OLLAMA_NUM_PARALLEL` requests at once (decoding slots). The compose file sets it explicitly to 4,
 with `OLLAMA_MAX_LOADED_MODELS=1` and a 4096 context. Left unset, Ollama picks 4 or 1 slots from the free memory. With
 1 slot, extra workers only queue: the agent stays near 50 runs/min and the latency grows. Keep the agent's worker pool
-(`--workers` of `campaign_s3s4.py`) equal to the number of slots: fewer workers leave slots idle, more workers only
+(`--workers` of the campaign scripts) equal to the number of slots: fewer workers leave slots idle, more workers only
 queue at the server.
 
 Measured on a T4 (15 GB), context 4096, temperature 0, workers = slots (lab SC-10, 2026-11-02). Runs/min, with the
@@ -130,15 +130,10 @@ expert before any real audit.
 
 ## Injection campaign S0 to S4
 
-`campaign_s3s4.py` injects known changes and `analyze_s3s4.py` checks that each detector sees its own and stays quiet
-otherwise. The agent now has a retrieval tool (`search_documents`, synthetic rules of the programs in French and
+The S0 to S4 campaign injects known changes and checks that each detector sees its own and stays quiet otherwise. Its
+scripts and raw runs are kept with the other validation experiments, outside this repository; the results are below. The agent now has a retrieval tool (`search_documents`, synthetic rules of the programs in French and
 English); every run is scored in-process (injection, faithfulness of the answer to the retrieved passages, personal
 information by role) and its trajectory is checked against the versioned rules of `rules/permit_agent.yaml` (LTLf).
-
-```bash
-python campaign_s3s4.py --campaign my-campaign --out results/s3s4 --workers 4
-python analyze_s3s4.py --results results/s3s4 --out results/s3s4/analysis.md --campaign my-campaign
-```
 
 Results on a T4 GPU (reference 150 runs, windows of 60; p < 0.05 counts as a detection):
 
